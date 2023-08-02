@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <glm/glm.hpp>
+#include <vector>
 
 //core
 #include "../include/Core/Mesh.hpp"
@@ -32,7 +33,7 @@ char *FragmentShader = "#version 330 core\n"
 
 int main()
 {
-    float vertices[] =
+    std::vector<float> vertices =
     {
         -1.0f, -1.0f,  1.0f,
         1.0f, -1.0f,  1.0f,
@@ -44,7 +45,7 @@ int main()
         -1.0f,  1.0f, -1.0f
     };
 
-    unsigned int indices[] =
+    std::vector<unsigned int> indices =
     {
         0, 1, 2,
 	    2, 3, 0,
@@ -71,7 +72,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     Shader shadercube = Shader(VertexShader, FragmentShader);
-    Mesh cube = Mesh(vertices, indices, sizeof(vertices) / sizeof(vertices[0]), sizeof(indices) / sizeof(indices[0]));
+    Mesh cube = Mesh(vertices, indices, glm::vec3(0,0,0), glm::vec3(0,0,0), 1);
     Camera cam = Camera(glm::vec3(0,0,5), glm::vec3(0.0f), glm::vec3(0,0,1), 45);
 
     while(!glfwWindowShouldClose(window))
@@ -81,10 +82,11 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shadercube.shader);
-        shadercube.setMat4("model", glm::mat4(1.0f));
+        shadercube.setMat4("model", cube.GetModelMat());
         shadercube.setMat4("view", cam.GetViewMat());
         shadercube.setMat4("proj", cam.GetProjMat(SCRWIDTH, SCRHEIGHT, 0.001f, 100.0f));
         cube.DrawMesh();
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();   

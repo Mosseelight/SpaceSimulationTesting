@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <vector>
 
 class Mesh
 {
@@ -9,17 +10,14 @@ private:
 
 public:
 
-    float *vertexes;
-    unsigned int vertexCount;
-    unsigned int *indices;
-    unsigned int indiceCount;
-    glm::vec3 positon, rotation;
+    std::vector<float> vertexes;
+    std::vector<unsigned int> indices;
+    glm::vec3 position, rotation;
     float scale;
-    glm::mat4 model;
 
-    Mesh(float vertexs[], unsigned int indices[], unsigned int vertexCount, unsigned int indiceCount);
+    Mesh(std::vector<float> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale);
     ~Mesh();
     void BufferGens();
     void DrawMesh();
-
+    glm::mat4 GetModelMat();
 };
