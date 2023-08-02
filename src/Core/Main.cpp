@@ -1,5 +1,8 @@
 #include "../include/glad/glad.h"
 #include <GLFW/glfw3.h>
+#include "../include/imgui/imgui.h"
+#include "../include/backends/imgui_impl_glfw.h"
+#include "../include/backends/imgui_impl_opengl3.h"
 #include <iostream>
 #include <glm/glm.hpp>
 #include <vector>
@@ -57,12 +60,25 @@ int main()
     gladLoadGL();
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);          
+    ImGui_ImplOpenGL3_Init();
+
     Shader shadercube = Shader(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag"));
     Mesh cube = Mesh(vertices, indices, glm::vec3(0,0,0), glm::vec3(0,0,0), 1);
     Camera cam = Camera(glm::vec3(0,0,5), glm::vec3(0.0f), glm::vec3(0,0,1), 45);
 
     while(!glfwWindowShouldClose(window))
     {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::ShowDemoWindow();
+
         glEnable(GL_DEPTH_TEST);
         glClearColor(0.0f, 0.54f, 0.54f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -73,11 +89,15 @@ int main()
         shadercube.setMat4("proj", cam.GetProjMat(SCRWIDTH, SCRHEIGHT, 0.001f, 100.0f));
         cube.DrawMesh();
 
-
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
         glfwPollEvents();   
     }
 
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     glfwTerminate();
     return 0;
 }
