@@ -1,18 +1,26 @@
 #include "../include/glad/glad.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <glm/glm.hpp>
 
 //core
 #include "../include/Core/Mesh.hpp"
 #include "../include/Core/Shader.hpp"
+#include "../include/Core/Camera.hpp"
+
+const int SCRWIDTH = 1920;
+const int SCRHEIGHT = 1080;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 char *VertexShader = "#version 330 core\n"
 "layout (location = 0) in vec3 aPosition;\n"
+"uniform mat4 model;\n"
+"uniform mat4 view;\n"
+"uniform mat4 proj;\n"
 "void main()\n"
 "{\n"
-"    gl_Position = vec4(aPosition, 1.0);\n"
+"    gl_Position = proj * view * model * vec4(aPosition, 1.0);\n"
 "}\0";
 
 char *FragmentShader = "#version 330 core\n"
@@ -26,14 +34,14 @@ int main()
 {
     float vertices[] =
     {
-        -4.0f, -4.0f,  4.0f,
-        4.0f, -4.0f,  4.0f,
-        4.0f,  4.0f,  4.0f,
-        -4.0f,  4.0f,  4.0f,
-        -4.0f, -4.0f, -4.0f,
-        4.0f, -4.0f, -4.0f,
-        4.0f,  4.0f, -4.0f,
-        -4.0f,  4.0f, -4.0f
+        -1.0f, -1.0f,  1.0f,
+        1.0f, -1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f
     };
 
     unsigned int indices[] =
@@ -63,7 +71,8 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     Shader shadercube = Shader(VertexShader, FragmentShader);
-    Mesh cube = Mesh(vertices, indices);
+    Mesh cube = Mesh(vertices, indices, sizeof(vertices) / sizeof(vertices[0]), sizeof(indices) / sizeof(indices[0]));
+    Camera cam = Camera(glm::vec3(0,0,5), glm::vec3(0.0f), glm::vec3(0,0,1), 45);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -72,6 +81,9 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shadercube.shader);
+        shadercube.setMat4("model", glm::mat4(1.0f));
+        shadercube.setMat4("view", cam.GetViewMat());
+        shadercube.setMat4("proj", cam.GetProjMat(SCRWIDTH, SCRHEIGHT, 0.001f, 100.0f));
         cube.DrawMesh();
 
         glfwSwapBuffers(window);
