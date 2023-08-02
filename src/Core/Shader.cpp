@@ -3,13 +3,16 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <typeinfo>
+#include <cstring>
 
-Shader::Shader(char *vertCode, char *fragCode)
+Shader::Shader(std::string vertCode, std::string fragCode)
 {
+    const char *vertCodearr = vertCode.c_str();
+    const char *fragCodearr = fragCode.c_str();
     int success;
     char infoLog[512];
     vertShaderU = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertShaderU, 1, &vertCode, NULL);
+    glShaderSource(vertShaderU, 1, &vertCodearr, NULL);
     glCompileShader(vertShaderU);
     glGetShaderiv(vertShaderU, GL_COMPILE_STATUS, &success);
     if(!success)
@@ -20,7 +23,7 @@ Shader::Shader(char *vertCode, char *fragCode)
     }
 
     fragShaderU = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragShaderU, 1, &fragCode, NULL);
+    glShaderSource(fragShaderU, 1, &fragCodearr, NULL);
     glCompileShader(fragShaderU);
     glGetShaderiv(fragShaderU, GL_COMPILE_STATUS, &success);
     if(!success)

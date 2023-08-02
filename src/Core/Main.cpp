@@ -8,28 +8,14 @@
 #include "../include/Core/Mesh.hpp"
 #include "../include/Core/Shader.hpp"
 #include "../include/Core/Camera.hpp"
+#include "../include/Core/ResUtil.hpp"
 
 const int SCRWIDTH = 1920;
 const int SCRHEIGHT = 1080;
 
+const std::string shaderLoc = "res/Shaders";
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
-char *VertexShader = "#version 330 core\n"
-"layout (location = 0) in vec3 aPosition;\n"
-"uniform mat4 model;\n"
-"uniform mat4 view;\n"
-"uniform mat4 proj;\n"
-"void main()\n"
-"{\n"
-"    gl_Position = proj * view * model * vec4(aPosition, 1.0);\n"
-"}\0";
-
-char *FragmentShader = "#version 330 core\n"
-"out vec4 out_color;\n"
-"void main()\n"
-"{\n"
-"    out_color = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
-"}\0";
 
 int main()
 {
@@ -71,7 +57,7 @@ int main()
     gladLoadGL();
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    Shader shadercube = Shader(VertexShader, FragmentShader);
+    Shader shadercube = Shader(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag"));
     Mesh cube = Mesh(vertices, indices, glm::vec3(0,0,0), glm::vec3(0,0,0), 1);
     Camera cam = Camera(glm::vec3(0,0,5), glm::vec3(0.0f), glm::vec3(0,0,1), 45);
 

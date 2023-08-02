@@ -11,7 +11,7 @@ private:
 public:
 
     unsigned int shader;
-    Shader(char *vertCode, char *fragCode);
+    Shader(std::string vertCode, std::string fragCode);
     ~Shader();
     void setBool(std::string name, bool value);
     void setInt(std::string name, int value);
