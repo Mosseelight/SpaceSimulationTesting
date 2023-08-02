@@ -6,6 +6,7 @@ Mesh::Mesh(float vertexes[], unsigned int indices[])
 {
     this->vertexes = vertexes;
     this->indices = indices;
+    BufferGens();
 }
 
 Mesh::~Mesh()
