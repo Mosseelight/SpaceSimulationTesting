@@ -14,6 +14,8 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
 LIBS = -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 
+RES = $(SRC_DIRS)/res
+
 # String substitution (suffix version without %).
 # As an example, ./build/hello.cpp.o turns into ./build/hello.cpp.d
 DEPS := $(OBJS:.o=.d)
@@ -39,6 +41,7 @@ $(BUILD_DIR)/%.c.o: %.c
 # Build step for C++ sourceS
 $(BUILD_DIR)/%.cpp.o: %.cpp
 	mkdir -p $(dir $@)
+	cp -r $(RES) $(BUILD_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBS) $(INCLUDE) -g -O3 -c $< -o $@ 
 
 
