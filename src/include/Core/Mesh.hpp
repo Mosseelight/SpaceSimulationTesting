@@ -4,8 +4,11 @@
 class Mesh
 {
 private:
+
     unsigned int vao, vbo, ebo;
+
 public:
+
     float *vertexes;
     unsigned int *indices;
     glm::vec3 positon, rotation;
@@ -16,4 +19,5 @@ public:
     ~Mesh();
     void BufferGens();
     void DrawMesh();
+    
 };
