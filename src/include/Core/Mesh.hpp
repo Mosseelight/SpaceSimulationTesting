@@ -24,5 +24,6 @@ public:
 
 
 Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation);
+Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation);
 
 

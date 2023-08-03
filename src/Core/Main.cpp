@@ -53,9 +53,9 @@ int main()
 
 
     shadercube = new Shader(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag"));
-    Mesh mesh = CreateCubeMesh(glm::vec3(0,0,0), glm::vec3(0,0,0));
+    Mesh mesh = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0));
     cube = &mesh;
-    cam = new Camera(glm::vec3(0,0,5), glm::vec3(0.0f), glm::vec3(0,0,1), 45);
+    cam = new Camera(glm::vec3(0,0,5), glm::vec3(0.0f), glm::vec3(0,0,1), 35);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -83,6 +83,7 @@ void Update(GLFWwindow* window)
         
         ImGui::Begin("SpaceTesting");
         ImGui::DragFloat3("Cube Position", glm::value_ptr(cube->position), 0.01f, -5.0f, 5.0f);
+        ImGui::DragFloat3("Cube Rotation", glm::value_ptr(cube->rotation), 0.01f, 360.0f, 0.0f);
     }
 
 
