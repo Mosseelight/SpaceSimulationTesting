@@ -5,6 +5,7 @@
 #include "../include/backends/imgui_impl_opengl3.h"
 #include <iostream>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <vector>
 
 //core
@@ -16,39 +17,14 @@
 const int SCRWIDTH = 1280;
 const int SCRHEIGHT = 720;
 bool DebugWindow = false;
+float deltaTime = 0.0f;
+float lastTime = 0.0f;
 
 const std::string shaderLoc = "res/Shaders";
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void Update(GLFWwindow* window);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-std::vector<float> vertices =
-{
-    -1.0f, -1.0f,  1.0f,
-    1.0f, -1.0f,  1.0f,
-    1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f, -1.0f, -1.0f,
-    1.0f, -1.0f, -1.0f,
-    1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f
-};
-std::vector<unsigned int> indices =
-{
-    0, 1, 2,
-    2, 3, 0,
-    1, 5, 6,
-    6, 2, 1,
-    7, 6, 5,
-    5, 4, 7,
-    4, 0, 3,
-    3, 7, 4,
-    4, 5, 1,
-    1, 0, 4,
-    3, 2, 6,
-    6, 7, 3
-};
 
 Shader *shadercube;
 Mesh *cube;
@@ -76,9 +52,9 @@ int main()
     ImGui_ImplOpenGL3_Init();
 
 
-
     shadercube = new Shader(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag"));
-    cube = new Mesh(vertices, indices, glm::vec3(0,0,0), glm::vec3(0,0,0), 1);
+    Mesh mesh = CreateCubeMesh(glm::vec3(0,0,0), glm::vec3(0,0,0));
+    cube = &mesh;
     cam = new Camera(glm::vec3(0,0,5), glm::vec3(0.0f), glm::vec3(0,0,1), 45);
 
     while(!glfwWindowShouldClose(window))
@@ -95,6 +71,9 @@ int main()
 
 void Update(GLFWwindow* window)
 {
+    float currentTime = glfwGetTime();
+    deltaTime = currentTime - lastTime;
+    lastTime = currentTime;
     if(DebugWindow)
     {
         ImGui_ImplOpenGL3_NewFrame();
@@ -102,8 +81,8 @@ void Update(GLFWwindow* window)
         ImGui::NewFrame();
         
         
-        ImGui::ShowMetricsWindow();
-
+        ImGui::Begin("SpaceTesting");
+        ImGui::DragFloat3("Cube Position", glm::value_ptr(cube->position), 0.01f, -5.0f, 5.0f);
     }
 
 
@@ -120,6 +99,7 @@ void Update(GLFWwindow* window)
 
     if(DebugWindow)
     {
+        ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
