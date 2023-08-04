@@ -1,6 +1,11 @@
 #pragma once
-#include <string>
+#include "../glad/glad.h"
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <iostream>
+#include <typeinfo>
+#include <cstring>
+#include <string>
 
 class Shader
 {

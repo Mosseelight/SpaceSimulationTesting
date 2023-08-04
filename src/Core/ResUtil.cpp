@@ -1,5 +1,4 @@
 #include "../include/Core/ResUtil.hpp"
-#include <fstream> 
 
 std::string ReadFile(std::string location)
 {

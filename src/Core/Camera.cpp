@@ -1,5 +1,4 @@
 #include "../include/Core/Camera.hpp"
-#include <glm/gtc/matrix_transform.hpp>
 
 Camera::Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 target, float fov)
 {

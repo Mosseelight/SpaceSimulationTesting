@@ -93,6 +93,7 @@ void Update(GLFWwindow* window)
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.54f, 0.54f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 
     glUseProgram(shadercube->shader);
@@ -156,7 +157,7 @@ void ImguiMenu()
 
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
                 {
-                    ImGui::DragFloat3("Cube Position", glm::value_ptr(cube->position), 0.01f, -5.0f, 5.0f);
+                    ImGui::DragFloat3("Cube Position", glm::value_ptr(cube->position), 0.01f, -10.0f, 10.0f);
                     ImGui::DragFloat3("Cube Rotation", glm::value_ptr(cube->rotation), 0.01f, 360.0f, 0.0f);
                     ImGui::TreePop();
                 }

@@ -1,9 +1,4 @@
 #include "../include/Core/Mesh.hpp"
-#include "../include/glad/glad.h"
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 Mesh::Mesh(std::vector<float> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale)
 {

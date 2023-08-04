@@ -1,9 +1,4 @@
 #include "../include/Core/Shader.hpp"
-#include "../include/glad/glad.h"
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include <typeinfo>
-#include <cstring>
 
 Shader::Shader(std::string vertCode, std::string fragCode)
 {
