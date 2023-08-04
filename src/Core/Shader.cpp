@@ -1,9 +1,9 @@
 #include "../include/Core/Shader.hpp"
 
-Shader::Shader(std::string vertCode, std::string fragCode)
+Shader::Shader(ShaderLoc location)
 {
-    const char *vertCodearr = vertCode.c_str();
-    const char *fragCodearr = fragCode.c_str();
+    const char *vertCodearr = location.vertCode.c_str();
+    const char *fragCodearr = location.fragCode.c_str();
     int success;
     char infoLog[512];
     vertShaderU = glCreateShader(GL_VERTEX_SHADER);

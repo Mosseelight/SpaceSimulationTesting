@@ -1,7 +1,10 @@
 #pragma once
+#include "../glad/glad.h"
+#include <GLFW/glfw3.h>
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include <vector>
+#include <glm/glm.hpp>
 
 struct SpaceObject
 {
@@ -22,9 +25,13 @@ private:
 public:
 
     std::vector<SpaceObject> SpaceObjects;
+    std::vector<unsigned int> idList;
 
     Scene();
     ~Scene();
+
+    void AddSpaceObject(Mesh mesh, ShaderLoc location);
+    void DrawFull(unsigned int stepSize); // Will Draw every object 
 };
 
 

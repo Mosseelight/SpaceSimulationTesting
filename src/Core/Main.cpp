@@ -32,6 +32,8 @@ void buildVerticesFlat();
 Shader *shadercube;
 Mesh *cube;
 Camera *cam;
+Scene mainScene;
+unsigned int vertCount, indCount;
 
 int main()
 {
@@ -55,11 +57,29 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
-    shadercube = new Shader(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag"));
-    Mesh mesh = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 4);
-    cube = &mesh;
-    cube->BufferGens();
+    mainScene = Scene();
+    shadercube = new Shader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    Mesh mesh = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 0);
+    mesh.BufferGens();
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
     cam = new Camera(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0,0,1), 35);
+    for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
+    {
+        vertCount += mainScene.SpaceObjects[i].SO_mesh.vertexes.size();
+        indCount += mainScene.SpaceObjects[i].SO_mesh.indices.size();
+    }
 
     while(!glfwWindowShouldClose(window))
     {
@@ -67,7 +87,6 @@ int main()
     }
     
     delete cam;
-    delete shadercube;
     delete cube;
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -96,12 +115,11 @@ void Update(GLFWwindow* window)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-
     glUseProgram(shadercube->shader);
-    shadercube->setMat4("model", cube->GetModelMat());
+    shadercube->setMat4("model", glm::mat4(1.0f));
     shadercube->setMat4("view", cam->GetViewMat());
     shadercube->setMat4("proj", cam->GetProjMat(SCRWIDTH, SCRHEIGHT, 0.001f, 100.0f));
-    cube->DrawMesh();
+    mainScene.DrawFull(5);
 
     if(DebugWindow)
     {
@@ -151,15 +169,15 @@ void ImguiMenu()
 
         if (ImGui::TreeNode("Objects"))
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
             {
                 if (i == 0)
                     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
                 {
-                    ImGui::DragFloat3("Cube Position", glm::value_ptr(cube->position), 0.01f, -10.0f, 10.0f);
-                    ImGui::DragFloat3("Cube Rotation", glm::value_ptr(cube->rotation), 0.01f, 360.0f, 0.0f);
+                    ImGui::DragFloat3("Cube Position", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.position), 0.01f, -10.0f, 10.0f);
+                    ImGui::DragFloat3("Cube Rotation", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.rotation), 0.01f, 360.0f, 0.0f);
                     ImGui::TreePop();
                 }
             }
@@ -168,7 +186,7 @@ void ImguiMenu()
 
         ImGui::End();
     }
-
     ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1 / deltaTime));
-    ImGui::Text("%d verts, %d indices (%d tris)", cube->vertexes.size(), cube->indices.size(), cube->indices.size() / 3);
+    ImGui::Text("%d verts, %d indices (%d tris)", vertCount, indCount, indCount / 3);
+    ImGui::Text("Amount of SpaceObjs: (%d)", mainScene.SpaceObjects.size());
 }

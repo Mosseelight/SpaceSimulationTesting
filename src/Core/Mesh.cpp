@@ -11,7 +11,9 @@ Mesh::Mesh(std::vector<float> vertexes, std::vector<unsigned int> indices, glm::
 
 Mesh::~Mesh()
 {
-    
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
+    glDeleteVertexArrays(1, &vao);
 }
 
 void Mesh::BufferGens()

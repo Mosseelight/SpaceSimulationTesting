@@ -7,6 +7,16 @@
 #include <cstring>
 #include <string>
 
+struct ShaderLoc
+{
+    std::string vertCode;
+    std::string fragCode;
+
+    ShaderLoc(std::string vertloc, std::string fragloc) 
+        : vertCode(vertloc), fragCode(fragloc) {}
+    ~ShaderLoc() {}
+};
+
 class Shader
 {
 private:
@@ -16,7 +26,7 @@ private:
 public:
 
     unsigned int shader;
-    Shader(std::string vertCode, std::string fragCode);
+    Shader(ShaderLoc location);
     ~Shader();
     void setBool(std::string name, bool value);
     void setInt(std::string name, int value);
