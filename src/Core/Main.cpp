@@ -9,6 +9,7 @@
 #include <vector>
 
 //core
+#include "../include/Core/Scene.hpp"
 #include "../include/Core/Mesh.hpp"
 #include "../include/Core/Shader.hpp"
 #include "../include/Core/Camera.hpp"

@@ -1,3 +1,4 @@
+#pragma once
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include <vector>
