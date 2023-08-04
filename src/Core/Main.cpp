@@ -55,7 +55,8 @@ int main()
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
     shadercube = new Shader(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag"));
-    cube = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 4);
+    Mesh mesh = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 4);
+    cube = &mesh;
     cube->BufferGens();
     cam = new Camera(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0,0,1), 35);
 

@@ -144,7 +144,7 @@ Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation)
     return Mesh(vertices, indices, position, rotation, 1.0f);
 }
 
-Mesh *CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdivideNum)
+Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdivideNum)
 {
 
     float t = 0.52573111f;
@@ -230,6 +230,6 @@ Mesh *CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subd
         
     }
 
-    return new Mesh(vertices, indices, position, rotation, 1.0f);
+    return Mesh(vertices, indices, position, rotation, 1.0f);
 }
 
