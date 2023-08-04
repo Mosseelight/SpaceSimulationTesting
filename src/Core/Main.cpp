@@ -24,6 +24,7 @@ const std::string shaderLoc = "res/Shaders";
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void Update(GLFWwindow* window);
+void ImguiMenu();
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void buildVerticesFlat();
 
@@ -51,21 +52,21 @@ int main()
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);          
     ImGui_ImplOpenGL3_Init();
-
+    ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
     shadercube = new Shader(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag"));
-    Mesh mesh = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 4);
-    mesh.BufferGens();
-    std::cout << mesh.vertexes.size() / 3 << std::endl;
-
-    cube = &mesh;
+    cube = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 4);
+    cube->BufferGens();
     cam = new Camera(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0,0,1), 35);
 
     while(!glfwWindowShouldClose(window))
     {
         Update(window);
     }
-
+    
+    delete cam;
+    delete shadercube;
+    delete cube;
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -83,18 +84,14 @@ void Update(GLFWwindow* window)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        
-        
-        ImGui::Begin("SpaceTesting");
-        ImGui::DragFloat3("Cube Position", glm::value_ptr(cube->position), 0.01f, -5.0f, 5.0f);
-        ImGui::DragFloat3("Cube Rotation", glm::value_ptr(cube->rotation), 0.01f, 360.0f, 0.0f);
+
+        ImguiMenu();
     }
 
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.54f, 0.54f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 
     glUseProgram(shadercube->shader);
@@ -122,4 +119,53 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     if(key == GLFW_KEY_GRAVE_ACCENT && action == GLFW_PRESS)
         DebugWindow = !DebugWindow;
+}
+
+
+bool ShowSceneViewerMenu = false;
+void ImguiMenu()
+{
+    
+    ImGuiWindowFlags window_flags = 0;
+    window_flags |= ImGuiWindowFlags_NoTitleBar;
+    window_flags |= ImGuiWindowFlags_MenuBar;
+
+    ImGui::Begin("SpaceTesting", nullptr, window_flags);
+    if (ImGui::BeginMenuBar())
+    {
+        if (ImGui::BeginMenu("Menus"))
+        {
+            ImGui::MenuItem("Scene Viewer", NULL, &ShowSceneViewerMenu);
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+    }
+
+    if(ShowSceneViewerMenu)
+    {
+        ImGui::SetNextWindowSize(ImVec2(600,420), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Scene Viewer");
+
+        if (ImGui::TreeNode("Objects"))
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                if (i == 0)
+                    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+
+                if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
+                {
+                    ImGui::DragFloat3("Cube Position", glm::value_ptr(cube->position), 0.01f, -5.0f, 5.0f);
+                    ImGui::DragFloat3("Cube Rotation", glm::value_ptr(cube->rotation), 0.01f, 360.0f, 0.0f);
+                    ImGui::TreePop();
+                }
+            }
+            ImGui::TreePop();
+        }
+
+        ImGui::End();
+    }
+
+    ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1 / deltaTime));
+    ImGui::Text("%d verts, %d indices (%d tris)", cube->vertexes.size(), cube->indices.size(), cube->indices.size() / 3);
 }

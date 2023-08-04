@@ -27,6 +27,6 @@ public:
 
 Mesh Create2DTriangle(glm::vec3 position, glm::vec3 rotation);
 Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation);
-Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdivideNum);
+Mesh *CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdivideNum);
 
 

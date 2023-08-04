@@ -55,6 +55,45 @@ glm::mat4 Mesh::GetModelMat()
     return model;
 }
 
+void Mesh::SubdivideTriangle()
+{
+    std::vector<unsigned int> newIndices;
+    for (unsigned int i = 0; i < indices.size() / 3; i++)
+    {
+        //ia is the row in the vertices array
+        unsigned int ia = indices[i * 3]; 
+        unsigned int ib = indices[i * 3 + 1];
+        unsigned int ic = indices[i * 3 + 2]; 
+        glm::vec3 a = glm::vec3(vertexes[ia * 3], vertexes[ia * 3 + 1], vertexes[ia * 3 + 2]);
+        glm::vec3 b = glm::vec3(vertexes[ib * 3], vertexes[ib * 3 + 1], vertexes[ib * 3 + 2]);
+        glm::vec3 c = glm::vec3(vertexes[ic * 3], vertexes[ic * 3 + 1], vertexes[ic * 3 + 2]);
+        glm::vec3 ab = (a + b) * 0.5f;
+        glm::vec3 bc = (b + c) * 0.5f;
+        glm::vec3 ca = (c + a) * 0.5f;
+        unsigned int iab = vertexes.size() / 3; 
+        vertexes.push_back(ab.x);
+        vertexes.push_back(ab.y);
+        vertexes.push_back(ab.z);
+        unsigned int ibc = vertexes.size() / 3; 
+        vertexes.push_back(bc.x);
+        vertexes.push_back(bc.y);
+        vertexes.push_back(bc.z);
+        unsigned int ica = vertexes.size() / 3; 
+        vertexes.push_back(ca.x); 
+        vertexes.push_back(ca.y); 
+        vertexes.push_back(ca.z);
+        newIndices.push_back(ia); newIndices.push_back(iab); newIndices.push_back(ica);
+        newIndices.push_back(ib); newIndices.push_back(ibc); newIndices.push_back(iab);
+        newIndices.push_back(ic); newIndices.push_back(ica); newIndices.push_back(ibc);
+        newIndices.push_back(iab); newIndices.push_back(ibc); newIndices.push_back(ica);
+    }
+    for (unsigned int i = 0; i < newIndices.size(); i++)
+    {
+        indices.push_back(newIndices[i]);
+    }
+    
+}
+
 
 //--------------------Mesh Generation--------------------------
 
@@ -105,7 +144,7 @@ Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation)
     return Mesh(vertices, indices, position, rotation, 1.0f);
 }
 
-Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdivideNum)
+Mesh *CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdivideNum)
 {
 
     float t = 0.52573111f;
@@ -191,44 +230,6 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
         
     }
 
-    return Mesh(vertices, indices, position, rotation, 1.0f);
+    return new Mesh(vertices, indices, position, rotation, 1.0f);
 }
 
-void Mesh::SubdivideTriangle()
-{
-    std::vector<unsigned int> newIndices;
-    for (unsigned int i = 0; i < indices.size() / 3; i++)
-    {
-        //ia is the row in the vertices array
-        unsigned int ia = indices[i * 3]; 
-        unsigned int ib = indices[i * 3 + 1];
-        unsigned int ic = indices[i * 3 + 2]; 
-        glm::vec3 a = glm::vec3(vertexes[ia * 3], vertexes[ia * 3 + 1], vertexes[ia * 3 + 2]);
-        glm::vec3 b = glm::vec3(vertexes[ib * 3], vertexes[ib * 3 + 1], vertexes[ib * 3 + 2]);
-        glm::vec3 c = glm::vec3(vertexes[ic * 3], vertexes[ic * 3 + 1], vertexes[ic * 3 + 2]);
-        glm::vec3 ab = (a + b) * 0.5f;
-        glm::vec3 bc = (b + c) * 0.5f;
-        glm::vec3 ca = (c + a) * 0.5f;
-        unsigned int iab = vertexes.size() / 3; 
-        vertexes.push_back(ab.x);
-        vertexes.push_back(ab.y);
-        vertexes.push_back(ab.z);
-        unsigned int ibc = vertexes.size() / 3; 
-        vertexes.push_back(bc.x);
-        vertexes.push_back(bc.y);
-        vertexes.push_back(bc.z);
-        unsigned int ica = vertexes.size() / 3; 
-        vertexes.push_back(ca.x); 
-        vertexes.push_back(ca.y); 
-        vertexes.push_back(ca.z);
-        newIndices.push_back(ia); newIndices.push_back(iab); newIndices.push_back(ica);
-        newIndices.push_back(ib); newIndices.push_back(ibc); newIndices.push_back(iab);
-        newIndices.push_back(ic); newIndices.push_back(ica); newIndices.push_back(ibc);
-        newIndices.push_back(iab); newIndices.push_back(ibc); newIndices.push_back(ica);
-    }
-    for (unsigned int i = 0; i < newIndices.size(); i++)
-    {
-        indices.push_back(newIndices[i]);
-    }
-    
-}
