@@ -59,9 +59,9 @@ int main()
 
     mainScene = Scene();
     shadercube = new Shader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    Mesh mesh = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 0);
+    Mesh mesh = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 3);
     mesh.BufferGens();
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 1000; i++)
     {
         mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
     }
@@ -110,7 +110,7 @@ void Update(GLFWwindow* window)
     shadercube->setMat4("model", glm::mat4(1.0f));
     shadercube->setMat4("view", cam->GetViewMat());
     shadercube->setMat4("proj", cam->GetProjMat(SCRWIDTH, SCRHEIGHT, 0.001f, 100.0f));
-    mainScene.DrawFull(5);
+    mainScene.DrawFull(1);
 
     if(DebugWindow)
     {

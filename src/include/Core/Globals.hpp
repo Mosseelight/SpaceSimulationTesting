@@ -1,6 +1,6 @@
 #pragma once
 
-const int SCRWIDTH = 1280;
-const int SCRHEIGHT = 720;
+const int SCRWIDTH = 1920;
+const int SCRHEIGHT = 1080;
 
 extern int DrawCallCount;
