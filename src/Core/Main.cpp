@@ -9,15 +9,15 @@
 #include <vector>
 
 //core
+#include "../include/Core/Globals.hpp"
 #include "../include/Core/Scene.hpp"
 #include "../include/Core/Mesh.hpp"
 #include "../include/Core/Shader.hpp"
 #include "../include/Core/Camera.hpp"
 #include "../include/Core/ResUtil.hpp"
 
-const int SCRWIDTH = 1280;
-const int SCRHEIGHT = 720;
 bool DebugWindow = false;
+float currentTime = 0.0f;
 float deltaTime = 0.0f;
 float lastTime = 0.0f;
 
@@ -61,19 +61,10 @@ int main()
     shadercube = new Shader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
     Mesh mesh = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 0);
     mesh.BufferGens();
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    for (int i = 0; i < 100; i++)
+    {
+        mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    }
     cam = new Camera(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0,0,1), 35);
     for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
     {
@@ -97,7 +88,7 @@ int main()
 
 void Update(GLFWwindow* window)
 {
-    float currentTime = glfwGetTime();
+    currentTime = glfwGetTime();
     deltaTime = currentTime - lastTime;
     lastTime = currentTime;
     if(DebugWindow)
@@ -189,4 +180,6 @@ void ImguiMenu()
     ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1 / deltaTime));
     ImGui::Text("%d verts, %d indices (%d tris)", vertCount, indCount, indCount / 3);
     ImGui::Text("Amount of SpaceObjs: (%d)", mainScene.SpaceObjects.size());
+    float drawCallAvg = DrawCallCount / (glfwGetTime() / deltaTime);
+    ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
 }

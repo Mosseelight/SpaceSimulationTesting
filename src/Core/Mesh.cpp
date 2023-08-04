@@ -39,6 +39,7 @@ void Mesh::DrawMesh()
 {
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    DrawCallCount++;
 }
 
 glm::mat4 Mesh::GetModelMat()

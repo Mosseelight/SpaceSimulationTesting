@@ -26,17 +26,27 @@ void Scene::DrawFull(unsigned int stepSize)
     std::vector<unsigned int> tmp_Indices;
     unsigned int drawNum = 0;
     if(SpaceObjects.size() > stepSize)
-        drawNum = stepSize / (SpaceObjects.size() - (SpaceObjects.size() % stepSize));
+    {
+        drawNum = (float)(SpaceObjects.size() - (SpaceObjects.size() % stepSize)) / (float)stepSize;
+        if(drawNum == 0)
+        {
+            drawNum = (float)SpaceObjects.size() / stepSize;
+        }
+    }
     else
         drawNum = 0;
 
     for (unsigned int i = 0; i < drawNum; i++)
     {
-        unsigned int vao, vbo, ebo;
         for (unsigned int j = 0; j < stepSize; j++)
         {
+            unsigned int indOffset = SpaceObjects[j + stepSize * i].SO_mesh.vertexes.size();
             tmp_Vertices.insert(tmp_Vertices.end(), SpaceObjects[j + stepSize * i].SO_mesh.vertexes.begin(), SpaceObjects[j + stepSize * i].SO_mesh.vertexes.end());
-            tmp_Indices.insert(tmp_Indices.end(), SpaceObjects[j + stepSize * i].SO_mesh.indices.begin(), SpaceObjects[j + stepSize * i].SO_mesh.indices.end());  
+            for (unsigned int g = 0; g < SpaceObjects[j + stepSize * i].SO_mesh.indices.size(); g++)
+            {
+                tmp_Indices.push_back(SpaceObjects[j + stepSize * i].SO_mesh.indices[g] + (indOffset * (j + stepSize * i)));
+            }
+             
         }
 
         Mesh mesh = Mesh(tmp_Vertices, tmp_Indices, glm::vec3(0.0f), glm::vec3(0.0f), 1);
