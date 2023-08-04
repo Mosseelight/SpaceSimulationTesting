@@ -20,10 +20,13 @@ public:
     void BufferGens();
     void DrawMesh();
     glm::mat4 GetModelMat();
+
+    void SubdivideTriangle();
 };
 
 
+Mesh Create2DTriangle(glm::vec3 position, glm::vec3 rotation);
 Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation);
-Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation);
+Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdivideNum);
 
 

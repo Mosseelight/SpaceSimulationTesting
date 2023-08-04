@@ -25,6 +25,7 @@ const std::string shaderLoc = "res/Shaders";
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void Update(GLFWwindow* window);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void buildVerticesFlat();
 
 Shader *shadercube;
 Mesh *cube;
@@ -53,9 +54,12 @@ int main()
 
 
     shadercube = new Shader(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag"));
-    Mesh mesh = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0));
+    Mesh mesh = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 4);
+    mesh.BufferGens();
+    std::cout << mesh.vertexes.size() / 3 << std::endl;
+
     cube = &mesh;
-    cam = new Camera(glm::vec3(0,0,5), glm::vec3(0.0f), glm::vec3(0,0,1), 35);
+    cam = new Camera(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0,0,1), 35);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -90,6 +94,7 @@ void Update(GLFWwindow* window)
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.54f, 0.54f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 
     glUseProgram(shadercube->shader);
