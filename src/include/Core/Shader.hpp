@@ -26,8 +26,9 @@ private:
 public:
 
     unsigned int shader;
-    Shader(ShaderLoc location);
+    Shader();
     ~Shader();
+    void CompileShader(ShaderLoc location);
     void setBool(std::string name, bool value);
     void setInt(std::string name, int value);
     void setFloat(std::string name, float value);

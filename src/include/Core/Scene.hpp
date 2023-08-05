@@ -10,11 +10,10 @@ struct SpaceObject
 {
 public:
     Mesh SO_mesh;
-    Shader SO_shader;
     unsigned int SO_id;
 
-    SpaceObject(Mesh mesh, Shader shader, unsigned int id)
-        : SO_mesh(mesh), SO_shader(shader), SO_id(id) {}
+    SpaceObject(Mesh mesh, unsigned int id)
+        : SO_mesh(mesh), SO_id(id) {}
     ~SpaceObject() {}
 };
 
@@ -30,8 +29,9 @@ public:
     Scene();
     ~Scene();
 
-    void AddSpaceObject(Mesh mesh, ShaderLoc location);
+    void AddSpaceObject(Mesh mesh);
     void DrawFull(unsigned int stepSize); // Will Draw every object 
+    void DrawSingle(Shader shader); 
 };
 
 

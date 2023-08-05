@@ -1,9 +1,20 @@
 #include "../include/Core/Shader.hpp"
 
-Shader::Shader(ShaderLoc location)
+Shader::Shader()
+{
+
+}
+
+Shader::~Shader()
+{
+    glDeleteProgram(shader);
+}
+
+void Shader::CompileShader(ShaderLoc location)
 {
     const char *vertCodearr = location.vertCode.c_str();
     const char *fragCodearr = location.fragCode.c_str();
+
     int success;
     char infoLog[512];
     vertShaderU = glCreateShader(GL_VERTEX_SHADER);
@@ -47,12 +58,7 @@ Shader::Shader(ShaderLoc location)
 
     glDeleteShader(vertShaderU);
     glDeleteShader(fragShaderU);
-}
-
-Shader::~Shader()
-{
-    glDeleteProgram(shader);
-}
+}   
 
 void Shader::setBool(std::string name, bool value)
 {         

@@ -17,9 +17,12 @@
 #include "../include/Core/ResUtil.hpp"
 
 bool DebugWindow = false;
+bool showWireFrame = false;
 float currentTime = 0.0f;
 float deltaTime = 0.0f;
 float lastTime = 0.0f;
+int currentSCRWIDTH = 0;
+int currentSCRHEIGHT = 0;
 
 const std::string shaderLoc = "res/Shaders";
 
@@ -29,8 +32,7 @@ void ImguiMenu();
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void buildVerticesFlat();
 
-Shader *shadercube;
-Mesh *cube;
+Shader shader;
 Camera *cam;
 Scene mainScene;
 unsigned int vertCount, indCount;
@@ -58,14 +60,15 @@ int main()
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
     mainScene = Scene();
-    shadercube = new Shader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
-    Mesh mesh = CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 3);
-    mesh.BufferGens();
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
-        mainScene.AddSpaceObject(mesh, ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+        //mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 3));
+        mainScene.AddSpaceObject(CreateCubeMesh(glm::vec3(0,0,0), glm::vec3(0,0,0)));
+        mainScene.SpaceObjects[i].SO_mesh.BufferGens();
     }
-    cam = new Camera(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0,0,1), 35);
+    cam = new Camera(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0,0,0), 35);
+    shader = Shader();
+    shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
     for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
     {
         vertCount += mainScene.SpaceObjects[i].SO_mesh.vertexes.size();
@@ -78,7 +81,6 @@ int main()
     }
     
     delete cam;
-    delete cube;
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -88,9 +90,13 @@ int main()
 
 void Update(GLFWwindow* window)
 {
+    glfwGetWindowSize(window, &currentSCRWIDTH, &currentSCRHEIGHT);
+
     currentTime = glfwGetTime();
     deltaTime = currentTime - lastTime;
     lastTime = currentTime;
+    drawCallAvg = DrawCallCount / (glfwGetTime() / deltaTime);
+
     if(DebugWindow)
     {
         ImGui_ImplOpenGL3_NewFrame();
@@ -101,16 +107,27 @@ void Update(GLFWwindow* window)
     }
 
 
-    glEnable(GL_DEPTH_TEST);
+
     glClearColor(0.0f, 0.54f, 0.54f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    if(showWireFrame)
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-    glUseProgram(shadercube->shader);
-    shadercube->setMat4("model", glm::mat4(1.0f));
-    shadercube->setMat4("view", cam->GetViewMat());
-    shadercube->setMat4("proj", cam->GetProjMat(SCRWIDTH, SCRHEIGHT, 0.001f, 100.0f));
-    mainScene.DrawFull(1);
+    cam->position.x = sin(glfwGetTime()) * 10;
+    cam->position.z = cos(glfwGetTime()) * 10;
+
+    glUseProgram(shader.shader);
+    shader.setMat4("proj", cam->GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100.0f));
+    shader.setMat4("view", cam->GetViewMat());
+
+    for (unsigned int i = 0; i < mainScene.SpaceObjects.size(); i++)
+    {
+        mainScene.SpaceObjects[i].SO_mesh.position.y = sin(glfwGetTime());
+
+        shader.setMat4("model", mainScene.SpaceObjects[i].SO_mesh.GetModelMat());
+        mainScene.SpaceObjects[i].SO_mesh.DrawMesh();
+    }
 
     if(DebugWindow)
     {
@@ -143,6 +160,18 @@ void ImguiMenu()
     window_flags |= ImGuiWindowFlags_MenuBar;
 
     ImGui::Begin("SpaceTesting", nullptr, window_flags);
+
+    ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1 / deltaTime));
+    ImGui::Text("%d verts, %d indices (%d tris)", vertCount, indCount, indCount / 3);
+    ImGui::Text("Amount of SpaceObjs: (%d)", mainScene.SpaceObjects.size());
+    ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
+    ImGui::Text("Ram Usage: %dmb", GetRamUsage() / 1024);
+
+    ImGui::Spacing();
+    ImGui::Checkbox("Wire Frame", &showWireFrame);
+    ImGui::DragFloat3("Cam Position", glm::value_ptr(cam->position), 0.01f, -10.0f, 10.0f);
+    ImGui::DragFloat3("Cam Rotation", glm::value_ptr(cam->rotation), 0.01f, 360.0f, 0.0f);
+
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("Menus"))
@@ -177,9 +206,4 @@ void ImguiMenu()
 
         ImGui::End();
     }
-    ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1 / deltaTime));
-    ImGui::Text("%d verts, %d indices (%d tris)", vertCount, indCount, indCount / 3);
-    ImGui::Text("Amount of SpaceObjs: (%d)", mainScene.SpaceObjects.size());
-    float drawCallAvg = DrawCallCount / (glfwGetTime() / deltaTime);
-    ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
 }

@@ -10,10 +10,10 @@ Scene::~Scene()
     
 }
 
-void Scene::AddSpaceObject(Mesh mesh, ShaderLoc location)
+void Scene::AddSpaceObject(Mesh mesh)
 {
     unsigned int id = idList.size();
-    SpaceObjects.push_back(SpaceObject(mesh, Shader(location), id));
+    SpaceObjects.push_back(SpaceObject(mesh, id));
     idList.push_back(id);
 }
 
@@ -63,12 +63,20 @@ void Scene::DrawFull(unsigned int stepSize)
         for (unsigned int i = 0; i < SpaceObjects.size() % stepSize; i++)
         {
             //draw that mesh
-            //std::cout << (SpaceObjects.size() - (SpaceObjects.size() % stepSize)) + i << std::endl;
             unsigned int index = (SpaceObjects.size() - (SpaceObjects.size() % stepSize)) + i;
-            SpaceObjects[index].SO_mesh.BufferGens();
             SpaceObjects[index].SO_mesh.DrawMesh();
         }
         
     }
 
+}
+
+void Scene::DrawSingle(Shader shader)
+{
+    for (unsigned int i = 0; i < SpaceObjects.size(); i++)
+    {
+        shader.setMat4("model", SpaceObjects[i].SO_mesh.GetModelMat());
+        SpaceObjects[i].SO_mesh.DrawMesh();
+    }
+    
 }
