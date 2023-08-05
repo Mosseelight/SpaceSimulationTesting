@@ -62,7 +62,7 @@ int main()
     mainScene = Scene();
     for (int i = 0; i < 10; i++)
     {
-        //mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 3));
+        mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 3));
         mainScene.AddSpaceObject(CreateCubeMesh(glm::vec3(0,0,0), glm::vec3(0,0,0)));
         mainScene.SpaceObjects[i].SO_mesh.BufferGens();
     }
@@ -196,8 +196,8 @@ void ImguiMenu()
 
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
                 {
-                    ImGui::DragFloat3("Cube Position", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.position), 0.01f, -10.0f, 10.0f);
-                    ImGui::DragFloat3("Cube Rotation", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.rotation), 0.01f, 360.0f, 0.0f);
+                    ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.position), 0.01f, -10.0f, 10.0f);
+                    ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.rotation), 0.01f, 360.0f, 0.0f);
                     ImGui::TreePop();
                 }
             }
