@@ -62,8 +62,11 @@ int main()
     mainScene = Scene();
     for (int i = 0; i < 10; i++)
     {
-        mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 3));
-        mainScene.AddSpaceObject(CreateCubeMesh(glm::vec3(0,0,0), glm::vec3(0,0,0)));
+        mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(i * 2,0,0), glm::vec3(0,0,0), 3));
+        mainScene.AddSpaceObject(CreateCubeMesh(glm::vec3(-i * 2,0,0), glm::vec3(0,0,0)));
+    }
+    for (unsigned int i = 0; i < mainScene.SpaceObjects.size(); i++)
+    {
         mainScene.SpaceObjects[i].SO_mesh.BufferGens();
     }
     cam = new Camera(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0,0,0), 35);
@@ -114,20 +117,13 @@ void Update(GLFWwindow* window)
     if(showWireFrame)
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-    cam->position.x = sin(glfwGetTime()) * 10;
-    cam->position.z = cos(glfwGetTime()) * 10;
+    cam->position.x = sin(glfwGetTime()) * 30;
+    cam->position.z = cos(glfwGetTime()) * 30;
 
     glUseProgram(shader.shader);
     shader.setMat4("proj", cam->GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100.0f));
     shader.setMat4("view", cam->GetViewMat());
-
-    for (unsigned int i = 0; i < mainScene.SpaceObjects.size(); i++)
-    {
-        mainScene.SpaceObjects[i].SO_mesh.position.y = sin(glfwGetTime());
-
-        shader.setMat4("model", mainScene.SpaceObjects[i].SO_mesh.GetModelMat());
-        mainScene.SpaceObjects[i].SO_mesh.DrawMesh();
-    }
+    mainScene.DrawSingle(&shader);
 
     if(DebugWindow)
     {

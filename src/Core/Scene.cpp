@@ -71,11 +71,11 @@ void Scene::DrawFull(unsigned int stepSize)
 
 }
 
-void Scene::DrawSingle(Shader shader)
+void Scene::DrawSingle(Shader *shader)
 {
     for (unsigned int i = 0; i < SpaceObjects.size(); i++)
     {
-        shader.setMat4("model", SpaceObjects[i].SO_mesh.GetModelMat());
+        shader->setMat4("model", SpaceObjects[i].SO_mesh.GetModelMat());
         SpaceObjects[i].SO_mesh.DrawMesh();
     }
     
