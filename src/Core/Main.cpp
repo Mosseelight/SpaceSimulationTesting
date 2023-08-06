@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 #include <memory>
+#include <random>
 
 //core
 #include "../include/Core/Globals.hpp"
@@ -61,17 +62,17 @@ int main()
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
     mainScene = Scene();
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 1; i++)
     {
         mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(i * 2,0,0), glm::vec3(0,0,0), 3));
-        mainScene.AddSpaceObject(CreateCubeMesh(glm::vec3(-i * 2,0,0), glm::vec3(0,0,0)));
-        mainScene.AddSpaceObject(Create2DTriangle(glm::vec3(0,i * 2,0), glm::vec3(0,0,0)));
+        //mainScene.AddSpaceObject(CreateCubeMesh(glm::vec3(-i * 2,0,0), glm::vec3(0,0,0)));
+        //mainScene.AddSpaceObject(Create2DTriangle(glm::vec3(0,0,i * 2), glm::vec3(0,0,0)));
     }
     for (unsigned int i = 0; i < mainScene.SpaceObjects.size(); i++)
     {
         mainScene.SpaceObjects[i].SO_mesh.BufferGens();
     }
-    cam.reset(new Camera(glm::vec3(0,0,10), glm::vec3(0.0f, 0.0f, -90.0f), glm::vec3(0,0,0), 35));
+    cam.reset(new Camera(glm::vec3(0,0,10), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,0), 35));
     shader = Shader();
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
     for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
@@ -116,12 +117,11 @@ void Update(GLFWwindow* window)
     if(showWireFrame)
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-    cam->position.x = sin(glfwGetTime()) * 30;
-    cam->position.z = cos(glfwGetTime()) * 30;
-    std::cout << cam->position.x << std::endl;
+    cam->position.x = cos(glfwGetTime()) * 10;
+    cam->position.z = sin(glfwGetTime()) * 10;
 
     glUseProgram(shader.shader);
-    shader.setMat4("proj", cam->GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100.0f));
+    shader.setMat4("proj", cam->GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f));
     shader.setMat4("view", cam->GetViewMat());
     mainScene.DrawSingle(&shader);
 
@@ -167,8 +167,9 @@ void ImguiMenu()
 
     ImGui::Spacing();
     ImGui::Checkbox("Wire Frame", &showWireFrame);
-    ImGui::DragFloat3("Cam Position", glm::value_ptr(cam->position), 0.01f, -50.0f, 50.0f);
-    ImGui::DragFloat3("Cam Rotation", glm::value_ptr(cam->rotation), 0.01f, 360.0f, 0.0f);
+    ImGui::SliderFloat3("Cam Position", glm::value_ptr(cam->position), -50.0f, 50.0f);
+    ImGui::SliderFloat3("Cam Rotation", glm::value_ptr(cam->rotation), 360.0f, 0.0f);
+    ImGui::SliderFloat("Cam Fov", &cam->fov, 90.0f, 0.0f);
 
     if (ImGui::BeginMenuBar())
     {
@@ -208,11 +209,55 @@ void ImguiMenu()
 
     if(ShowObjectViewerMenu)
     {
+        static bool objectSelected = false;
+        static int counter;
+        static Mesh selmesh = Mesh();
+        static glm::vec3 selposition;
+        static glm::vec3 selrotation;
+        MeshType type;
         ImGui::SetNextWindowSize(ImVec2(600,420), ImGuiCond_FirstUseEver);
         ImGui::Begin("Object Viewer");
 
         //select the object you want gives properties 
         //or create a object and that selects by default
+        ImGui::Text("Select Object Properties");
+        ImGui::Spacing();
+        if (ImGui::ArrowButton("##left", ImGuiDir_Left)) 
+        { 
+            if(counter > MeshType::First)
+                counter--;
+        }
+        ImGui::SameLine(0.0f, 1.0f);
+        if (ImGui::ArrowButton("##right", ImGuiDir_Right)) 
+        { 
+            if(counter < MeshType::Last)
+                counter++; 
+        }
+        ImGui::SameLine();
+        ImGui::Text(GetMeshTypeName(static_cast<MeshType>(counter)).c_str());
+        ImGui::InputFloat3("Object Position", glm::value_ptr(selposition));
+        ImGui::InputFloat3("Object Rotation", glm::value_ptr(selrotation));
+
+        if(ImGui::Button("Add Object"))
+        {
+            switch (static_cast<MeshType>(counter))
+            {
+            case CubeMesh:
+                selmesh = CreateCubeMesh(selposition, selrotation);
+                break;
+            case IcoSphereMesh:
+                selmesh = CreateSphereMesh(selposition, selrotation, 3);
+                break;
+            case TriangleMesh:
+                selmesh = Create2DTriangle(selposition, selrotation);
+                break;
+            }
+            objectSelected = true;
+            static unsigned int id = mainScene.SpaceObjects.size();
+            static SpaceObject selectedObject = SpaceObject(selmesh, id);
+            mainScene.SpaceObjects.push_back(selectedObject);
+            mainScene.SpaceObjects[id].SO_mesh.BufferGens();
+        }
 
         ImGui::End();
     }

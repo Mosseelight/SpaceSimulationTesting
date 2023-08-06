@@ -76,6 +76,7 @@ void Scene::DrawSingle(Shader *shader)
     for (unsigned int i = 0; i < SpaceObjects.size(); i++)
     {
         shader->setMat4("model", SpaceObjects[i].SO_mesh.GetModelMat());
+        shader->setVec4("color", glm::vec4(0.0f, i / 255.0f, 0.0f, 1.0f));
         SpaceObjects[i].SO_mesh.DrawMesh();
     }
     

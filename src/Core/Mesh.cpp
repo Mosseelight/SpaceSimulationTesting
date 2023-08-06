@@ -1,5 +1,27 @@
 #include "../include/Core/Mesh.hpp"
 
+std::string GetMeshTypeName(MeshType type)
+{
+    switch (type)
+    {
+    case CubeMesh:
+        return "CubeMesh";
+        break;
+    case IcoSphereMesh:
+        return "IcoSphereMesh";
+        break;
+    case TriangleMesh:
+        return "TriangleMesh";
+        break;
+    }
+    return "No Mesh";
+}
+
+Mesh::Mesh()
+{
+
+}
+
 Mesh::Mesh(std::vector<float> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale)
 {
     this->vertexes = vertexes;

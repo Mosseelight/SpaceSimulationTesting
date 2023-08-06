@@ -8,6 +8,17 @@
 #include <vector>
 #include "Globals.hpp"
 
+enum MeshType
+{
+    CubeMesh,
+    IcoSphereMesh,
+    TriangleMesh,
+    First = CubeMesh,
+    Last = TriangleMesh
+};
+
+std::string GetMeshTypeName(MeshType type);
+
 class Mesh
 {
 private:
@@ -21,6 +32,7 @@ public:
     glm::vec3 position, rotation;
     float scale;
 
+    Mesh();
     Mesh(std::vector<float> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale);
     ~Mesh();
     void BufferGens();
