@@ -24,9 +24,9 @@ public:
     Mesh(std::vector<float> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale);
     ~Mesh();
     void BufferGens();
+    void ReGenBuffer();
     void DrawMesh();
     glm::mat4 GetModelMat();
-
     void SubdivideTriangle();
 };
 

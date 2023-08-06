@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
+#include <memory>
 
 //core
 #include "../include/Core/Globals.hpp"
@@ -33,7 +34,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void buildVerticesFlat();
 
 Shader shader;
-Camera *cam;
+std::unique_ptr<Camera> cam;
 Scene mainScene;
 unsigned int vertCount, indCount;
 
@@ -64,12 +65,13 @@ int main()
     {
         mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(i * 2,0,0), glm::vec3(0,0,0), 3));
         mainScene.AddSpaceObject(CreateCubeMesh(glm::vec3(-i * 2,0,0), glm::vec3(0,0,0)));
+        mainScene.AddSpaceObject(Create2DTriangle(glm::vec3(0,i * 2,0), glm::vec3(0,0,0)));
     }
     for (unsigned int i = 0; i < mainScene.SpaceObjects.size(); i++)
     {
         mainScene.SpaceObjects[i].SO_mesh.BufferGens();
     }
-    cam = new Camera(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0,0,0), 35);
+    cam.reset(new Camera(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0,0,0), 35));
     shader = Shader();
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
     for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
@@ -83,7 +85,6 @@ int main()
         Update(window);
     }
     
-    delete cam;
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -162,10 +163,11 @@ void ImguiMenu()
     ImGui::Text("Amount of SpaceObjs: (%d)", mainScene.SpaceObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
     ImGui::Text("Ram Usage: %dmb", GetRamUsage() / 1024);
+    ImGui::Text("Time Open %.1f minutes", glfwGetTime() / 60);
 
     ImGui::Spacing();
     ImGui::Checkbox("Wire Frame", &showWireFrame);
-    ImGui::DragFloat3("Cam Position", glm::value_ptr(cam->position), 0.01f, -10.0f, 10.0f);
+    ImGui::DragFloat3("Cam Position", glm::value_ptr(cam->position), 0.01f, -50.0f, 50.0f);
     ImGui::DragFloat3("Cam Rotation", glm::value_ptr(cam->rotation), 0.01f, 360.0f, 0.0f);
 
     if (ImGui::BeginMenuBar())
