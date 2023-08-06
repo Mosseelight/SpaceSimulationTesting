@@ -71,7 +71,7 @@ int main()
     {
         mainScene.SpaceObjects[i].SO_mesh.BufferGens();
     }
-    cam.reset(new Camera(glm::vec3(0,0,10), glm::vec3(0.0f), glm::vec3(0,0,0), 35));
+    cam.reset(new Camera(glm::vec3(0,0,10), glm::vec3(0.0f, 0.0f, -90.0f), glm::vec3(0,0,0), 35));
     shader = Shader();
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
     for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
@@ -110,8 +110,6 @@ void Update(GLFWwindow* window)
         ImguiMenu();
     }
 
-
-
     glClearColor(0.0f, 0.54f, 0.54f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -120,6 +118,7 @@ void Update(GLFWwindow* window)
 
     cam->position.x = sin(glfwGetTime()) * 30;
     cam->position.z = cos(glfwGetTime()) * 30;
+    std::cout << cam->position.x << std::endl;
 
     glUseProgram(shader.shader);
     shader.setMat4("proj", cam->GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100.0f));
@@ -149,6 +148,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
 bool ShowSceneViewerMenu = false;
+bool ShowObjectViewerMenu = false;
 void ImguiMenu()
 {
     
@@ -175,6 +175,7 @@ void ImguiMenu()
         if (ImGui::BeginMenu("Menus"))
         {
             ImGui::MenuItem("Scene Viewer", NULL, &ShowSceneViewerMenu);
+            ImGui::MenuItem("Object Viewer", NULL, &ShowObjectViewerMenu);
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
@@ -195,12 +196,23 @@ void ImguiMenu()
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
                 {
                     ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.position), 0.01f, -10.0f, 10.0f);
-                    ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.rotation), 0.01f, 360.0f, 0.0f);
+                    ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.rotation), 1.0f, -360.0f, 360.0f);
                     ImGui::TreePop();
                 }
             }
             ImGui::TreePop();
         }
+
+        ImGui::End();
+    }
+
+    if(ShowObjectViewerMenu)
+    {
+        ImGui::SetNextWindowSize(ImVec2(600,420), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Object Viewer");
+
+        //select the object you want gives properties 
+        //or create a object and that selects by default
 
         ImGui::End();
     }

@@ -13,6 +13,7 @@ public:
     glm::vec3 target;
     float fov;
 
+    Camera();
     Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 target, float fov);
     glm::vec3 GetCameraDir();
     glm::vec3 GetCameraUp();

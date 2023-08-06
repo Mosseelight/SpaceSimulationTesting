@@ -1,5 +1,10 @@
 #include "../include/Core/Camera.hpp"
 
+Camera::Camera()
+{
+    
+}
+
 Camera::Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 target, float fov)
 {
     this->position = position;
@@ -10,7 +15,10 @@ Camera::Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 target, float f
 
 glm::vec3 Camera::GetCameraDir()
 {
-    return glm::normalize(position - target);
+    target.x = cos(glm::radians(rotation.z) * cos(glm::radians(rotation.x)));
+    target.y = sin(glm::radians(rotation.x));
+    target.x = sin(glm::radians(rotation.z) * cos(glm::radians(rotation.x)));
+    return glm::normalize(target);
 }
 
 glm::vec3 Camera::GetCameraUp()
@@ -22,7 +30,7 @@ glm::vec3 Camera::GetCameraUp()
 
 glm::mat4 Camera::GetViewMat()
 {
-    return glm::lookAt(position, GetCameraDir(), GetCameraUp());
+    return glm::lookAt(position, position - GetCameraDir(), GetCameraUp());
 }
 
 glm::mat4 Camera::GetProjMat(int width, int height, float near, float far)
