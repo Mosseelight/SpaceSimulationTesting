@@ -70,16 +70,11 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
-    for (int i = 0; i < 1; i++)
-    {
-        mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 3));
-        mainScene.AddSpaceObject(CreateCubeMesh(glm::vec3(0,0,0), glm::vec3(0,0,0)));
-    }
     cam.reset(new Camera(glm::vec3(0,0,10), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,0), 35));
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
     for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
     {
-        vertCount += mainScene.SpaceObjects[i].SO_mesh.vertexes.size();
+        vertCount += mainScene.SpaceObjects[i].SO_mesh.vertices.size();
         indCount += mainScene.SpaceObjects[i].SO_mesh.indices.size();
     }
 
@@ -118,9 +113,6 @@ void Update(GLFWwindow* window)
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     if(showWireFrame)
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
-    cam->position.x = cos(glfwGetTime()) * 10;
-    cam->position.z = sin(glfwGetTime()) * 10;
 
     glUseProgram(shader.shader);
     shader.setMat4("proj", cam->GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f));
@@ -171,7 +163,7 @@ void ImguiMenu()
     ImGui::Checkbox("Wire Frame", &showWireFrame);
     ImGui::SliderFloat3("Cam Position", glm::value_ptr(cam->position), -50.0f, 50.0f);
     ImGui::SliderFloat3("Cam Rotation", glm::value_ptr(cam->rotation), 360.0f, 0.0f);
-    ImGui::SliderFloat("Cam Fov", &cam->fov, 90.0f, 0.0f);
+    ImGui::SliderFloat("Cam Fov", &cam->fov, 179.9f, 0.01f);
 
     if (ImGui::BeginMenuBar())
     {
@@ -199,7 +191,7 @@ void ImguiMenu()
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
                 {
                     ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.position), 0.01f, -10.0f, 10.0f);
-                    ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.rotation), 1.0f, -360.0f, 360.0f);
+                    ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.rotation), 0.1f, 360.0f, 360.0f);
                     ImGui::TreePop();
                 }
             }
@@ -215,6 +207,7 @@ void ImguiMenu()
         static int counter;
         static glm::vec3 selposition;
         static glm::vec3 selrotation;
+        static int IcoSphereSub = 0;
         MeshType type;
         ImGui::SetNextWindowSize(ImVec2(600,420), ImGuiCond_FirstUseEver);
         ImGui::Begin("Object Viewer");
@@ -238,6 +231,8 @@ void ImguiMenu()
         ImGui::Text(GetMeshTypeName(static_cast<MeshType>(counter)).c_str());
         ImGui::InputFloat3("Object Position", glm::value_ptr(selposition));
         ImGui::InputFloat3("Object Rotation", glm::value_ptr(selrotation));
+        if(counter == MeshType::IcoSphereMesh)
+            ImGui::SliderInt("IcoSphere Subdivison level", &IcoSphereSub, 0, 15);
 
         if(ImGui::Button("Add Object"))
         {
@@ -248,13 +243,15 @@ void ImguiMenu()
                 selmesh = CreateCubeMesh(selposition, selrotation);
                 break;
             case IcoSphereMesh:
-                selmesh = CreateSphereMesh(selposition, selrotation, 3);
+                selmesh = CreateSphereMesh(selposition, selrotation, IcoSphereSub);
                 break;
             case TriangleMesh:
                 selmesh = Create2DTriangle(selposition, selrotation);
                 break;
             }
             objectSelected = true;
+            vertCount += selmesh.vertices.size();
+            indCount += selmesh.indices.size();
             mainScene.AddSpaceObject(selmesh);
         }
 

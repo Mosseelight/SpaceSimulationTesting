@@ -42,8 +42,8 @@ void Scene::DrawFull(unsigned int stepSize)
     {
         for (unsigned int j = 0; j < stepSize; j++)
         {
-            unsigned int indOffset = SpaceObjects[j + stepSize * i].SO_mesh.vertexes.size();
-            tmp_Vertices.insert(tmp_Vertices.end(), SpaceObjects[j + stepSize * i].SO_mesh.vertexes.begin(), SpaceObjects[j + stepSize * i].SO_mesh.vertexes.end());
+            unsigned int indOffset = SpaceObjects[j + stepSize * i].SO_mesh.vertices.size();
+            tmp_Vertices.insert(tmp_Vertices.end(), SpaceObjects[j + stepSize * i].SO_mesh.vertices.begin(), SpaceObjects[j + stepSize * i].SO_mesh.vertices.end());
             for (unsigned int g = 0; g < SpaceObjects[j + stepSize * i].SO_mesh.indices.size(); g++)
             {
                 tmp_Indices.push_back(SpaceObjects[j + stepSize * i].SO_mesh.indices[g] + (indOffset * (j + stepSize * i)));

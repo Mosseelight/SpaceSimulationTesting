@@ -27,16 +27,16 @@ Mesh::Mesh(const Mesh &other)
     this->vao = other.vao;
     this->vbo = other.vbo;
     this->ebo = other.ebo;
-    this->vertexes = other.vertexes;
+    this->vertices = other.vertices;
     this->indices = other.indices;
     this->position = other.position;
     this->rotation = other.rotation;
     this->scale = other.scale;
 }
 
-Mesh::Mesh(std::vector<float> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale)
+Mesh::Mesh(std::vector<float> vertices, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale)
 {
-    this->vertexes = vertexes;
+    this->vertices = vertices;
     this->indices = indices;
     this->position = position;
     this->rotation = rotation;
@@ -60,7 +60,7 @@ void Mesh::BufferGens()
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    glBufferData(GL_ARRAY_BUFFER, vertexes.size() * sizeof(float), vertexes.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
@@ -85,7 +85,7 @@ void Mesh::ReGenBuffer()
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-    glBufferData(GL_ARRAY_BUFFER, vertexes.size() * sizeof(float), vertexes.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
@@ -120,40 +120,52 @@ glm::mat4 Mesh::GetModelMat()
 void Mesh::SubdivideTriangle()
 {
     std::vector<unsigned int> newIndices;
+    std::vector<float> newVerts;
     for (unsigned int i = 0; i < indices.size() / 3; i++)
     {
         //ia is the row in the vertices array
         unsigned int ia = indices[i * 3]; 
         unsigned int ib = indices[i * 3 + 1];
         unsigned int ic = indices[i * 3 + 2]; 
-        glm::vec3 a = glm::vec3(vertexes[ia * 3], vertexes[ia * 3 + 1], vertexes[ia * 3 + 2]);
-        glm::vec3 b = glm::vec3(vertexes[ib * 3], vertexes[ib * 3 + 1], vertexes[ib * 3 + 2]);
-        glm::vec3 c = glm::vec3(vertexes[ic * 3], vertexes[ic * 3 + 1], vertexes[ic * 3 + 2]);
-        glm::vec3 ab = (a + b) * 0.5f;
-        glm::vec3 bc = (b + c) * 0.5f;
-        glm::vec3 ca = (c + a) * 0.5f;
-        unsigned int iab = vertexes.size() / 3; 
-        vertexes.push_back(ab.x);
-        vertexes.push_back(ab.y);
-        vertexes.push_back(ab.z);
-        unsigned int ibc = vertexes.size() / 3; 
-        vertexes.push_back(bc.x);
-        vertexes.push_back(bc.y);
-        vertexes.push_back(bc.z);
-        unsigned int ica = vertexes.size() / 3; 
-        vertexes.push_back(ca.x); 
-        vertexes.push_back(ca.y); 
-        vertexes.push_back(ca.z);
+        glm::vec3 a = glm::vec3(vertices[ia * 3], vertices[ia * 3 + 1], vertices[ia * 3 + 2]);
+        glm::vec3 b = glm::vec3(vertices[ib * 3], vertices[ib * 3 + 1], vertices[ib * 3 + 2]);
+        glm::vec3 c = glm::vec3(vertices[ic * 3], vertices[ic * 3 + 1], vertices[ic * 3 + 2]);
+        glm::vec3 ab = glm::normalize((a + b) * 0.5f);
+        glm::vec3 bc = glm::normalize((b + c) * 0.5f);
+        glm::vec3 ca = glm::normalize((c + a) * 0.5f);
+        ia = newVerts.size() / 3;
+        newVerts.push_back(a.x);
+        newVerts.push_back(a.y);
+        newVerts.push_back(a.z);
+        ib = newVerts.size() / 3;
+        newVerts.push_back(b.x);
+        newVerts.push_back(b.y);
+        newVerts.push_back(b.z);
+        ic = newVerts.size() / 3;
+        newVerts.push_back(c.x);
+        newVerts.push_back(c.y);
+        newVerts.push_back(c.z);
+        unsigned int iab = newVerts.size() / 3;
+        newVerts.push_back(ab.x);
+        newVerts.push_back(ab.y);
+        newVerts.push_back(ab.z);
+        unsigned int ibc = newVerts.size() / 3; 
+        newVerts.push_back(bc.x);
+        newVerts.push_back(bc.y);
+        newVerts.push_back(bc.z);
+        unsigned int ica = newVerts.size() / 3; 
+        newVerts.push_back(ca.x); 
+        newVerts.push_back(ca.y); 
+        newVerts.push_back(ca.z);
         newIndices.push_back(ia); newIndices.push_back(iab); newIndices.push_back(ica);
         newIndices.push_back(ib); newIndices.push_back(ibc); newIndices.push_back(iab);
         newIndices.push_back(ic); newIndices.push_back(ica); newIndices.push_back(ibc);
         newIndices.push_back(iab); newIndices.push_back(ibc); newIndices.push_back(ica);
     }
-    for (unsigned int i = 0; i < newIndices.size(); i++)
-    {
-        indices.push_back(newIndices[i]);
-    }
-    
+    indices.clear();
+    indices = newIndices;
+    vertices.clear();
+    vertices = newVerts;
 }
 
 
@@ -161,7 +173,7 @@ void Mesh::SubdivideTriangle()
 
 Mesh Create2DTriangle(glm::vec3 position, glm::vec3 rotation)
 {
-    std::vector<float> vertices =
+    std::vector<float> verts =
     {
         -1.0f, -1.0f, 0.0f,
         1.0f, -1.0f, 0.0f,
@@ -172,12 +184,12 @@ Mesh Create2DTriangle(glm::vec3 position, glm::vec3 rotation)
         0, 1, 2
     };
 
-    return Mesh(vertices, indices, position, rotation, 1);
+    return Mesh(verts, indices, position, rotation, 1);
 }
 
 Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation)
 {
-    std::vector<float> vertices =
+    std::vector<float> verts =
     {
         -1.0f, -1.0f,  1.0f,
         1.0f, -1.0f,  1.0f,
@@ -203,7 +215,7 @@ Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation)
         3, 2, 6,
         6, 7, 3
     };
-    return Mesh(vertices, indices, position, rotation, 1.0f);
+    return Mesh(verts, indices, position, rotation, 1.0f);
 }
 
 Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdivideNum)
@@ -212,7 +224,7 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
     float t = 0.52573111f;
     float b = 0.850650808f;
 
-    std::vector<float> vertices = {
+    std::vector<float> verts = {
         -t,  b,  0,
         t,  b,  0,
         -t, -b,  0,
@@ -256,42 +268,54 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
     for (unsigned int i = 0; i < subdivideNum; i++)
     {
         std::vector<unsigned int> newIndices;
+        std::vector<float> newVerts;
         for (unsigned int i = 0; i < indices.size() / 3; i++)
         {
             //ia is the row in the vertices array
             unsigned int ia = indices[i * 3]; 
             unsigned int ib = indices[i * 3 + 1];
             unsigned int ic = indices[i * 3 + 2]; 
-            glm::vec3 a = glm::vec3(vertices[ia * 3], vertices[ia * 3 + 1], vertices[ia * 3 + 2]);
-            glm::vec3 b = glm::vec3(vertices[ib * 3], vertices[ib * 3 + 1], vertices[ib * 3 + 2]);
-            glm::vec3 c = glm::vec3(vertices[ic * 3], vertices[ic * 3 + 1], vertices[ic * 3 + 2]);
+            glm::vec3 a = glm::vec3(verts[ia * 3], verts[ia * 3 + 1], verts[ia * 3 + 2]);
+            glm::vec3 b = glm::vec3(verts[ib * 3], verts[ib * 3 + 1], verts[ib * 3 + 2]);
+            glm::vec3 c = glm::vec3(verts[ic * 3], verts[ic * 3 + 1], verts[ic * 3 + 2]);
             glm::vec3 ab = glm::normalize((a + b) * 0.5f);
             glm::vec3 bc = glm::normalize((b + c) * 0.5f);
             glm::vec3 ca = glm::normalize((c + a) * 0.5f);
-            unsigned int iab = vertices.size() / 3; 
-            vertices.push_back(ab.x);
-            vertices.push_back(ab.y);
-            vertices.push_back(ab.z);
-            unsigned int ibc = vertices.size() / 3; 
-            vertices.push_back(bc.x);
-            vertices.push_back(bc.y);
-            vertices.push_back(bc.z);
-            unsigned int ica = vertices.size() / 3; 
-            vertices.push_back(ca.x); 
-            vertices.push_back(ca.y); 
-            vertices.push_back(ca.z);
+            ia = newVerts.size() / 3;
+            newVerts.push_back(a.x);
+            newVerts.push_back(a.y);
+            newVerts.push_back(a.z);
+            ib = newVerts.size() / 3;
+            newVerts.push_back(b.x);
+            newVerts.push_back(b.y);
+            newVerts.push_back(b.z);
+            ic = newVerts.size() / 3;
+            newVerts.push_back(c.x);
+            newVerts.push_back(c.y);
+            newVerts.push_back(c.z);
+            unsigned int iab = newVerts.size() / 3;
+            newVerts.push_back(ab.x);
+            newVerts.push_back(ab.y);
+            newVerts.push_back(ab.z);
+            unsigned int ibc = newVerts.size() / 3; 
+            newVerts.push_back(bc.x);
+            newVerts.push_back(bc.y);
+            newVerts.push_back(bc.z);
+            unsigned int ica = newVerts.size() / 3; 
+            newVerts.push_back(ca.x); 
+            newVerts.push_back(ca.y); 
+            newVerts.push_back(ca.z);
             newIndices.push_back(ia); newIndices.push_back(iab); newIndices.push_back(ica);
             newIndices.push_back(ib); newIndices.push_back(ibc); newIndices.push_back(iab);
             newIndices.push_back(ic); newIndices.push_back(ica); newIndices.push_back(ibc);
             newIndices.push_back(iab); newIndices.push_back(ibc); newIndices.push_back(ica);
         }
-        for (unsigned int i = 0; i < newIndices.size(); i++)
-        {
-            indices.push_back(newIndices[i]);
-        }
-        
+        indices.clear();
+        indices = newIndices;
+        verts.clear();
+        verts = newVerts;
     }
 
-    return Mesh(vertices, indices, position, rotation, 1.0f);
+    return Mesh(verts, indices, position, rotation, 1.0f);
 }
 

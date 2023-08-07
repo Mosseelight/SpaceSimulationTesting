@@ -28,14 +28,14 @@ private:
 
 public:
 
-    std::vector<float> vertexes;
+    std::vector<float> vertices;
     std::vector<unsigned int> indices;
     glm::vec3 position, rotation;
     float scale;
 
     Mesh();
     Mesh(const Mesh &other);
-    Mesh(std::vector<float> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale);
+    Mesh(std::vector<float> vertices, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale);
     void BufferGens();
     void ReGenBuffer();
     void DrawMesh();
