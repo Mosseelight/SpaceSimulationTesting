@@ -130,9 +130,9 @@ void Mesh::SubdivideTriangle()
         glm::vec3 a = glm::vec3(vertices[ia * 3], vertices[ia * 3 + 1], vertices[ia * 3 + 2]);
         glm::vec3 b = glm::vec3(vertices[ib * 3], vertices[ib * 3 + 1], vertices[ib * 3 + 2]);
         glm::vec3 c = glm::vec3(vertices[ic * 3], vertices[ic * 3 + 1], vertices[ic * 3 + 2]);
-        glm::vec3 ab = glm::normalize((a + b) * 0.5f);
-        glm::vec3 bc = glm::normalize((b + c) * 0.5f);
-        glm::vec3 ca = glm::normalize((c + a) * 0.5f);
+        glm::vec3 ab = (a + b) * 0.5f;
+        glm::vec3 bc = (b + c) * 0.5f;
+        glm::vec3 ca = (c + a) * 0.5f;
         ia = newVerts.size() / 3;
         newVerts.push_back(a.x);
         newVerts.push_back(a.y);
