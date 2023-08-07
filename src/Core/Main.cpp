@@ -18,6 +18,9 @@
 #include "../include/Core/Camera.hpp"
 #include "../include/Core/ResUtil.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "../include/3rdp/stb_image.h"
+
 bool DebugWindow = false;
 bool showWireFrame = false;
 float currentTime = 0.0f;
@@ -25,7 +28,9 @@ float deltaTime = 0.0f;
 float lastTime = 0.0f;
 int currentSCRWIDTH = 0;
 int currentSCRHEIGHT = 0;
+GLFWimage windowIcon;
 
+const std::string imageLoc = "res/Textures";
 const std::string shaderLoc = "res/Shaders";
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -52,6 +57,9 @@ int main()
     gladLoadGL();
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
+    windowIcon.pixels = stbi_load((imageLoc + "/IconSpace.png").c_str(), &windowIcon.width, &windowIcon.height, 0, 4);
+    glfwSetWindowIcon(window, 1, &windowIcon);
+    stbi_image_free(windowIcon.pixels);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
