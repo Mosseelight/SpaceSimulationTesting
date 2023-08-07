@@ -7,13 +7,15 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-    
+    std::cout << "Scene got deleted" << std::endl;
+    DeleteObjects();
 }
 
 void Scene::AddSpaceObject(Mesh mesh)
 {
-    unsigned int id = idList.size();
+    unsigned int id = SpaceObjects.size();
     SpaceObjects.push_back(SpaceObject(mesh, id));
+    SpaceObjects[id].SO_mesh.BufferGens();
     idList.push_back(id);
 }
 
@@ -76,8 +78,16 @@ void Scene::DrawSingle(Shader *shader)
     for (unsigned int i = 0; i < SpaceObjects.size(); i++)
     {
         shader->setMat4("model", SpaceObjects[i].SO_mesh.GetModelMat());
-        shader->setVec4("color", glm::vec4(0.0f, i / 255.0f, 0.0f, 1.0f));
+        shader->setVec4("color", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
         SpaceObjects[i].SO_mesh.DrawMesh();
     }
     
+}
+
+void Scene::DeleteObjects()
+{
+    for (unsigned int i = 0; i < SpaceObjects.size(); i++)
+    {
+        SpaceObjects[i].SO_mesh.Delete();
+    }
 }

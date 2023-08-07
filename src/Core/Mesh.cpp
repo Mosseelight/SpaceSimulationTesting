@@ -22,6 +22,18 @@ Mesh::Mesh()
 
 }
 
+Mesh::Mesh(const Mesh &other)
+{
+    this->vao = other.vao;
+    this->vbo = other.vbo;
+    this->ebo = other.ebo;
+    this->vertexes = other.vertexes;
+    this->indices = other.indices;
+    this->position = other.position;
+    this->rotation = other.rotation;
+    this->scale = other.scale;
+}
+
 Mesh::Mesh(std::vector<float> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale)
 {
     this->vertexes = vertexes;
@@ -31,7 +43,7 @@ Mesh::Mesh(std::vector<float> vertexes, std::vector<unsigned int> indices, glm::
     this->scale = scale;
 }
 
-Mesh::~Mesh()
+void Mesh::Delete()
 {
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
@@ -40,6 +52,7 @@ Mesh::~Mesh()
 
 void Mesh::BufferGens()
 {
+    BufferLock = true;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     glGenBuffers(1, &vbo);
@@ -55,10 +68,12 @@ void Mesh::BufferGens()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    BufferLock = false;
 }
 
 void Mesh::ReGenBuffer()
 {
+    BufferLock = true;
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
     glDeleteVertexArrays(1, &vao);
@@ -78,13 +93,17 @@ void Mesh::ReGenBuffer()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    BufferLock = false;
 }
 
 void Mesh::DrawMesh()
 {
-    glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    DrawCallCount++;
+    if(!BufferLock)
+    {
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        DrawCallCount++;
+    }
 }
 
 glm::mat4 Mesh::GetModelMat()

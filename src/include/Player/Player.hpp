@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "../Core/Camera.hpp"
+#include <iostream>
 
 class Player
 {

@@ -8,6 +8,7 @@ Shader::Shader()
 Shader::~Shader()
 {
     glDeleteProgram(shader);
+    std::cout << "Shader deleted Id: " << shader << std::endl;
 }
 
 void Shader::CompileShader(ShaderLoc location)

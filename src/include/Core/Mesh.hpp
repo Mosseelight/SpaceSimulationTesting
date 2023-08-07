@@ -24,6 +24,7 @@ class Mesh
 private:
 
     unsigned int vao, vbo, ebo;
+    bool BufferLock = false;
 
 public:
 
@@ -33,11 +34,12 @@ public:
     float scale;
 
     Mesh();
+    Mesh(const Mesh &other);
     Mesh(std::vector<float> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale);
-    ~Mesh();
     void BufferGens();
     void ReGenBuffer();
     void DrawMesh();
+    void Delete();
     glm::mat4 GetModelMat();
     void SubdivideTriangle();
 };
