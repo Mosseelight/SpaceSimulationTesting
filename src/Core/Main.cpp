@@ -41,7 +41,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void buildVerticesFlat();
 
-Mesh mesh;
 Shader shader;
 std::unique_ptr<Camera> cam;
 Scene mainScene;
@@ -72,11 +71,19 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
+    Mesh mesh;
     LoadModel(&mesh, modelLoc + "/Monkey.obj");
+    mesh.Balloon(0, 0, 0.8f);
     mesh.scale = 1;
     mesh.position = glm::vec3(0);
     mesh.rotation = glm::vec3(0);
     mainScene.AddSpaceObject(mesh);
+    Mesh mesh2;
+    LoadModel(&mesh2, modelLoc + "/Teapot.obj");
+    mesh2.scale = 1;
+    mesh2.position = glm::vec3(3, 0, 0);
+    mesh2.rotation = glm::vec3(0);
+    mainScene.AddSpaceObject(mesh2);
 
     cam.reset(new Camera(glm::vec3(0,0,10), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,0), 35));
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));

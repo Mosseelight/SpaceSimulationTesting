@@ -62,12 +62,12 @@ public:
     Mesh(std::vector<Vertex> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale);
     Mesh(std::vector<float> vertices, std::vector<float> normals, std::vector<float> uv, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale);
     void BufferGens();
-    void OldBufferGens(); //normals and uv not supported;
     void ReGenBuffer();
     void DrawMesh();
     void Delete();
     glm::mat4 GetModelMat();
     void SubdivideTriangle();
+    void Balloon(float delta, float speed, float percentage);
 };
 
 

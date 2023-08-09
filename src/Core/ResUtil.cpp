@@ -82,7 +82,7 @@ void LoadModel(Mesh *mesh, std::string location)
             line = stringRemove(line, " ", " ");
             line = stringRemove(line, "/", " ");
             std::istringstream data(line);
-            float ind, uvind, norind;
+            unsigned int ind, uvind, norind;
             data >> ind;
             data >> uvind;
             data >> norind;
@@ -102,7 +102,7 @@ void LoadModel(Mesh *mesh, std::string location)
         unsigned int indUv = tmpUVInd[i];
         unsigned int indNor = tmpNormalInd[i];
         unsigned int indVert = tmpInd[i];
-        mesh->indices.push_back(vertexes.size());
+        mesh->indices.push_back(i);
         vertexes.push_back(vertex);
         vertexes[i].uv = tmpUV[indUv - 1];
         vertexes[i].normal = tmpNormal[indNor - 1]; 
