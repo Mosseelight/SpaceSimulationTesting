@@ -21,7 +21,7 @@ void Scene::AddSpaceObject(Mesh mesh)
 
 //dont know if 10 is good step num 
 //test to figure out
-void Scene::DrawFull(unsigned int stepSize)
+/*void Scene::DrawFull(unsigned int stepSize)
 {
 
     std::vector<float> tmp_Vertices;
@@ -71,14 +71,14 @@ void Scene::DrawFull(unsigned int stepSize)
         
     }
 
-}
+}*/
 
 void Scene::DrawSingle(Shader *shader)
 {
     for (unsigned int i = 0; i < SpaceObjects.size(); i++)
     {
         shader->setMat4("model", SpaceObjects[i].SO_mesh.GetModelMat());
-        shader->setVec4("color", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        shader->setVec3("color", glm::vec3(0.0f, 1.0f, 0.0f));
         SpaceObjects[i].SO_mesh.DrawMesh();
     }
     

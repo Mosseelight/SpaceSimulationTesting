@@ -27,21 +27,36 @@ Mesh::Mesh(const Mesh &other)
     this->vao = other.vao;
     this->vbo = other.vbo;
     this->ebo = other.ebo;
+    this->vertexes = other.vertexes;
     this->vertices = other.vertices;
+    this->normals = other.normals;
+    this->uv = other.uv;
     this->indices = other.indices;
     this->position = other.position;
     this->rotation = other.rotation;
     this->scale = other.scale;
 }
 
-Mesh::Mesh(std::vector<float> vertices, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale)
+Mesh::Mesh(std::vector<Vertex> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale)
 {
-    this->vertices = vertices;
+    this->vertexes = vertexes;
     this->indices = indices;
     this->position = position;
     this->rotation = rotation;
     this->scale = scale;
 }
+
+Mesh::Mesh(std::vector<float> vertices, std::vector<float> normals, std::vector<float> uv, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale)
+{
+    this->vertices = vertices;
+    this->normals = normals;
+    this->uv = uv;
+    this->indices = indices;
+    this->position = position;
+    this->rotation = rotation;
+    this->scale = scale;
+}
+
 
 void Mesh::Delete()
 {
@@ -50,24 +65,49 @@ void Mesh::Delete()
     glDeleteVertexArrays(1, &vao);
 }
 
+std::vector<Vertex> Mesh::CombineToVertex()
+{
+    std::vector<Vertex> tempVertex;
+    std::cout << "no vertexes combining to vertex" << std::endl;
+    for (unsigned int i = 0; i < vertices.size() / 3; i++)
+    {
+        Vertex tmpVertex = Vertex(glm::vec3(0), glm::vec3(0), glm::vec2(0));
+        if(vertices.size() != 0)
+            tmpVertex.position = glm::vec3(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
+        if(normals.size() != 0)
+            tmpVertex.normal = glm::vec3(normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]);
+        if(uv.size() != 0)
+            tmpVertex.uv = glm::vec2(uv[i * 2], uv[i * 2 + 1]);
+        tempVertex.push_back(tmpVertex);
+    }
+    return tempVertex;
+}
+
 void Mesh::BufferGens()
 {
     BufferLock = true;
+    if(vertexes.size() == 0)
+        vertexes = CombineToVertex();
     glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
     glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+  
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexes.size() * sizeof(Vertex), vertexes.data(), GL_STATIC_DRAW);  
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);	
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    glEnableVertexAttribArray(1);	
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(2);	
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+
     glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     BufferLock = false;
 }
 
@@ -82,14 +122,18 @@ void Mesh::ReGenBuffer()
     glBindVertexArray(vao);
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(float), (void*) 0);
+
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, 3 * sizeof(float), (void*) 0);
+
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -179,49 +223,70 @@ Mesh Create2DTriangle(glm::vec3 position, glm::vec3 rotation)
         1.0f, -1.0f, 0.0f,
         -1.0f, 1.0f, 0.0f,
     };
+    std::vector<float> normals =
+    {
+        0.0f,0.0f,1.0f,
+        0.0f,0.0f,1.0f,
+        0.0f,1.0f,0.0f
+    };
+    std::vector<float> uv =
+    {
+        0.0f,1.0f,
+        0.0f,1.0f,
+        0.0f,1.0f
+    };
+    std::vector<Vertex> vertxes;
+    Vertex tmpvertex = Vertex(glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f));
+    vertxes.push_back(tmpvertex);
+    tmpvertex.position = glm::vec3(1.0f, -1.0f, 0.0f);
+    vertxes.push_back(tmpvertex);
+    tmpvertex.position = glm::vec3(-1.0f, 1.0f, 0.0f);
+    vertxes.push_back(tmpvertex);
+    
     std::vector<unsigned int> indices =
     {
         0, 1, 2
     };
-
-    return Mesh(verts, indices, position, rotation, 1);
+    return Mesh(vertxes, indices, position, rotation, 1);
 }
 
 Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation)
 {
     std::vector<float> verts =
     {
-        -1.0f, -1.0f,  1.0f,
-        1.0f, -1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f, 1.0f,
+        -1.0f, 1.0f, 1.0f,
         -1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f
+        -1.0f, 1.0f, -1.0f,
+        1.0f,-1.0f, 1.0f,
+        1.0f,1.0f, 1.0f,
+        1.0f,-1.0f, -1.0f,
+        1.0f,1.0f, -1.0f
     };
+    std::vector<float> normals;
+    std::vector<float> uv;
     std::vector<unsigned int> indices =
     {
-        0, 1, 2,
-        2, 3, 0,
-        1, 5, 6,
-        6, 2, 1,
-        7, 6, 5,
-        5, 4, 7,
-        4, 0, 3,
-        3, 7, 4,
-        4, 5, 1,
-        1, 0, 4,
-        3, 2, 6,
-        6, 7, 3
+        1, 2, 0,
+        3, 6, 2,
+        7, 4, 6,
+        5, 0, 4,
+        6, 0, 2,
+        3, 5, 7,
+        1, 3, 2,
+        3, 7, 6,
+        7, 5, 4,
+        5, 1, 0,
+        6, 4, 0,
+        3, 1, 5
     };
-    return Mesh(verts, indices, position, rotation, 1.0f);
+    return Mesh(verts, normals, uv, indices, position, rotation, 1.0f);
 }
 
 Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdivideNum)
 {
 
-    float t = 0.52573111f;
+    float t = 0.52573111f;  
     float b = 0.850650808f;
 
     std::vector<float> verts = {
@@ -264,6 +329,9 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
         8, 6, 7,
         9, 8, 1
     };
+
+    std::vector<float> normals;
+    std::vector<float> uv;
 
     for (unsigned int i = 0; i < subdivideNum; i++)
     {
@@ -316,6 +384,6 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
         verts = newVerts;
     }
 
-    return Mesh(verts, indices, position, rotation, 1.0f);
+    return Mesh(verts, normals, uv, indices, position, rotation, 1.0f);
 }
 

@@ -32,6 +32,7 @@ GLFWimage windowIcon;
 
 const std::string imageLoc = "res/Textures";
 const std::string shaderLoc = "res/Shaders";
+const std::string modelLoc = "res/Models";
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void Update(GLFWwindow* window);
@@ -40,6 +41,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void buildVerticesFlat();
 
+Mesh mesh;
 Shader shader;
 std::unique_ptr<Camera> cam;
 Scene mainScene;
@@ -70,11 +72,17 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
+    LoadModel(&mesh, modelLoc + "/Monkey.obj");
+    mesh.scale = 1;
+    mesh.position = glm::vec3(0);
+    mesh.rotation = glm::vec3(0);
+    mainScene.AddSpaceObject(mesh);
+
     cam.reset(new Camera(glm::vec3(0,0,10), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,0), 35));
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
     for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
     {
-        vertCount += mainScene.SpaceObjects[i].SO_mesh.vertices.size();
+        vertCount += mainScene.SpaceObjects[i].SO_mesh.vertexes.size();
         indCount += mainScene.SpaceObjects[i].SO_mesh.indices.size();
     }
 
