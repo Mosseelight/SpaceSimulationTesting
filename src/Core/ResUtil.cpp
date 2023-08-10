@@ -121,7 +121,7 @@ int parseLine(char* line){
     return i;
 }
 
-int GetRamUsage()
+float GetRamUsage()
 {
     FILE* file = fopen("/proc/self/status", "r");
     int result = -1;

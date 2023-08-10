@@ -56,6 +56,7 @@ int main()
     GLFWwindow* window = glfwCreateWindow(SCRWIDTH, SCRHEIGHT, "SpaceSim", NULL, NULL);
     glfwMakeContextCurrent(window);
     gladLoadGL();
+    glEnable(GL_DEPTH_TEST);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetKeyCallback(window, key_callback);
     windowIcon.pixels = stbi_load((imageLoc + "/IconSpace.png").c_str(), &windowIcon.width, &windowIcon.height, 0, 4);
@@ -72,18 +73,19 @@ int main()
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
     Mesh mesh;
-    LoadModel(&mesh, modelLoc + "/Monkey.obj");
-    mesh.Balloon(0, 0, 0.8f);
+    LoadModel(&mesh, modelLoc + "/Bunny.obj");
     mesh.scale = 1;
-    mesh.position = glm::vec3(0);
+    mesh.position = glm::vec3(0,-1,0);
     mesh.rotation = glm::vec3(0);
     mainScene.AddSpaceObject(mesh);
     Mesh mesh2;
-    LoadModel(&mesh2, modelLoc + "/Teapot.obj");
+    LoadModel(&mesh2, modelLoc + "/Torus.obj");
     mesh2.scale = 1;
     mesh2.position = glm::vec3(3, 0, 0);
     mesh2.rotation = glm::vec3(0);
     mainScene.AddSpaceObject(mesh2);
+    Mesh mesh3 = CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 2);
+    mainScene.AddSpaceObject(mesh3);
 
     cam.reset(new Camera(glm::vec3(0,0,10), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,0), 35));
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
@@ -125,6 +127,7 @@ void Update(GLFWwindow* window)
 
     glClearColor(0.0f, 0.54f, 0.54f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDepthFunc(GL_LESS);
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     if(showWireFrame)
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -171,7 +174,7 @@ void ImguiMenu()
     ImGui::Text("%d verts, %d indices (%d tris)", vertCount, indCount, indCount / 3);
     ImGui::Text("Amount of SpaceObjs: (%d)", mainScene.SpaceObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
-    ImGui::Text("Ram Usage: %dmb", GetRamUsage() / 1024);
+    ImGui::Text("Ram Usage: %.2fmb", GetRamUsage() / 1024);
     ImGui::Text("Time Open %.1f minutes", glfwGetTime() / 60);
 
     ImGui::Spacing();
@@ -205,7 +208,7 @@ void ImguiMenu()
 
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
                 {
-                    ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.position), 0.01f, -10.0f, 10.0f);
+                    ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.position), 0.01f, -100000.0f, 100000.0f);
                     ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.rotation), 0.1f, 360.0f, 360.0f);
                     ImGui::TreePop();
                 }
@@ -247,7 +250,7 @@ void ImguiMenu()
         ImGui::InputFloat3("Object Position", glm::value_ptr(selposition));
         ImGui::InputFloat3("Object Rotation", glm::value_ptr(selrotation));
         if(counter == MeshType::IcoSphereMesh)
-            ImGui::SliderInt("IcoSphere Subdivison level", &IcoSphereSub, 0, 15);
+            ImGui::SliderInt("IcoSphere Subdivison level", &IcoSphereSub, 0, 10);
 
         if(ImGui::Button("Add Object"))
         {

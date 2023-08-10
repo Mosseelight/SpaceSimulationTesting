@@ -66,6 +66,7 @@ public:
     void DrawMesh();
     void Delete();
     glm::mat4 GetModelMat();
+    void FixWindingOrder();
     void SubdivideTriangle();
     void Balloon(float delta, float speed, float percentage);
 };
