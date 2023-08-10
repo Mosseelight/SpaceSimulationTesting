@@ -7,7 +7,7 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-    std::cout << "Scene got deleted" << std::endl;
+    DebugLog("Scene got deleted");
     DeleteObjects();
 }
 
@@ -89,5 +89,6 @@ void Scene::DeleteObjects()
     for (unsigned int i = 0; i < SpaceObjects.size(); i++)
     {
         SpaceObjects[i].SO_mesh.Delete();
+        DebugLog("Deleted Space Object id: " + SpaceObjects[i].SO_id);
     }
 }

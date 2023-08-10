@@ -44,7 +44,6 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	cp -r $(RES) $(BUILD_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LIBS) $(INCLUDE) -g -O3 -c $< -o $@ 
 
-
 .PHONY: clean
 clean:
 	rm -r $(BUILD_DIR)

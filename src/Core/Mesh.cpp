@@ -1,4 +1,5 @@
 #include "../include/Core/Mesh.hpp"
+#include "../include/Core/Debug.hpp"
 
 std::string GetMeshTypeName(MeshType type)
 {
@@ -12,6 +13,9 @@ std::string GetMeshTypeName(MeshType type)
         break;
     case TriangleMesh:
         return "TriangleMesh";
+        break;
+    case FileMesh:
+        return "FileMesh";
         break;
     }
     return "No Mesh";
@@ -68,7 +72,7 @@ void Mesh::Delete()
 std::vector<Vertex> Mesh::CombineToVertex()
 {
     std::vector<Vertex> tempVertex;
-    std::cout << "no vertexes combining to vertex" << std::endl;
+    DebugLog("no vertexes combining to vertex");
     for (unsigned int i = 0; i < vertices.size() / 3; i++)
     {
         Vertex tmpVertex = Vertex(glm::vec3(0), glm::vec3(0), glm::vec2(0));

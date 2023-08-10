@@ -17,6 +17,7 @@
 #include "../include/Core/Shader.hpp"
 #include "../include/Core/Camera.hpp"
 #include "../include/Core/ResUtil.hpp"
+#include "../include/Core/Debug.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../include/3rdp/stb_image.h"
@@ -30,9 +31,9 @@ int currentSCRWIDTH = 0;
 int currentSCRHEIGHT = 0;
 GLFWimage windowIcon;
 
-const std::string imageLoc = "res/Textures";
-const std::string shaderLoc = "res/Shaders";
-const std::string modelLoc = "res/Models";
+const std::string imageLoc = "res/Textures/";
+const std::string shaderLoc = "res/Shaders/";
+const std::string modelLoc = "res/Models/";
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void Update(GLFWwindow* window);
@@ -48,6 +49,7 @@ unsigned int vertCount, indCount;
 
 int main()
 {
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -72,23 +74,12 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
-    Mesh mesh;
-    LoadModel(&mesh, modelLoc + "/Bunny.obj");
-    mesh.scale = 1;
-    mesh.position = glm::vec3(0,-1,0);
-    mesh.rotation = glm::vec3(0);
-    mainScene.AddSpaceObject(mesh);
-    Mesh mesh2;
-    LoadModel(&mesh2, modelLoc + "/Torus.obj");
-    mesh2.scale = 1;
-    mesh2.position = glm::vec3(3, 0, 0);
-    mesh2.rotation = glm::vec3(0);
-    mainScene.AddSpaceObject(mesh2);
-    Mesh mesh3 = CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 2);
-    mainScene.AddSpaceObject(mesh3);
+    mainScene.AddSpaceObject(LoadModel(glm::vec3(0,-1,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    mainScene.AddSpaceObject(LoadModel(glm::vec3(3,0,0), glm::vec3(0), modelLoc + "Torus.obj"));
+    mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 2));
 
     cam.reset(new Camera(glm::vec3(0,0,10), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,0), 35));
-    shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "/Default.vert"), ReadFile(shaderLoc + "/Default.frag")));
+    shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
     for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
     {
         vertCount += mainScene.SpaceObjects[i].SO_mesh.vertexes.size();
@@ -104,6 +95,7 @@ int main()
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
     glfwTerminate();
+    CreateFileLog();
     return 0;
 }
 
@@ -161,6 +153,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 bool ShowSceneViewerMenu = false;
 bool ShowObjectViewerMenu = false;
+bool ShowConsoleViewerMenu = false;
 void ImguiMenu()
 {
     
@@ -189,6 +182,7 @@ void ImguiMenu()
         {
             ImGui::MenuItem("Scene Viewer", NULL, &ShowSceneViewerMenu);
             ImGui::MenuItem("Object Viewer", NULL, &ShowObjectViewerMenu);
+            ImGui::MenuItem("Console Viewer", NULL, &ShowConsoleViewerMenu);
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
@@ -226,6 +220,7 @@ void ImguiMenu()
         static glm::vec3 selposition;
         static glm::vec3 selrotation;
         static int IcoSphereSub = 0;
+        static char input[128] = "mesh.obj";
         MeshType type;
         ImGui::SetNextWindowSize(ImVec2(600,420), ImGuiCond_FirstUseEver);
         ImGui::Begin("Object Viewer");
@@ -251,6 +246,12 @@ void ImguiMenu()
         ImGui::InputFloat3("Object Rotation", glm::value_ptr(selrotation));
         if(counter == MeshType::IcoSphereMesh)
             ImGui::SliderInt("IcoSphere Subdivison level", &IcoSphereSub, 0, 10);
+        if(counter == MeshType::FileMesh)
+        {
+            ImGui::Text(modelLoc.c_str());
+            ImGui::SameLine();
+            ImGui::InputText("Mesh File Name", input, IM_ARRAYSIZE(input));
+        }
 
         if(ImGui::Button("Add Object"))
         {
@@ -266,13 +267,22 @@ void ImguiMenu()
             case TriangleMesh:
                 selmesh = Create2DTriangle(selposition, selrotation);
                 break;
+            case FileMesh:
+                selmesh = LoadModel(selposition, selrotation, modelLoc + input);
             }
             objectSelected = true;
-            vertCount += selmesh.vertices.size();
+            vertCount += selmesh.vertexes.size() * 3;
             indCount += selmesh.indices.size();
             mainScene.AddSpaceObject(selmesh);
         }
 
+        ImGui::End();
+    }
+
+    if(ShowConsoleViewerMenu)
+    {
+        ImGui::SetNextWindowSize(ImVec2(600,420), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Console Viewer");
         ImGui::End();
     }
 }

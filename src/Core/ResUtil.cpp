@@ -5,7 +5,7 @@ std::string ReadFile(std::string location)
     std::string contents;
     std::ifstream file(location);
     if(!file)
-        std::cout << "Location for File not found " << location << std::endl;
+        DebugLog("Location for File not found " + location);
 
     std::string line;
     while(std::getline(file, line))
@@ -15,6 +15,26 @@ std::string ReadFile(std::string location)
 
     file.close();
     return contents;
+}
+
+void CreateFile(std::string location, std::string name)
+{
+    std::ifstream check(location + name);
+    if(!check)
+    {
+        std::ofstream file(location + name);
+        file.close();
+    }
+    else
+        DebugLog("File " + location + name + " already there");
+    check.close();
+}
+
+void WriteFile(std::string location, std::string content)
+{
+    std::ofstream file(location, std::ios::app);
+    file << content << std::endl;
+    file.close();
 }
 
 std::string stringRemove(std::string s, std::string del = " ", std::string adder = "")
@@ -29,11 +49,15 @@ std::string stringRemove(std::string s, std::string del = " ", std::string adder
     return a;
 }
 
-void LoadModel(Mesh *mesh, std::string location)
+Mesh LoadModel(glm::vec3 position, glm::vec3 rotation, std::string location)
 {
+    Mesh mesh;
+    mesh.position = position;
+    mesh.rotation = rotation;
+    mesh.scale = 1;
     std::ifstream file(location);
     if(!file)
-        std::cout << "Location for Mesh not found " << location << std::endl;
+        DebugLog("Location for Mesh not found " + location);
 
     std::string line;
     std::vector<Vertex> vertexes;
@@ -102,14 +126,15 @@ void LoadModel(Mesh *mesh, std::string location)
         unsigned int indUv = tmpUVInd[i];
         unsigned int indNor = tmpNormalInd[i];
         unsigned int indVert = tmpInd[i];
-        mesh->indices.push_back(i);
+        mesh.indices.push_back(i);
         vertexes.push_back(vertex);
         vertexes[i].uv = tmpUV[indUv - 1];
         vertexes[i].normal = tmpNormal[indNor - 1]; 
         vertexes[i].position = tmpVertice[indVert - 1];
     }
-    mesh->vertexes = vertexes;
+    mesh.vertexes = vertexes;
     file.close();
+    return mesh;
 }
 
 int parseLine(char* line){

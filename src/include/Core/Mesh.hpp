@@ -13,8 +13,9 @@ enum MeshType
     CubeMesh,
     IcoSphereMesh,
     TriangleMesh,
+    FileMesh,
     First = CubeMesh,
-    Last = TriangleMesh
+    Last = FileMesh
 };
 
 std::string GetMeshTypeName(MeshType type);
