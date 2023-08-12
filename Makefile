@@ -12,7 +12,7 @@ SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
 # As an example, ./your_dir/hello.cpp turns into ./build/./your_dir/hello.cpp.o
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
-LIBS = -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl
+LIBS = -lSDL2
 
 RES = $(SRC_DIRS)/res
 

@@ -1,7 +1,7 @@
 #include "../include/glad/glad.h"
-#include <GLFW/glfw3.h>
+#include <SDL2/SDL.h>
 #include "../include/imgui/imgui.h"
-#include "../include/backends/imgui_impl_glfw.h"
+#include "../include/backends/imgui_impl_sdl2.h"
 #include "../include/backends/imgui_impl_opengl3.h"
 #include <iostream>
 #include <glm/glm.hpp>
@@ -15,12 +15,18 @@
 #include "../include/Core/Scene.hpp"
 #include "../include/Core/Mesh.hpp"
 #include "../include/Core/Shader.hpp"
-#include "../include/Core/Camera.hpp"
+#include "../include/Player/Camera.hpp"
 #include "../include/Core/ResUtil.hpp"
 #include "../include/Core/Debug.hpp"
 
+//player
+#include "../include/Player/Camera.hpp"
+#include "../include/Player/Player.hpp"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "../include/3rdp/stb_image.h"
+
+#define GetTime() SDL_GetTicks64() / 1000.0f
 
 bool DebugWindow = false;
 bool showWireFrame = false;
@@ -29,40 +35,37 @@ float deltaTime = 0.0f;
 float lastTime = 0.0f;
 int currentSCRWIDTH = 0;
 int currentSCRHEIGHT = 0;
-GLFWimage windowIcon;
+SDL_Surface windowIcon;
 
 const std::string imageLoc = "res/Textures/";
 const std::string shaderLoc = "res/Shaders/";
 const std::string modelLoc = "res/Models/";
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void Update(GLFWwindow* window);
+void Update(SDL_Window* window);
 void ImguiMenu();
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-void buildVerticesFlat();
+void input();
 
 Shader shader;
-std::unique_ptr<Camera> cam;
+std::unique_ptr<Player> player;
 Scene mainScene;
 unsigned int vertCount, indCount;
 
+int run = 1;
 int main()
 {
 
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    SDL_Init(SDL_INIT_VIDEO);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
 
-    GLFWwindow* window = glfwCreateWindow(SCRWIDTH, SCRHEIGHT, "SpaceSim", NULL, NULL);
-    glfwMakeContextCurrent(window);
+    SDL_Window* window = SDL_CreateWindow("SpaceSim", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCRWIDTH, SCRHEIGHT, SDL_WINDOW_OPENGL);
+    SDL_GLContext context = SDL_GL_CreateContext(window);
     gladLoadGL();
     glEnable(GL_DEPTH_TEST);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetKeyCallback(window, key_callback);
-    windowIcon.pixels = stbi_load((imageLoc + "/IconSpace.png").c_str(), &windowIcon.width, &windowIcon.height, 0, 4);
-    glfwSetWindowIcon(window, 1, &windowIcon);
+    windowIcon.pixels = stbi_load((imageLoc + "/IconSpace.png").c_str(), &windowIcon.w, &windowIcon.h, 0, 4);
+    //SDL_SetWindowIcon(window, &windowIcon);
     stbi_image_free(windowIcon.pixels);
 
     IMGUI_CHECKVERSION();
@@ -70,7 +73,7 @@ int main()
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     
 
-    ImGui_ImplGlfw_InitForOpenGL(window, true);          
+    ImGui_ImplSDL2_InitForOpenGL(window, context);
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
@@ -78,7 +81,7 @@ int main()
     mainScene.AddSpaceObject(LoadModel(glm::vec3(3,0,0), glm::vec3(0), modelLoc + "Torus.obj"));
     mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 2));
 
-    cam.reset(new Camera(glm::vec3(0,0,10), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,0), 35));
+    player.reset(new Player(20.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
     for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
     {
@@ -86,32 +89,36 @@ int main()
         indCount += mainScene.SpaceObjects[i].SO_mesh.indices.size();
     }
 
-    while(!glfwWindowShouldClose(window))
+    while(run)
     {
         Update(window);
     }
     
     ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
-    glfwTerminate();
+    SDL_GL_DeleteContext(context);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
     CreateFileLog();
     return 0;
 }
 
-void Update(GLFWwindow* window)
+void Update(SDL_Window* window)
 {
-    glfwGetWindowSize(window, &currentSCRWIDTH, &currentSCRHEIGHT);
+    SDL_GetWindowSize(window, &currentSCRWIDTH, &currentSCRHEIGHT);
 
-    currentTime = glfwGetTime();
+    currentTime = GetTime();
     deltaTime = currentTime - lastTime;
     lastTime = currentTime;
-    drawCallAvg = DrawCallCount / (glfwGetTime() / deltaTime);
+    drawCallAvg = DrawCallCount / (GetTime() / deltaTime);
+
+    player->UpdatePlayer();
 
     if(DebugWindow)
     {
         ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
         ImguiMenu();
@@ -125,8 +132,8 @@ void Update(GLFWwindow* window)
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     glUseProgram(shader.shader);
-    shader.setMat4("proj", cam->GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f));
-    shader.setMat4("view", cam->GetViewMat());
+    shader.setMat4("proj", player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f));
+    shader.setMat4("view", player->camera.GetViewMat());
     mainScene.DrawSingle(&shader);
 
     if(DebugWindow)
@@ -135,19 +142,47 @@ void Update(GLFWwindow* window)
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+
+    input();
+    SDL_GL_SwapWindow(window);
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+void input()
 {
-    glViewport(0, 0, width, height);
-}
-
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    if(key == GLFW_KEY_GRAVE_ACCENT && action == GLFW_PRESS)
-        DebugWindow = !DebugWindow;
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        ImGui_ImplSDL2_ProcessEvent(&event);
+        switch (event.type) {
+        case SDL_QUIT:
+            run = 0;
+            break;
+        case SDL_KEYDOWN:
+            switch (event.key.keysym.sym)
+            {
+            case SDLK_BACKQUOTE:
+                DebugWindow = !DebugWindow;
+                break;
+            }
+            break;
+        }
+    }
+    /*
+    if(key == GLFW_KEY_W && action == GLFW_PRESS)
+        player->Movement(key, deltaTime);
+    if(key == GLFW_KEY_S && action == GLFW_PRESS)
+        player->Movement(key, deltaTime);
+    if(key == GLFW_KEY_A && action == GLFW_PRESS)
+        player->Movement(key, deltaTime);
+    if(key == GLFW_KEY_D && action == GLFW_PRESS)
+        player->Movement(key, deltaTime);
+    if(key == GLFW_KEY_W && action == GLFW_REPEAT)
+        player->Movement(key, deltaTime);
+    if(key == GLFW_KEY_S && action == GLFW_REPEAT)
+        player->Movement(key, deltaTime);
+    if(key == GLFW_KEY_A && action == GLFW_REPEAT)
+        player->Movement(key, deltaTime);
+    if(key == GLFW_KEY_D && action == GLFW_REPEAT)
+        player->Movement(key, deltaTime);*/
 }
 
 
@@ -168,13 +203,13 @@ void ImguiMenu()
     ImGui::Text("Amount of SpaceObjs: (%d)", mainScene.SpaceObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
     ImGui::Text("Ram Usage: %.2fmb", GetRamUsage() / 1024);
-    ImGui::Text("Time Open %.1f minutes", glfwGetTime() / 60);
+    ImGui::Text("Time Open %.1f minutes", (GetTime() / 60));
 
     ImGui::Spacing();
     ImGui::Checkbox("Wire Frame", &showWireFrame);
-    ImGui::SliderFloat3("Cam Position", glm::value_ptr(cam->position), -50.0f, 50.0f);
-    ImGui::SliderFloat3("Cam Rotation", glm::value_ptr(cam->rotation), 360.0f, 0.0f);
-    ImGui::SliderFloat("Cam Fov", &cam->fov, 179.9f, 0.01f);
+    ImGui::SliderFloat3("Player Position", glm::value_ptr(player->position), -50.0f, 50.0f);
+    ImGui::SliderFloat3("Player Rotation", glm::value_ptr(player->rotation), 360.0f, 0.0f);
+    ImGui::SliderFloat("Cam Fov", &player->camera.fov, 179.9f, 0.01f);
 
     if (ImGui::BeginMenuBar())
     {
