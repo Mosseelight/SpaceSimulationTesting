@@ -243,7 +243,7 @@ void Mesh::Balloon(float delta = 0.0f, float speed = 0.0f, float percentage = 0.
     {
         glm::vec3 finPos = glm::normalize(vertexes[i].position);
         if(percentage == 0)
-            vertexes[i].position = vertexes[i].position * (1.0f - ((float)(SDL_GetTicks64() / 1000.0f) * delta * speed)) + finPos * ((SDL_GetTicks64() / 1000.0f) * delta * speed);
+            vertexes[i].position = vertexes[i].position * (1.0f - ((SDL_GetTicks64() / 1000.0f) * delta * speed)) + finPos * ((SDL_GetTicks64() / 1000.0f) * delta * speed);
         else
             vertexes[i].position = vertexes[i].position * (1.0f - percentage) + finPos * percentage;
     }

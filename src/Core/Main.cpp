@@ -81,7 +81,7 @@ int main()
     mainScene.AddSpaceObject(LoadModel(glm::vec3(3,0,0), glm::vec3(0), modelLoc + "Torus.obj"));
     mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 2));
 
-    player.reset(new Player(20.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
+    player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
     for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
     {
@@ -162,27 +162,28 @@ void input()
             case SDLK_BACKQUOTE:
                 DebugWindow = !DebugWindow;
                 break;
+            case SDLK_w:
+                player->Movement(SDLK_w, deltaTime);
+                break;
+            case SDLK_s:
+                player->Movement(SDLK_s, deltaTime);
+                break;
+            case SDLK_a:
+                player->Movement(SDLK_a, deltaTime);
+                break;
+            case SDLK_d:
+                player->Movement(SDLK_d, deltaTime);
+                break;
+            case SDLK_SPACE:
+                player->Movement(SDLK_SPACE, deltaTime);
+                break;
+            case SDLK_LSHIFT:
+                player->Movement(SDLK_LSHIFT, deltaTime);
+                break;
             }
             break;
         }
     }
-    /*
-    if(key == GLFW_KEY_W && action == GLFW_PRESS)
-        player->Movement(key, deltaTime);
-    if(key == GLFW_KEY_S && action == GLFW_PRESS)
-        player->Movement(key, deltaTime);
-    if(key == GLFW_KEY_A && action == GLFW_PRESS)
-        player->Movement(key, deltaTime);
-    if(key == GLFW_KEY_D && action == GLFW_PRESS)
-        player->Movement(key, deltaTime);
-    if(key == GLFW_KEY_W && action == GLFW_REPEAT)
-        player->Movement(key, deltaTime);
-    if(key == GLFW_KEY_S && action == GLFW_REPEAT)
-        player->Movement(key, deltaTime);
-    if(key == GLFW_KEY_A && action == GLFW_REPEAT)
-        player->Movement(key, deltaTime);
-    if(key == GLFW_KEY_D && action == GLFW_REPEAT)
-        player->Movement(key, deltaTime);*/
 }
 
 
