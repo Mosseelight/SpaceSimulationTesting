@@ -1,4 +1,4 @@
-#version 330 core
+#version 460 core
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec3 aNormal;
@@ -14,5 +14,5 @@ void main()
 {
     gl_Position = proj * view * model * vec4(aPosition, 1.0);
     pos = vec3(model * vec4(aPosition, 1.0));
-    normal = aNormal;
+    normal = vec3(model * vec4(aNormal, 1.0));;
 }
