@@ -77,7 +77,7 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
-    mainScene.AddSpaceObject(LoadModel(glm::vec3(0,-1,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    mainScene.AddSpaceObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunny.obj"));
     mainScene.AddSpaceObject(LoadModel(glm::vec3(3,0,0), glm::vec3(0), modelLoc + "Torus.obj"));
     mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 2));
 
@@ -132,9 +132,7 @@ void Update(SDL_Window* window)
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     glUseProgram(shader.shader);
-    shader.setMat4("proj", player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f));
-    shader.setMat4("view", player->camera.GetViewMat());
-    mainScene.DrawSingle(&shader);
+    mainScene.DrawSingle(&shader, player->camera.GetViewMat(), player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f));
 
     if(DebugWindow)
     {
@@ -201,7 +199,7 @@ void ImguiMenu()
 
     ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1 / deltaTime));
     ImGui::Text("%d verts, %d indices (%d tris)", vertCount, indCount, indCount / 3);
-    ImGui::Text("Amount of SpaceObjs: (%d)", mainScene.SpaceObjects.size());
+    ImGui::Text("Amount of SpaceObjs: (%zu)", mainScene.SpaceObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
     ImGui::Text("Ram Usage: %.2fmb", GetRamUsage() / 1024);
     ImGui::Text("Time Open %.1f minutes", (GetTime() / 60));
@@ -256,7 +254,7 @@ void ImguiMenu()
         static glm::vec3 selposition;
         static glm::vec3 selrotation;
         static int IcoSphereSub = 0;
-        static char input[128] = "mesh.obj";
+        static char input[128] = "Mesh.obj";
         MeshType type;
         ImGui::SetNextWindowSize(ImVec2(600,420), ImGuiCond_FirstUseEver);
         ImGui::Begin("Object Viewer");
@@ -277,14 +275,14 @@ void ImguiMenu()
                 counter++; 
         }
         ImGui::SameLine();
-        ImGui::Text(GetMeshTypeName(static_cast<MeshType>(counter)).c_str());
+        ImGui::Text("%s", GetMeshTypeName(static_cast<MeshType>(counter)).c_str());
         ImGui::InputFloat3("Object Position", glm::value_ptr(selposition));
         ImGui::InputFloat3("Object Rotation", glm::value_ptr(selrotation));
         if(counter == MeshType::IcoSphereMesh)
             ImGui::SliderInt("IcoSphere Subdivison level", &IcoSphereSub, 0, 10);
         if(counter == MeshType::FileMesh)
         {
-            ImGui::Text(modelLoc.c_str());
+            ImGui::Text("%s", modelLoc.c_str());
             ImGui::SameLine();
             ImGui::InputText("Mesh File Name", input, IM_ARRAYSIZE(input));
         }
@@ -296,20 +294,46 @@ void ImguiMenu()
             {
             case CubeMesh:
                 selmesh = CreateCubeMesh(selposition, selrotation);
+                objectSelected = true;
+                vertCount += selmesh.vertexes.size() * 3;
+                indCount += selmesh.indices.size();
+                mainScene.AddSpaceObject(selmesh);
                 break;
             case IcoSphereMesh:
                 selmesh = CreateSphereMesh(selposition, selrotation, IcoSphereSub);
+                objectSelected = true;
+                vertCount += selmesh.vertexes.size() * 3;
+                indCount += selmesh.indices.size();
+                mainScene.AddSpaceObject(selmesh);
                 break;
             case TriangleMesh:
                 selmesh = Create2DTriangle(selposition, selrotation);
+                objectSelected = true;
+                vertCount += selmesh.vertexes.size() * 3;
+                indCount += selmesh.indices.size();
+                mainScene.AddSpaceObject(selmesh);
                 break;
             case FileMesh:
-                selmesh = LoadModel(selposition, selrotation, modelLoc + input);
+                if(!FileExist(modelLoc + input))
+                {
+                    ImGui::OpenPopup("Error");
+                }
+                else
+                {
+                    selmesh = LoadModel(selposition, selrotation, modelLoc + input);
+                    objectSelected = true;
+                    vertCount += selmesh.vertexes.size() * 3;
+                    indCount += selmesh.indices.size();
+                    mainScene.AddSpaceObject(selmesh);
+                }
+                break;
             }
-            objectSelected = true;
-            vertCount += selmesh.vertexes.size() * 3;
-            indCount += selmesh.indices.size();
-            mainScene.AddSpaceObject(selmesh);
+        }
+        if(ImGui::BeginPopup("Error"))
+        {
+            std::string text = "Model Not Found " + (std::string)input;
+            ImGui::Text("%s", text.c_str());
+            ImGui::EndPopup();
         }
 
         ImGui::End();

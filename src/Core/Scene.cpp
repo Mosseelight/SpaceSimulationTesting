@@ -73,12 +73,15 @@ void Scene::AddSpaceObject(Mesh mesh)
 
 }*/
 
-void Scene::DrawSingle(Shader *shader)
+void Scene::DrawSingle(Shader *shader, glm::mat4 view, glm::mat4 proj)
 {
     for (unsigned int i = 0; i < SpaceObjects.size(); i++)
     {
         shader->setMat4("model", SpaceObjects[i].SO_mesh.GetModelMat());
         shader->setVec3("color", glm::vec3(0.0f, 1.0f, 0.0f));
+        shader->setMat4("proj", proj);
+        shader->setMat4("view", view);
+        shader->setMat4("normalMat", glm::transpose(glm::inverse(SpaceObjects[i].SO_mesh.GetModelMat())));
         SpaceObjects[i].SO_mesh.DrawMesh();
     }
     

@@ -9,10 +9,11 @@ out vec3 pos;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
+uniform mat4 normalMat;
 
 void main()
 {
     gl_Position = proj * view * model * vec4(aPosition, 1.0);
     pos = vec3(model * vec4(aPosition, 1.0));
-    normal = vec3(model * vec4(aNormal, 1.0));;
+    normal = mat3(normalMat) * aNormal;
 }

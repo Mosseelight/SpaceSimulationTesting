@@ -31,7 +31,7 @@ public:
 
     void AddSpaceObject(Mesh mesh);
     void DrawFull(unsigned int stepSize); // Will Draw every object 
-    void DrawSingle(Shader *shader); 
+    void DrawSingle(Shader *shader, glm::mat4 view, glm::mat4 proj); 
     void DeleteObjects();
 };
 

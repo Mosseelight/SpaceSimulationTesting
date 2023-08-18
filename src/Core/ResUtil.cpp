@@ -17,6 +17,21 @@ std::string ReadFile(std::string location)
     return contents;
 }
 
+bool FileExist(std::string location)
+{
+    std::ifstream check(location);
+    if(!check)
+    {
+        check.close();
+        return false;
+    }
+    else
+    {
+        check.close();
+        return true;
+    }
+}
+
 void CreateFile(std::string location, std::string name)
 {
     std::ifstream check(location + name);
