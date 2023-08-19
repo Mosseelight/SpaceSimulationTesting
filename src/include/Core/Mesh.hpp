@@ -68,6 +68,7 @@ public:
     void Delete();
     glm::mat4 GetModelMat();
     void FixWindingOrder();
+    void CreateSmoothNormals();
     void SubdivideTriangle();
     void Balloon(float delta, float speed, float percentage);
 };

@@ -237,7 +237,7 @@ void ImguiMenu()
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
                 {
                     ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.position), 0.01f, -100000.0f, 100000.0f);
-                    ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.rotation), 0.1f, 360.0f, 360.0f);
+                    ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.rotation), 0.01f, -3.6f, 3.6f);
                     ImGui::TreePop();
                 }
             }

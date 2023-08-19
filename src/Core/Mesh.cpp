@@ -118,6 +118,7 @@ void Mesh::BufferGens()
 void Mesh::ReGenBuffer()
 {
     BufferLock = true;
+    Delete();
     if(vertexes.size() == 0)
         vertexes = CombineToVertex();
     glGenVertexArrays(1, &vao);
@@ -193,6 +194,39 @@ void Mesh::FixWindingOrder()
         }
         
     }
+}
+
+//---------------------------
+//Needs fixing
+//---------------------------
+void Mesh::CreateSmoothNormals()
+{
+
+    std::vector<glm::vec3> normals;
+    for (unsigned int v = 0; v < vertexes.size(); v++)
+    {
+        glm::vec3 normal;
+        for (unsigned int i = 0; i < indices.size() / 3; i++)
+        {
+            unsigned int a,b,c;
+            a = indices[i * 3];
+            b = indices[i * 3 + 1];
+            c = indices[i * 3 + 2];
+            if(vertexes[v].position == vertexes[a].position || vertexes[v].position == vertexes[b].position || vertexes[v].position == vertexes[c].position)
+            {
+                glm::vec3 u = vertexes[b].position - vertexes[a].position;
+                glm::vec3 v = vertexes[c].position - vertexes[a].position;
+                glm::vec3 tmpnormal = glm::cross(u,v);
+                normal = tmpnormal;
+            }
+        }
+        normals.push_back(glm::normalize(normal));
+    }
+    for (unsigned int v = 0; v < vertexes.size(); v++)
+    {
+        vertexes[v].normal = normals[v];
+    }
+    ReGenBuffer();
 }
 
 void Mesh::SubdivideTriangle()
@@ -385,19 +419,25 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
         std::vector<Vertex> newVerts;
         for (unsigned int i = 0; i < indices.size() / 3; i++)
         {
-            //ia is the row in the vertices array
+            //Get the required vertexes
             unsigned int ia = indices[i * 3]; 
             unsigned int ib = indices[i * 3 + 1];
             unsigned int ic = indices[i * 3 + 2]; 
             Vertex a = vertexes[ia];
             Vertex b = vertexes[ib];
             Vertex c = vertexes[ic];
+
+            //Create New Points
             glm::vec3 ab = glm::normalize((a.position + b.position) * 0.5f);
             glm::vec3 bc = glm::normalize((b.position + c.position) * 0.5f);
             glm::vec3 ca = glm::normalize((c.position + a.position) * 0.5f);
+
+            //Create Normals
             glm::vec3 u = bc - ab;
             glm::vec3 v = ca - ab;
             glm::vec3 normal = glm::cross(u,v);
+
+            //Add the new vertexes
             ia = newVerts.size();
             newVerts.push_back(a);
             ib = newVerts.size();
