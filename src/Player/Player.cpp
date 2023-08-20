@@ -14,7 +14,7 @@ Player::~Player()
 
 void Player::UpdatePlayer()
 {
-    camera.position = position + glm::vec3(0,0,0);
+    camera.position = position;
 }
 
 glm::mat4 Player::GetRotMat()

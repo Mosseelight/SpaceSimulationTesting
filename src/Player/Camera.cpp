@@ -35,5 +35,5 @@ glm::mat4 Camera::GetViewMat()
 
 glm::mat4 Camera::GetProjMat(int width, int height, float near, float far)
 {
-    return glm::perspectiveFov(glm::radians(fov), (float)width, (float)height, near, far);
+    return glm::perspective(glm::radians(fov), (float)width / (float)height, near, far);
 }

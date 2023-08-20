@@ -158,10 +158,10 @@ glm::mat4 Mesh::GetModelMat()
 {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
-    model = glm::scale(model, glm::vec3(scale, scale, scale));
     model = glm::rotate(model, rotation.x, glm::vec3(1.0f,0.0f,0.0f));
     model = glm::rotate(model, rotation.y, glm::vec3(0.0f,1.0f,0.0f));
     model = glm::rotate(model, rotation.z, glm::vec3(0.0f,0.0f,1.0f));
+    model = glm::scale(model, glm::vec3(scale, scale, scale));
     return model;
 }
 
@@ -201,44 +201,38 @@ void Mesh::FixWindingOrder()
 //---------------------------
 void Mesh::CreateSmoothNormals()
 {
-
     std::vector<glm::vec3> normals;
     for (unsigned int v = 0; v < vertexes.size(); v++)
     {
         glm::vec3 normal;
-        for (unsigned int i = 0; i < indices.size() / 3; i++)
+        for (unsigned int i = 0; i < indices.size(); i += 3)
         {
             unsigned int a,b,c;
-            a = indices[i * 3];
-            b = indices[i * 3 + 1];
-            c = indices[i * 3 + 2];
+            a = indices[i];
+            b = indices[i + 1];
+            c = indices[i + 2];
             if(vertexes[v].position == vertexes[a].position || vertexes[v].position == vertexes[b].position || vertexes[v].position == vertexes[c].position)
             {
                 glm::vec3 u = vertexes[b].position - vertexes[a].position;
                 glm::vec3 v = vertexes[c].position - vertexes[a].position;
-                glm::vec3 tmpnormal = glm::cross(u,v);
+                glm::vec3 tmpnormal = glm::normalize(glm::cross(u,v));
                 normal = tmpnormal;
             }
         }
-        normals.push_back(glm::normalize(normal));
+        vertexes[v].normal = glm::normalize(normal);
     }
-    for (unsigned int v = 0; v < vertexes.size(); v++)
-    {
-        vertexes[v].normal = normals[v];
-    }
-    ReGenBuffer();
 }
 
 void Mesh::SubdivideTriangle()
 {
     std::vector<unsigned int> newIndices;
     std::vector<Vertex> newVerts;
-    for (unsigned int i = 0; i < indices.size() / 3; i++)
+    for (unsigned int i = 0; i < indices.size(); i += 3)
     {
         //ia is the row in the vertices array
-        unsigned int ia = indices[i * 3]; 
-        unsigned int ib = indices[i * 3 + 1];
-        unsigned int ic = indices[i * 3 + 2]; 
+        unsigned int ia = indices[i]; 
+        unsigned int ib = indices[i + 1];
+        unsigned int ic = indices[i + 2]; 
         Vertex a = vertexes[ia];
         Vertex b = vertexes[ib];
         Vertex c = vertexes[ic];
@@ -247,7 +241,7 @@ void Mesh::SubdivideTriangle()
         glm::vec3 ca = (c.position + a.position) * 0.5f;
         glm::vec3 u = bc - ab;
         glm::vec3 v = ca - ab;
-        glm::vec3 normal = glm::cross(u,v);
+        glm::vec3 normal = glm::normalize(glm::cross(u,v));
         ia = newVerts.size();
         newVerts.push_back(a);
         ib = newVerts.size();
@@ -417,12 +411,12 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
     {
         std::vector<unsigned int> newIndices;
         std::vector<Vertex> newVerts;
-        for (unsigned int i = 0; i < indices.size() / 3; i++)
+        for (unsigned int i = 0; i < indices.size(); i += 3)
         {
             //Get the required vertexes
-            unsigned int ia = indices[i * 3]; 
-            unsigned int ib = indices[i * 3 + 1];
-            unsigned int ic = indices[i * 3 + 2]; 
+            unsigned int ia = indices[i]; 
+            unsigned int ib = indices[i + 1];
+            unsigned int ic = indices[i + 2]; 
             Vertex a = vertexes[ia];
             Vertex b = vertexes[ib];
             Vertex c = vertexes[ic];
@@ -435,7 +429,7 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
             //Create Normals
             glm::vec3 u = bc - ab;
             glm::vec3 v = ca - ab;
-            glm::vec3 normal = glm::cross(u,v);
+            glm::vec3 normal = glm::normalize(glm::cross(u,v));
 
             //Add the new vertexes
             ia = newVerts.size();
@@ -461,6 +455,8 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
         vertexes = newVerts;
     }
 
-    return Mesh(vertexes, indices, position, rotation, 1.0f);
+    Mesh mesh = Mesh(vertexes, indices, position, rotation, 1.0f);
+    mesh.CreateSmoothNormals();
+    return mesh;
 }
 

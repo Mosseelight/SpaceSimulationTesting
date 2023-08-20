@@ -41,7 +41,8 @@ const std::string imageLoc = "res/Textures/";
 const std::string shaderLoc = "res/Shaders/";
 const std::string modelLoc = "res/Models/";
 
-void Update(SDL_Window* window);
+void UpdateLogic(SDL_Window* window);
+void Render(SDL_Window* window);
 void ImguiMenu();
 void input();
 
@@ -77,9 +78,9 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
-    mainScene.AddSpaceObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunny.obj"));
-    mainScene.AddSpaceObject(LoadModel(glm::vec3(3,0,0), glm::vec3(0), modelLoc + "Torus.obj"));
-    mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpaceObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
+    mainScene.AddSpaceObject(LoadModel(glm::vec3(3,0,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 4));
 
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
@@ -91,7 +92,8 @@ int main()
 
     while(run)
     {
-        Update(window);
+        UpdateLogic(window);
+        Render(window);
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -104,7 +106,7 @@ int main()
     return 0;
 }
 
-void Update(SDL_Window* window)
+void UpdateLogic(SDL_Window* window)
 {
     SDL_GetWindowSize(window, &currentSCRWIDTH, &currentSCRHEIGHT);
 
@@ -114,7 +116,11 @@ void Update(SDL_Window* window)
     drawCallAvg = DrawCallCount / (GetTime() / deltaTime);
 
     player->UpdatePlayer();
+    input();
+}
 
+void Render(SDL_Window* window)
+{
     if(DebugWindow)
     {
         ImGui_ImplOpenGL3_NewFrame();
@@ -141,7 +147,6 @@ void Update(SDL_Window* window)
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
-    input();
     SDL_GL_SwapWindow(window);
 }
 
