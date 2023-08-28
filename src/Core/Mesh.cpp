@@ -201,7 +201,6 @@ void Mesh::FixWindingOrder()
 //---------------------------
 void Mesh::CreateSmoothNormals()
 {
-    std::vector<glm::vec3> normals;
     for (unsigned int v = 0; v < vertexes.size(); v++)
     {
         glm::vec3 normal;
@@ -211,18 +210,32 @@ void Mesh::CreateSmoothNormals()
             a = indices[i];
             b = indices[i + 1];
             c = indices[i + 2];
-            if(vertexes[v].position == vertexes[a].position || vertexes[v].position == vertexes[b].position || vertexes[v].position == vertexes[c].position)
+            if(vertexes[v].position == vertexes[a].position)
             {
                 glm::vec3 u = vertexes[b].position - vertexes[a].position;
                 glm::vec3 v = vertexes[c].position - vertexes[a].position;
                 glm::vec3 tmpnormal = glm::normalize(glm::cross(u,v));
-                normal = tmpnormal;
+                normal += tmpnormal;
+            }
+            if(vertexes[v].position == vertexes[b].position)
+            {
+                glm::vec3 u = vertexes[a].position - vertexes[b].position;
+                glm::vec3 v = vertexes[c].position - vertexes[b].position;
+                glm::vec3 tmpnormal = glm::normalize(glm::cross(u,v));
+                normal += tmpnormal;
+            }
+            if(vertexes[v].position == vertexes[c].position)
+            {
+                glm::vec3 u = vertexes[b].position - vertexes[c].position;
+                glm::vec3 v = vertexes[a].position - vertexes[c].position;
+                glm::vec3 tmpnormal = glm::normalize(glm::cross(u,v));
+                normal += tmpnormal;
             }
         }
         vertexes[v].normal = glm::normalize(normal);
     }
 }
-
+ 
 void Mesh::SubdivideTriangle()
 {
     std::vector<unsigned int> newIndices;
@@ -456,7 +469,6 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
     }
 
     Mesh mesh = Mesh(vertexes, indices, position, rotation, 1.0f);
-    mesh.CreateSmoothNormals();
     return mesh;
 }
 

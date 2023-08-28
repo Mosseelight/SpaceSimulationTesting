@@ -15,6 +15,7 @@ Player::~Player()
 void Player::UpdatePlayer()
 {
     camera.position = position;
+    camera.rotation = rotation;
 }
 
 glm::mat4 Player::GetRotMat()

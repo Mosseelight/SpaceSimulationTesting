@@ -1,5 +1,6 @@
 #include "../include/glad/glad.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include "../include/imgui/imgui.h"
 #include "../include/backends/imgui_impl_sdl2.h"
 #include "../include/backends/imgui_impl_opengl3.h"
@@ -18,13 +19,11 @@
 #include "../include/Player/Camera.hpp"
 #include "../include/Core/ResUtil.hpp"
 #include "../include/Core/Debug.hpp"
+#include "../include/Core/Texture.hpp"
 
 //player
 #include "../include/Player/Camera.hpp"
 #include "../include/Player/Player.hpp"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "../include/3rdp/stb_image.h"
 
 #define GetTime() SDL_GetTicks64() / 1000.0f
 
@@ -35,7 +34,7 @@ float deltaTime = 0.0f;
 float lastTime = 0.0f;
 int currentSCRWIDTH = 0;
 int currentSCRHEIGHT = 0;
-SDL_Surface windowIcon;
+SDL_Surface *windowIcon;
 
 const std::string imageLoc = "res/Textures/";
 const std::string shaderLoc = "res/Shaders/";
@@ -65,9 +64,10 @@ int main()
     SDL_GLContext context = SDL_GL_CreateContext(window);
     gladLoadGL();
     glEnable(GL_DEPTH_TEST);
-    windowIcon.pixels = stbi_load((imageLoc + "/IconSpace.png").c_str(), &windowIcon.w, &windowIcon.h, 0, 4);
-    //SDL_SetWindowIcon(window, &windowIcon);
-    stbi_image_free(windowIcon.pixels);
+    glEnable(GL_TEXTURE_2D);
+
+    windowIcon = IMG_Load((imageLoc + "/IconSpace.png").c_str());
+    SDL_SetWindowIcon(window, windowIcon);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -78,11 +78,12 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
-    mainScene.AddSpaceObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
-    mainScene.AddSpaceObject(LoadModel(glm::vec3(3,0,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    mainScene.AddSpaceObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0,0,0), modelLoc + "Teapot.obj"));
+    mainScene.AddSpaceObject(LoadModel(glm::vec3(4,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
     mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 4));
-
+    
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
+    player->rotation.x = 180;
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
     for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
     {
@@ -96,6 +97,7 @@ int main()
         Render(window);
     }
     
+    SDL_FreeSurface(windowIcon);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -126,7 +128,7 @@ void Render(SDL_Window* window)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
-
+  
         ImguiMenu();
     }
 
@@ -212,7 +214,7 @@ void ImguiMenu()
     ImGui::Spacing();
     ImGui::Checkbox("Wire Frame", &showWireFrame);
     ImGui::SliderFloat3("Player Position", glm::value_ptr(player->position), -50.0f, 50.0f);
-    ImGui::SliderFloat3("Player Rotation", glm::value_ptr(player->rotation), 360.0f, 0.0f);
+    ImGui::SliderFloat3("Player Rotation", glm::value_ptr(player->rotation), -360.0f, 360.0f);
     ImGui::SliderFloat("Cam Fov", &player->camera.fov, 179.9f, 0.01f);
 
     if (ImGui::BeginMenuBar())

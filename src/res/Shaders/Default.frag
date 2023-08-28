@@ -3,14 +3,16 @@
 out vec4 out_color;
 in vec3 normal;
 in vec3 pos;
+in vec2 uv;
 
 uniform vec3 color;
+uniform sampler2D tex;
 
 void main()
 {
     float shine = 20.0;
 
-    float ambientPower = 0.2;
+    float ambientPower = 0.185;
     vec3 ambientColor = vec3(0.0,0.54,0.54);
 
     vec3 lightDiffuse = vec3(1.0);
@@ -31,5 +33,5 @@ void main()
         spec = lightSpec * pow(max(dot(r,v),0.0),shine);
     }
     vec3 light = ambient + diffuse + spec;
-    out_color = vec4(color * light, 1.0);
+    out_color = vec4(light * color, 1.0);
 }
