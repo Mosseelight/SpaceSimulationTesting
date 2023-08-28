@@ -8,5 +8,7 @@ class Texture
 {
 public:
     unsigned int id;
-    Texture(std::string location);
+    std::string textLocation;
+    Texture();
+    void LoadTexture(std::string location);
 };

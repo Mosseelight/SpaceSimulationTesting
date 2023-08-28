@@ -1,6 +1,11 @@
 #include "../include/Core/Texture.hpp"
 
-Texture::Texture(std::string location)
+Texture::Texture()
+{
+    
+}
+
+void Texture::LoadTexture(std::string location)
 {
     SDL_Surface *image;
     GLenum textureFormat;

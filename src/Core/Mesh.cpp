@@ -50,6 +50,16 @@ Mesh::Mesh(std::vector<Vertex> vertexes, std::vector<unsigned int> indices, glm:
     this->scale = scale;
 }
 
+Mesh::Mesh(std::string modelLocation, std::vector<Vertex> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale)
+{
+    this->modelLocation = modelLocation;
+    this->vertexes = vertexes;
+    this->indices = indices;
+    this->position = position;
+    this->rotation = rotation;
+    this->scale = scale;
+}
+
 Mesh::Mesh(std::vector<float> vertices, std::vector<float> normals, std::vector<float> uv, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale)
 {
     this->vertices = vertices;

@@ -1,5 +1,19 @@
 #include "../include/Core/Scene.hpp"
 
+unsigned int SpatialObject::GetSizeUsage()
+{
+    unsigned int total = 0;
+    total += sizeof(SpatialObject); // get variable sizes
+
+    //mesh data sizes
+    total += sizeof(Vertex) * SO_mesh.vertexes.size();
+    total += sizeof(float) * SO_mesh.vertices.size();
+    total += sizeof(float) * SO_mesh.normals.size();
+    total += sizeof(float) * SO_mesh.uv.size();
+    total += sizeof(unsigned int) * SO_mesh.indices.size();
+    return total;
+}
+
 Scene::Scene()
 {
 
@@ -11,11 +25,11 @@ Scene::~Scene()
     DeleteObjects();
 }
 
-void Scene::AddSpaceObject(Mesh mesh)
+void Scene::AddSpatialObject(Mesh mesh)
 {
-    unsigned int id = SpaceObjects.size();
-    SpaceObjects.push_back(SpaceObject(mesh, id));
-    SpaceObjects[id].SO_mesh.BufferGens();
+    unsigned int id = SpatialObjects.size();
+    SpatialObjects.push_back(SpatialObject(mesh, id));
+    SpatialObjects[id].SO_mesh.BufferGens();
     idList.push_back(id);
 }
 
@@ -27,12 +41,12 @@ void Scene::AddSpaceObject(Mesh mesh)
     std::vector<float> tmp_Vertices;
     std::vector<unsigned int> tmp_Indices;
     unsigned int drawNum = 0;
-    if(SpaceObjects.size() > stepSize)
+    if(SpatialObjects.size() > stepSize)
     {
-        drawNum = (float)(SpaceObjects.size() - (SpaceObjects.size() % stepSize)) / (float)stepSize;
+        drawNum = (float)(SpatialObjects.size() - (SpatialObjects.size() % stepSize)) / (float)stepSize;
         if(drawNum == 0)
         {
-            drawNum = (float)SpaceObjects.size() / stepSize;
+            drawNum = (float)SpatialObjects.size() / stepSize;
         }
     }
     else
@@ -42,11 +56,11 @@ void Scene::AddSpaceObject(Mesh mesh)
     {
         for (unsigned int j = 0; j < stepSize; j++)
         {
-            unsigned int indOffset = SpaceObjects[j + stepSize * i].SO_mesh.vertices.size();
-            tmp_Vertices.insert(tmp_Vertices.end(), SpaceObjects[j + stepSize * i].SO_mesh.vertices.begin(), SpaceObjects[j + stepSize * i].SO_mesh.vertices.end());
-            for (unsigned int g = 0; g < SpaceObjects[j + stepSize * i].SO_mesh.indices.size(); g++)
+            unsigned int indOffset = SpatialObjects[j + stepSize * i].SO_mesh.vertices.size();
+            tmp_Vertices.insert(tmp_Vertices.end(), SpatialObjects[j + stepSize * i].SO_mesh.vertices.begin(), SpatialObjects[j + stepSize * i].SO_mesh.vertices.end());
+            for (unsigned int g = 0; g < SpatialObjects[j + stepSize * i].SO_mesh.indices.size(); g++)
             {
-                tmp_Indices.push_back(SpaceObjects[j + stepSize * i].SO_mesh.indices[g] + (indOffset * (j + stepSize * i)));
+                tmp_Indices.push_back(SpatialObjects[j + stepSize * i].SO_mesh.indices[g] + (indOffset * (j + stepSize * i)));
             }
              
         }
@@ -60,13 +74,13 @@ void Scene::AddSpaceObject(Mesh mesh)
     }
 
     //if object total last digit is 1-9
-    if(SpaceObjects.size() % stepSize != 0)
+    if(SpatialObjects.size() % stepSize != 0)
     {
-        for (unsigned int i = 0; i < SpaceObjects.size() % stepSize; i++)
+        for (unsigned int i = 0; i < SpatialObjects.size() % stepSize; i++)
         {
             //draw that mesh
-            unsigned int index = (SpaceObjects.size() - (SpaceObjects.size() % stepSize)) + i;
-            SpaceObjects[index].SO_mesh.DrawMesh();
+            unsigned int index = (SpatialObjects.size() - (SpatialObjects.size() % stepSize)) + i;
+            SpatialObjects[index].SO_mesh.DrawMesh();
         }
         
     }
@@ -75,23 +89,43 @@ void Scene::AddSpaceObject(Mesh mesh)
 
 void Scene::DrawSingle(Shader *shader, glm::mat4 view, glm::mat4 proj)
 {
-    for (unsigned int i = 0; i < SpaceObjects.size(); i++)
+    for (unsigned int i = 0; i < SpatialObjects.size(); i++)
     {
-        shader->setMat4("model", SpaceObjects[i].SO_mesh.GetModelMat());
+        shader->setMat4("model", SpatialObjects[i].SO_mesh.GetModelMat());
         shader->setVec3("color", glm::vec3(0.0f, 1.0f, 0.0f));
         shader->setMat4("proj", proj);
         shader->setMat4("view", view);
-        shader->setMat4("normalMat", glm::transpose(glm::inverse(SpaceObjects[i].SO_mesh.GetModelMat())));
-        SpaceObjects[i].SO_mesh.DrawMesh();
+        shader->setMat4("normalMat", glm::transpose(glm::inverse(SpatialObjects[i].SO_mesh.GetModelMat())));
+        SpatialObjects[i].SO_mesh.DrawMesh();
     }
     
 }
 
 void Scene::DeleteObjects()
 {
-    for (unsigned int i = 0; i < SpaceObjects.size(); i++)
+    for (unsigned int i = 0; i < SpatialObjects.size(); i++)
     {
-        SpaceObjects[i].SO_mesh.Delete();
-        DebugLog("Deleted Space Object id: " + SpaceObjects[i].SO_id);
+        SpatialObjects[i].SO_mesh.Delete();
+        DebugLog("Deleted Space Object id: " + SpatialObjects[i].SO_id);
     }
+}
+
+/*Scene Save format
+(Scene name)
+(number of SpatialObjects)
+Spatialobject/(object number)
+(Mesh location)
+(Mesh position.x)/(mesh position.y)/(mesh position.z)
+(Mesh rotation.x)/(mesh rotation.y)/(mesh rotation.z)
+(mesh scale)
+
+*/
+void Scene::SaveScene(std::string location, std::string name)
+{
+
+}
+
+void Scene::LoadScene(std::string location, std::string name)
+{
+
 }

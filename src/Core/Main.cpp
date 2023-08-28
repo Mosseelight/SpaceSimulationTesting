@@ -78,17 +78,28 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
-    mainScene.AddSpaceObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0,0,0), modelLoc + "Teapot.obj"));
-    mainScene.AddSpaceObject(LoadModel(glm::vec3(4,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
-    mainScene.AddSpaceObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 4));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0,0,0), modelLoc + "Teapot.obj"));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(4,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 3));
+
+    for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
+    {
+        if(mainScene.SpatialObjects[i].GetSizeUsage() / 1024 < 1000)
+            std::cout << mainScene.SpatialObjects[i].GetSizeUsage() / 1024.0f << "kb" << std::endl;
+        else if(mainScene.SpatialObjects[i].GetSizeUsage() / 1024 / 1024 < 1000)
+            std::cout << mainScene.SpatialObjects[i].GetSizeUsage() / 1024.0f / 1024.0f << "mb" << std::endl;
+        else
+            std::cout << mainScene.SpatialObjects[i].GetSizeUsage() / 1024.0f / 1024.0f / 1024.0f << "gb" << std::endl;
+    }
+    
     
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
     player->rotation.x = 180;
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
-    for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
+    for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
-        vertCount += mainScene.SpaceObjects[i].SO_mesh.vertexes.size();
-        indCount += mainScene.SpaceObjects[i].SO_mesh.indices.size();
+        vertCount += mainScene.SpatialObjects[i].SO_mesh.vertexes.size();
+        indCount += mainScene.SpatialObjects[i].SO_mesh.indices.size();
     }
 
     while(run)
@@ -206,7 +217,7 @@ void ImguiMenu()
 
     ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1 / deltaTime));
     ImGui::Text("%d verts, %d indices (%d tris)", vertCount, indCount, indCount / 3);
-    ImGui::Text("Amount of SpaceObjs: (%zu)", mainScene.SpaceObjects.size());
+    ImGui::Text("Amount of SpaceObjs: (%zu)", mainScene.SpatialObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
     ImGui::Text("Ram Usage: %.2fmb", GetRamUsage() / 1024);
     ImGui::Text("Time Open %.1f minutes", (GetTime() / 60));
@@ -236,15 +247,15 @@ void ImguiMenu()
 
         if (ImGui::TreeNode("Objects"))
         {
-            for (int i = 0; i < mainScene.SpaceObjects.size(); i++)
+            for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
             {
                 if (i == 0)
                     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
                 {
-                    ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.position), 0.01f, -100000.0f, 100000.0f);
-                    ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpaceObjects[i].SO_mesh.rotation), 0.01f, -3.6f, 3.6f);
+                    ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpatialObjects[i].SO_mesh.position), 0.01f, -100000.0f, 100000.0f);
+                    ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpatialObjects[i].SO_mesh.rotation), 0.01f, -3.6f, 3.6f);
                     ImGui::TreePop();
                 }
             }
@@ -304,21 +315,21 @@ void ImguiMenu()
                 objectSelected = true;
                 vertCount += selmesh.vertexes.size() * 3;
                 indCount += selmesh.indices.size();
-                mainScene.AddSpaceObject(selmesh);
+                mainScene.AddSpatialObject(selmesh);
                 break;
             case IcoSphereMesh:
                 selmesh = CreateSphereMesh(selposition, selrotation, IcoSphereSub);
                 objectSelected = true;
                 vertCount += selmesh.vertexes.size() * 3;
                 indCount += selmesh.indices.size();
-                mainScene.AddSpaceObject(selmesh);
+                mainScene.AddSpatialObject(selmesh);
                 break;
             case TriangleMesh:
                 selmesh = Create2DTriangle(selposition, selrotation);
                 objectSelected = true;
                 vertCount += selmesh.vertexes.size() * 3;
                 indCount += selmesh.indices.size();
-                mainScene.AddSpaceObject(selmesh);
+                mainScene.AddSpatialObject(selmesh);
                 break;
             case FileMesh:
                 if(!FileExist(modelLoc + input))
@@ -331,7 +342,7 @@ void ImguiMenu()
                     objectSelected = true;
                     vertCount += selmesh.vertexes.size() * 3;
                     indCount += selmesh.indices.size();
-                    mainScene.AddSpaceObject(selmesh);
+                    mainScene.AddSpatialObject(selmesh);
                 }
                 break;
             }
