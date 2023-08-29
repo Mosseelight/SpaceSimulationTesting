@@ -66,13 +66,16 @@ std::string stringRemove(std::string s, std::string del = " ", std::string adder
 
 Mesh LoadModel(glm::vec3 position, glm::vec3 rotation, std::string location)
 {
+    std::ifstream file(location);
+    if(!file)
+    {
+        DebugLog("Location for Mesh not found " + location);
+    }
+
     Mesh mesh;
     mesh.position = position;
     mesh.rotation = rotation;
     mesh.scale = 1;
-    std::ifstream file(location);
-    if(!file)
-        DebugLog("Location for Mesh not found " + location);
 
     std::string line;
     std::vector<Vertex> vertexes;
@@ -149,6 +152,8 @@ Mesh LoadModel(glm::vec3 position, glm::vec3 rotation, std::string location)
     }
     mesh.vertexes = vertexes;
     file.close();
+    DebugLog("Loaded mesh: " + location);
+    mesh.modelLocation = location;
     return mesh;
 }
 

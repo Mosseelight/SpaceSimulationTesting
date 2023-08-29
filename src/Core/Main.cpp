@@ -81,20 +81,11 @@ int main()
     mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0,0,0), modelLoc + "Teapot.obj"));
     mainScene.AddSpatialObject(LoadModel(glm::vec3(4,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
     mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 3));
-
-    for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
-    {
-        if(mainScene.SpatialObjects[i].GetSizeUsage() / 1024 < 1000)
-            std::cout << mainScene.SpatialObjects[i].GetSizeUsage() / 1024.0f << "kb" << std::endl;
-        else if(mainScene.SpatialObjects[i].GetSizeUsage() / 1024 / 1024 < 1000)
-            std::cout << mainScene.SpatialObjects[i].GetSizeUsage() / 1024.0f / 1024.0f << "mb" << std::endl;
-        else
-            std::cout << mainScene.SpatialObjects[i].GetSizeUsage() / 1024.0f / 1024.0f / 1024.0f << "gb" << std::endl;
-    }
-    
     
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
     player->rotation.x = 180;
+    player->rotation.y = 0;
+    player->rotation.z = 0;
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
     for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {

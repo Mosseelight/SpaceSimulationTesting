@@ -344,7 +344,7 @@ Mesh Create2DTriangle(glm::vec3 position, glm::vec3 rotation)
     {
         0, 1, 2
     };
-    return Mesh(vertxes, indices, position, rotation, 1);
+    return Mesh("computerTriangle", vertxes, indices, position, rotation, 1);
 }
 
 Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation)
@@ -377,7 +377,9 @@ Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation)
         6, 4, 0,
         3, 1, 5
     };
-    return Mesh(verts, normals, uv, indices, position, rotation, 1.0f);
+    Mesh mesh = Mesh(verts, normals, uv, indices, position, rotation, 1.0f);
+    mesh.modelLocation = "computerCube";
+    return mesh;
 }
 
 Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdivideNum)
@@ -478,7 +480,7 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
         vertexes = newVerts;
     }
 
-    Mesh mesh = Mesh(vertexes, indices, position, rotation, 1.0f);
+    Mesh mesh = Mesh("computerSphere", vertexes, indices, position, rotation, 1.0f);
     return mesh;
 }
 

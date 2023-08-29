@@ -31,6 +31,13 @@ void Scene::AddSpatialObject(Mesh mesh)
     SpatialObjects.push_back(SpatialObject(mesh, id));
     SpatialObjects[id].SO_mesh.BufferGens();
     idList.push_back(id);
+
+    if(SpatialObjects[id].GetSizeUsage() / 1024 < 1000)
+        DebugLog("Added spatial object mesh: " + mesh.modelLocation + ", size: " + std::to_string(SpatialObjects[id].GetSizeUsage() / 1024.0f) + "kb");
+    else if(SpatialObjects[id].GetSizeUsage() / 1024 / 1024 < 1000)
+        DebugLog("Added spatial object mesh: " + mesh.modelLocation + ", size: " + std::to_string(SpatialObjects[id].GetSizeUsage() / 1024.0f / 1024.0f) + "mb");
+    else
+        DebugLog("Added spatial object mesh: " + mesh.modelLocation + ", size: " + std::to_string(SpatialObjects[id].GetSizeUsage() / 1024.0f / 1024.0f / 1024.0f) + "gb");
 }
 
 //dont know if 10 is good step num 
