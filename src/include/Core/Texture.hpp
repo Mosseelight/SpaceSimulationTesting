@@ -11,4 +11,5 @@ public:
     std::string textLocation;
     Texture();
     void LoadTexture(std::string location);
+    void Delete();
 };

@@ -33,5 +33,5 @@ void main()
         spec = lightSpec * pow(max(dot(r,v),0.0),shine);
     }
     vec3 light = ambient + diffuse + spec;
-    out_color = vec4(light * color, 1.0);
+    out_color = texture(tex, uv) * vec4(light * color, 1.0f);
 }

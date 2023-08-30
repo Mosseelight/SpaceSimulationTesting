@@ -46,6 +46,7 @@ void ImguiMenu();
 void input();
 
 Shader shader;
+Texture texture;
 std::unique_ptr<Player> player;
 Scene mainScene;
 unsigned int vertCount, indCount;
@@ -78,6 +79,8 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
+    texture.LoadTexture(imageLoc + "IconSpace.png");
+
     mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0,0,0), modelLoc + "Teapot.obj"));
     mainScene.AddSpatialObject(LoadModel(glm::vec3(4,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
     mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 3));
@@ -87,6 +90,10 @@ int main()
     player->rotation.y = 0;
     player->rotation.z = 0;
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
+
+    glUseProgram(shader.shader);
+    shader.setInt("tex", 0);
+
     for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
         vertCount += mainScene.SpatialObjects[i].SO_mesh.vertexes.size();
@@ -99,6 +106,7 @@ int main()
         Render(window);
     }
     
+    texture.Delete();
     SDL_FreeSurface(windowIcon);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
@@ -142,6 +150,7 @@ void Render(SDL_Window* window)
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     glUseProgram(shader.shader);
+    glBindTexture(GL_TEXTURE_2D, texture.id);
     mainScene.DrawSingle(&shader, player->camera.GetViewMat(), player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f));
 
     if(DebugWindow)
