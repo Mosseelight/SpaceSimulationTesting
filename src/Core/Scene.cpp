@@ -118,18 +118,41 @@ void Scene::DeleteObjects()
 }
 
 /*Scene Save format
-(Scene name)
-(number of SpatialObjects)
-Spatialobject/(object number)
-(Mesh location)
-(Mesh position.x)/(mesh position.y)/(mesh position.z)
-(Mesh rotation.x)/(mesh rotation.y)/(mesh rotation.z)
-(mesh scale)
+S (Scene name)
+SN (number of SpatialObjects)
+SO (object number)
+ML (Mesh location)
+MP (Mesh position.x)/(mesh position.y)/(mesh position.z)
+MR (Mesh rotation.x)/(mesh rotation.y)/(mesh rotation.z)
+MS (mesh scale)
+TL (Texture location)  
 
 */
 void Scene::SaveScene(std::string location, std::string name)
 {
+    if(!FileExist(location + name))
+        CreateFile(location, name);
+    else
+    {
+        std::ofstream stream;
+        stream.open(location + name, std::ofstream::out | std::ofstream::trunc);
+        stream.close();
+    }
+    size_t endExt = name.find_last_of('.');
+    std::string newName = name.substr(0, endExt);
+    WriteFile(location + name, "S " + newName);
+    WriteFile(location + name, "SN " + std::to_string(SpatialObjects.size()));
 
+    for (unsigned int i = 0; i < SpatialObjects.size(); i++)
+    {
+        WriteFile(location + name, "SO " + std::to_string(SpatialObjects[i].SO_id));
+        WriteFile(location + name, "ML " + SpatialObjects[i].SO_mesh.modelLocation);
+        WriteFile(location + name, "MP " + std::to_string(SpatialObjects[i].SO_mesh.position.x) + "/" + std::to_string(SpatialObjects[i].SO_mesh.position.y) + "/" + std::to_string(SpatialObjects[i].SO_mesh.position.z));
+        WriteFile(location + name, "MR " + std::to_string(SpatialObjects[i].SO_mesh.rotation.x) + "/" + std::to_string(SpatialObjects[i].SO_mesh.rotation.y) + "/" + std::to_string(SpatialObjects[i].SO_mesh.rotation.z));
+        WriteFile(location + name, "MS " + std::to_string(SpatialObjects[i].SO_mesh.scale));
+        WriteFile(location + name, "TL " + SpatialObjects[i].SO_texture.textLocation);
+    }
+    
 }
 
 void Scene::LoadScene(std::string location, std::string name)

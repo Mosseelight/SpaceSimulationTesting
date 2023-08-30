@@ -28,6 +28,7 @@ Mesh::Mesh()
 
 Mesh::Mesh(const Mesh &other)
 {
+    this->modelLocation = other.modelLocation;
     this->vao = other.vao;
     this->vbo = other.vbo;
     this->ebo = other.ebo;

@@ -44,6 +44,7 @@ void Texture::LoadTexture(std::string location)
     glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
     SDL_FreeSurface(image);
+    textLocation = location;
 }
 
 void Texture::Delete()

@@ -6,4 +6,4 @@
 #include <chrono>
 
 void DebugLog(std::string content);
-void CreateFileLog();
+void CreateFileLog(std::string location);

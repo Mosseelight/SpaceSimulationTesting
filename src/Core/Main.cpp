@@ -39,6 +39,8 @@ SDL_Surface *windowIcon;
 const std::string imageLoc = "res/Textures/";
 const std::string shaderLoc = "res/Shaders/";
 const std::string modelLoc = "res/Models/";
+const std::string logLoc = "res/Logs/";
+const std::string sceneLoc = "res/Scenes/";
 
 void UpdateLogic(SDL_Window* window);
 void Render(SDL_Window* window);
@@ -105,6 +107,8 @@ int main()
         UpdateLogic(window);
         Render(window);
     }
+
+    mainScene.SaveScene(sceneLoc, "main.scene");
     
     texture.Delete();
     SDL_FreeSurface(windowIcon);
@@ -114,7 +118,7 @@ int main()
     SDL_GL_DeleteContext(context);
     SDL_DestroyWindow(window);
     SDL_Quit();
-    CreateFileLog();
+    CreateFileLog(logLoc);
     return 0;
 }
 
