@@ -47,15 +47,11 @@ private:
 
     unsigned int vao, vbo, ebo;
     bool BufferLock = false;
-    std::vector<Vertex> CombineToVertex();
 
 public:
 
     std::string modelLocation;
     std::vector<Vertex> vertexes;
-    std::vector<float> vertices;
-    std::vector<float> normals;
-    std::vector<float> uv;
     std::vector<unsigned int> indices;
     glm::vec3 position, rotation;
     float scale;
@@ -64,7 +60,6 @@ public:
     Mesh(const Mesh &other);
     Mesh(std::vector<Vertex> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale);
     Mesh(std::string modelLocation, std::vector<Vertex> vertexes, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale);
-    Mesh(std::vector<float> vertices, std::vector<float> normals, std::vector<float> uv, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale);
     void BufferGens();
     void ReGenBuffer();
     void DrawMesh();

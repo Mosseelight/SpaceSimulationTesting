@@ -32,9 +32,6 @@ Mesh::Mesh(const Mesh &other)
     this->vbo = other.vbo;
     this->ebo = other.ebo;
     this->vertexes = other.vertexes;
-    this->vertices = other.vertices;
-    this->normals = other.normals;
-    this->uv = other.uv;
     this->indices = other.indices;
     this->position = other.position;
     this->rotation = other.rotation;
@@ -60,18 +57,6 @@ Mesh::Mesh(std::string modelLocation, std::vector<Vertex> vertexes, std::vector<
     this->scale = scale;
 }
 
-Mesh::Mesh(std::vector<float> vertices, std::vector<float> normals, std::vector<float> uv, std::vector<unsigned int> indices, glm::vec3 position, glm::vec3 rotation, float scale)
-{
-    this->vertices = vertices;
-    this->normals = normals;
-    this->uv = uv;
-    this->indices = indices;
-    this->position = position;
-    this->rotation = rotation;
-    this->scale = scale;
-}
-
-
 void Mesh::Delete()
 {
     glDeleteBuffers(1, &vbo);
@@ -79,29 +64,9 @@ void Mesh::Delete()
     glDeleteVertexArrays(1, &vao);
 }
 
-std::vector<Vertex> Mesh::CombineToVertex()
-{
-    std::vector<Vertex> tempVertex;
-    DebugLog("no vertexes combining to vertex");
-    for (unsigned int i = 0; i < vertices.size() / 3; i++)
-    {
-        Vertex tmpVertex = Vertex(glm::vec3(0), glm::vec3(0), glm::vec2(0));
-        if(vertices.size() != 0)
-            tmpVertex.position = glm::vec3(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]);
-        if(normals.size() != 0)
-            tmpVertex.normal = glm::vec3(normals[i * 3], normals[i * 3 + 1], normals[i * 3 + 2]);
-        if(uv.size() != 0)
-            tmpVertex.uv = glm::vec2(uv[i * 2], uv[i * 2 + 1]);
-        tempVertex.push_back(tmpVertex);
-    }
-    return tempVertex;
-}
-
 void Mesh::BufferGens()
 {
     BufferLock = true;
-    if(vertexes.size() == 0)
-        vertexes = CombineToVertex();
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
@@ -129,8 +94,6 @@ void Mesh::ReGenBuffer()
 {
     BufferLock = true;
     Delete();
-    if(vertexes.size() == 0)
-        vertexes = CombineToVertex();
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
@@ -454,19 +417,16 @@ Mesh Create2DTriangle(glm::vec3 position, glm::vec3 rotation)
 
 Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation)
 {
-    std::vector<float> verts =
-    {
-        -1.0f, -1.0f, 1.0f,
-        -1.0f, 1.0f, 1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, 1.0f, -1.0f,
-        1.0f,-1.0f, 1.0f,
-        1.0f,1.0f, 1.0f,
-        1.0f,-1.0f, -1.0f,
-        1.0f,1.0f, -1.0f
+    std::vector<Vertex> vertexes = {
+        Vertex(glm::vec3(-1.0f, -1.0f, 1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(-1.0f, 1.0f, 1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(-1.0f, -1.0f, -1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(-1.0f, 1.0f, -1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3( 1.0f,-1.0f, 1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(1.0f,1.0f, 1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(1.0f,-1.0f, -1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(1.0f,1.0f, -1.0f),glm::vec3(0), glm::vec2(0))
     };
-    std::vector<float> normals;
-    std::vector<float> uv;
     std::vector<unsigned int> indices =
     {
         1, 2, 0,
@@ -482,7 +442,7 @@ Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation)
         6, 4, 0,
         3, 1, 5
     };
-    Mesh mesh = Mesh(verts, normals, uv, indices, position, rotation, 1.0f);
+    Mesh mesh = Mesh(vertexes, indices, position, rotation, 1.0f);
     mesh.modelLocation = std::to_string(CubeMesh);
     return mesh;
 }

@@ -7,9 +7,6 @@ unsigned int SpatialObject::GetSizeUsage()
 
     //mesh data sizes
     total += sizeof(Vertex) * SO_mesh.vertexes.size();
-    total += sizeof(float) * SO_mesh.vertices.size();
-    total += sizeof(float) * SO_mesh.normals.size();
-    total += sizeof(float) * SO_mesh.uv.size();
     total += sizeof(unsigned int) * SO_mesh.indices.size();
     return total;
 }
