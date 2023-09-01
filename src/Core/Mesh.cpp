@@ -1,5 +1,4 @@
 #include "../include/Core/Mesh.hpp"
-#include "../include/Core/Debug.hpp"
 
 std::string GetMeshTypeName(MeshType type)
 {
@@ -302,6 +301,99 @@ void Mesh::Balloon(float delta = 0.0f, float speed = 0.0f, float percentage = 0.
     
 }
 
+Mesh LoadModel(glm::vec3 position, glm::vec3 rotation, std::string location)
+{
+    std::ifstream file(location);
+    if(!file)
+    {
+        DebugLog("Location for Mesh not found " + location);
+    }
+
+    Mesh mesh;
+    mesh.position = position;
+    mesh.rotation = rotation;
+    mesh.scale = 1;
+
+    std::string line;
+    std::vector<Vertex> vertexes;
+    std::vector<glm::vec2> tmpUV;
+    std::vector<glm::vec3> tmpNormal;
+    std::vector<glm::vec3> tmpVertice;
+    std::vector<unsigned int> tmpInd, tmpUVInd, tmpNormalInd;
+    Vertex vertex(glm::vec3(0), glm::vec3(0), glm::vec2(0));
+    while(std::getline(file, line))
+    {
+        if(line[0] == 'v' && line[1] != 't' && line[1] != 'n')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", " ");
+            std::istringstream data(line);
+            float x, y, z;
+            data >> x;
+            data >> y;
+            data >> z;
+            tmpVertice.push_back(glm::vec3(x,y,z));
+        }
+        else if(line[0] == 'v' && line[1] == 't' && line[1] != 'n')
+        {
+            line.erase(line.begin(), line.begin() + 3);
+            line = stringRemove(line, " ", " ");
+            std::istringstream data(line);
+            float x, y;
+            data >> x;
+            data >> y;
+            tmpUV.push_back(glm::vec2(x, y));
+        }
+        else if(line[0] == 'v' && line[1] != 't' && line[1] == 'n')
+        {
+            line.erase(line.begin(), line.begin() + 3);
+            line = stringRemove(line, " ", " ");
+            std::istringstream data(line);
+            float x, y, z;
+            data >> x;
+            data >> y;
+            data >> z;
+            tmpNormal.push_back(glm::vec3(x, y, z));
+        }
+        else if(line[0] == 'f')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", " ");
+            line = stringRemove(line, "/", " ");
+            std::istringstream data(line);
+            unsigned int ind, uvind, norind;
+            data >> ind;
+            data >> uvind;
+            data >> norind;
+            tmpInd.push_back(ind); tmpUVInd.push_back(uvind); tmpNormalInd.push_back(norind);
+            data >> ind;
+            data >> uvind;
+            data >> norind;
+            tmpInd.push_back(ind); tmpUVInd.push_back(uvind); tmpNormalInd.push_back(norind);
+            data >> ind;
+            data >> uvind;
+            data >> norind;
+            tmpInd.push_back(ind); tmpUVInd.push_back(uvind); tmpNormalInd.push_back(norind);
+        }
+    }
+    for (unsigned int i = 0; i < tmpInd.size(); i++)
+    {
+        unsigned int indUv = tmpUVInd[i];
+        unsigned int indNor = tmpNormalInd[i];
+        unsigned int indVert = tmpInd[i];
+        mesh.indices.push_back(i);
+        vertexes.push_back(vertex);
+        vertexes[i].uv = tmpUV[indUv - 1];
+        vertexes[i].normal = tmpNormal[indNor - 1]; 
+        vertexes[i].position = tmpVertice[indVert - 1];
+    }
+    mesh.vertexes = vertexes;
+    file.close();
+    DebugLog("Loaded mesh: " + location);
+    mesh.modelLocation = location;
+    return mesh;
+}
+
 
 //
 //
@@ -345,7 +437,7 @@ Mesh Create2DTriangle(glm::vec3 position, glm::vec3 rotation)
     {
         0, 1, 2
     };
-    return Mesh("computerTriangle", vertxes, indices, position, rotation, 1);
+    return Mesh(std::to_string(TriangleMesh), vertxes, indices, position, rotation, 1);
 }
 
 Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation)
@@ -379,7 +471,7 @@ Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation)
         3, 1, 5
     };
     Mesh mesh = Mesh(verts, normals, uv, indices, position, rotation, 1.0f);
-    mesh.modelLocation = "computerCube";
+    mesh.modelLocation = std::to_string(CubeMesh);
     return mesh;
 }
 
@@ -481,7 +573,7 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
         vertexes = newVerts;
     }
 
-    Mesh mesh = Mesh("computerSphere", vertexes, indices, position, rotation, 1.0f);
+    Mesh mesh = Mesh(std::to_string(IcoSphereMesh), vertexes, indices, position, rotation, 1.0f);
     return mesh;
 }
 

@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include "Globals.hpp"
+#include "Debug.hpp"
 
 enum MeshType
 {
@@ -75,6 +76,7 @@ public:
     void Balloon(float delta, float speed, float percentage);
 };
 
+Mesh LoadModel(glm::vec3 position, glm::vec3 rotation, std::string location);
 
 Mesh Create2DTriangle(glm::vec3 position, glm::vec3 rotation);
 Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation);

@@ -19,6 +19,12 @@ Scene::Scene()
 
 }
 
+Scene::Scene(const Scene &other)
+{
+    this->SpatialObjects = other.SpatialObjects;
+    this->idList = other.idList;
+}
+
 Scene::~Scene()
 {
     DebugLog("Scene got deleted");
@@ -113,8 +119,20 @@ void Scene::DeleteObjects()
     for (unsigned int i = 0; i < SpatialObjects.size(); i++)
     {
         SpatialObjects[i].SO_mesh.Delete();
-        DebugLog("Deleted Space Object id: " + SpatialObjects[i].SO_id);
+        DebugLog("Deleted Space Object id: " + std::to_string(SpatialObjects[i].SO_id));
     }
+}
+
+void Scene::Clear()
+{
+    for (unsigned int i = 0; i < SpatialObjects.size(); i++)
+    {
+        SpatialObjects[i].SO_mesh.Delete();
+        SpatialObjects[i].SO_texture.Delete();
+        DebugLog("Deleted Space Object id: " + std::to_string(SpatialObjects[i].SO_id));
+    }
+    SpatialObjects.clear();
+    idList.clear();
 }
 
 /*Scene Save format
@@ -125,7 +143,7 @@ ML (Mesh location)
 MP (Mesh position.x)/(mesh position.y)/(mesh position.z)
 MR (Mesh rotation.x)/(mesh rotation.y)/(mesh rotation.z)
 MS (mesh scale)
-TL (Texture location)  
+TL (Texture location)
 
 */
 void Scene::SaveScene(std::string location, std::string name)
@@ -155,7 +173,81 @@ void Scene::SaveScene(std::string location, std::string name)
     
 }
 
-void Scene::LoadScene(std::string location, std::string name)
+void LoadScene(std::string location, std::string name, Scene& scene)
 {
-
+    if(!FileExist(location + name))
+        DebugLog("Scene not found");
+    DebugLog("Loading scene " + name);
+    std::ifstream file(location + name);
+    std::string line;
+    unsigned int size = 0;
+    SpatialObject tempObject;
+    
+    while (std::getline(file, line))
+    {
+        if(line[0] == 'S' && line[1] == 'N')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            std::istringstream data(line);
+            data >> size;
+        }
+        if(line[0] == 'S' && line[1] == 'O')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            std::istringstream data(line);
+            unsigned int id;
+            data >> id;
+            tempObject.SO_id = id;
+        }
+        if(line[0] == 'M' && line[1] == 'L')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            tempObject.SO_mesh.modelLocation = line;
+        }
+        if(line[0] == 'M' && line[1] == 'P')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            line = stringRemove(line, "/", " ");
+            std::istringstream data(line);
+            float x, y, z;
+            data >> x;
+            data >> y;
+            data >> z;
+            tempObject.SO_mesh.position = glm::vec3(x,y,z);
+        }
+        if(line[0] == 'M' && line[1] == 'R')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            line = stringRemove(line, "/", " ");
+            std::istringstream data(line);
+            float x, y, z;
+            data >> x;
+            data >> y;
+            data >> z;
+            tempObject.SO_mesh.rotation = glm::vec3(x,y,z);
+        }
+        if(line[0] == 'M' && line[1] == 'S')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            std::istringstream data(line);
+            float s;
+            data >> s;
+            tempObject.SO_mesh.scale = s;
+        }
+        if(line[0] == 'T' && line[1] == 'L')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            tempObject.SO_texture.textLocation = line;
+            scene.AddSpatialObject(LoadModel(tempObject.SO_mesh.position, tempObject.SO_mesh.rotation, tempObject.SO_mesh.modelLocation));
+        }
+    }
+    
+    file.close();
 }
