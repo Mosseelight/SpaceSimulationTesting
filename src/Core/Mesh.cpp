@@ -307,6 +307,18 @@ Mesh LoadModel(glm::vec3 position, glm::vec3 rotation, std::string location)
     if(!file)
     {
         DebugLog("Location for Mesh not found " + location);
+        switch (static_cast<MeshType>(std::stoi(location)))
+        {
+        case CubeMesh:
+            return CreateCubeMesh(position, rotation);
+            break;
+        case IcoSphereMesh:
+            return CreateSphereMesh(position, rotation, 4);
+            break;
+        case TriangleMesh:
+            return Create2DTriangle(position, rotation);
+            break;
+        }
     }
 
     Mesh mesh;
