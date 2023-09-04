@@ -544,7 +544,6 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
         vertexes.clear();
         vertexes = newVerts;
     }
-
     Mesh mesh = Mesh(std::to_string(IcoSphereMesh), vertexes, indices, position, rotation, 1.0f);
     return mesh;
 }

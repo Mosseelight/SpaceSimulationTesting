@@ -80,13 +80,11 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
-    LoadScene(sceneLoc, "main.scene", mainScene);
-
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0,0,0), modelLoc + "Teapot.obj"));
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(4,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
-    //mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 3));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0,0,0), modelLoc + "Teapot.obj"));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(4,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 3));
     
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
     player->rotation.x = 180;
@@ -109,7 +107,7 @@ int main()
         Render(window);
     }
 
-    mainScene.SaveScene(sceneLoc, "mainnew.scene");
+    mainScene.SaveScene(sceneLoc, "main.scene");
     
     texture.Delete();
     SDL_FreeSurface(windowIcon);
