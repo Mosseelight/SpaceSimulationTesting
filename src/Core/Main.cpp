@@ -20,6 +20,9 @@
 #include "../include/Core/Debug.hpp"
 #include "../include/Core/Texture.hpp"
 
+//physics
+#include "../include/Core/Physics/SpatialPhysics.hpp"
+
 //player
 #include "../include/Player/Camera.hpp"
 #include "../include/Player/Player.hpp"
@@ -130,6 +133,8 @@ void UpdateLogic(SDL_Window* window)
     lastTime = currentTime;
     drawCallAvg = DrawCallCount / (GetTime() / deltaTime);
 
+    RunSimulation(deltaTime, mainScene);
+
     player->UpdatePlayer();
     input();
 }
@@ -220,7 +225,7 @@ void ImguiMenu()
 
     ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1 / deltaTime));
     ImGui::Text("%d verts, %d indices (%d tris)", vertCount, indCount, indCount / 3);
-    ImGui::Text("Amount of SpaceObjs: (%zu)", mainScene.SpatialObjects.size());
+    ImGui::Text("Amount of Spatials: (%zu)", mainScene.SpatialObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
     ImGui::Text("Ram Usage: %.2fmb", GetRamUsage() / 1024);
     ImGui::Text("Time Open %.1f minutes", (GetTime() / 60));
@@ -257,8 +262,8 @@ void ImguiMenu()
 
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
                 {
-                    ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpatialObjects[i].SO_mesh.position), 0.01f, -100000.0f, 100000.0f);
-                    ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpatialObjects[i].SO_mesh.rotation), 0.01f, -3.6f, 3.6f);
+                    ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.position), 0.01f, -100000.0f, 100000.0f);
+                    ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.rotation), 0.1f, -360.0f, 360.0f);
                     ImGui::TreePop();
                 }
             }

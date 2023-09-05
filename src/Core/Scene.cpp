@@ -173,7 +173,10 @@ void Scene::SaveScene(std::string location, std::string name)
 void LoadScene(std::string location, std::string name, Scene& scene)
 {
     if(!FileExist(location + name))
+    {
         DebugLog("Scene not found");
+        return;
+    }
     DebugLog("Loading scene " + name);
     std::ifstream file(location + name);
     std::string line;

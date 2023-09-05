@@ -4,6 +4,7 @@
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
+#include "Physics/RigidBody.hpp"
 #include <vector>
 #include <glm/glm.hpp>
 
@@ -12,6 +13,7 @@ struct SpatialObject
 public:
     Mesh SO_mesh;
     Texture SO_texture;
+    RigidBody SO_rigidbody;
     unsigned int SO_id;
 
     SpatialObject() {}

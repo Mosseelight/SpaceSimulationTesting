@@ -37,3 +37,8 @@ glm::mat4 Camera::GetProjMat(int width, int height, float near, float far)
 {
     return glm::perspective(glm::radians(fov), (float)width / (float)height, near, far);
 }
+
+void Camera::LookAtPos(glm::vec3 pos)
+{
+    target = pos;
+}
