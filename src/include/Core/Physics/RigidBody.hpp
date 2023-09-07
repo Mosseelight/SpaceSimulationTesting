@@ -1,6 +1,8 @@
 #pragma once
+#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "../Globals.hpp"
 
 class RigidBody
 {
@@ -19,6 +21,7 @@ public:
     RigidBody();
     ~RigidBody();
     void Step(float timeStep);
-    void AddForce(glm::vec3 force);
+    void ApplyForce(glm::vec3 force);
+    void ApplyDragForce(float airDensity, float area);
     glm::vec3 GetLocalDir(glm::vec3 dir);
 };

@@ -86,8 +86,9 @@ int main()
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
     mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0,0,0), modelLoc + "Teapot.obj"));
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(4,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
-    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 3));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(4,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
+    //mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 0));
+    
     
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
     player->rotation.x = 180;
@@ -232,8 +233,8 @@ void ImguiMenu()
 
     ImGui::Spacing();
     ImGui::Checkbox("Wire Frame", &showWireFrame);
-    ImGui::SliderFloat3("Player Position", glm::value_ptr(player->position), -50.0f, 50.0f);
-    ImGui::SliderFloat3("Player Rotation", glm::value_ptr(player->rotation), -360.0f, 360.0f);
+    ImGui::DragFloat3("Player Position", glm::value_ptr(player->position), 1.0f, -50.0f, 50.0f);
+    ImGui::DragFloat3("Player Rotation", glm::value_ptr(player->rotation), 1.0f, -360.0f, 360.0f);
     ImGui::SliderFloat("Cam Fov", &player->camera.fov, 179.9f, 0.01f);
 
     if (ImGui::BeginMenuBar())
