@@ -265,6 +265,9 @@ void ImguiMenu()
                 {
                     ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.position), 0.01f, -100000.0f, 100000.0f);
                     ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.rotation), 0.1f, -360.0f, 360.0f);
+                    ImGui::DragFloat3("Object Velocity", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.velocity), 0.0f, 0.0f, 0.0f);
+                    ImGui::DragFloat3("Object Acceleration", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.acceleration), 0.0f, 0.0f, 0.0f);
+                    ImGui::DragFloat3("Object NetForce", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.totalForce), 0.0f, 0.0f, 0.0f);
                     ImGui::TreePop();
                 }
             }

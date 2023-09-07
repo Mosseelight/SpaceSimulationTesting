@@ -17,23 +17,22 @@ RigidBody::~RigidBody()
 
 void RigidBody::Step(float timeStep)
 {
-    ApplyForce(GetLocalDir(glm::vec3(0,-9.81f,0)));
+    totalForce = glm::vec3(0);
+    ApplyForce(glm::vec3(0,-9.81f,0));
     ApplyDragForce(AirDensity, 1.0f);
     acceleration = totalForce / mass;
     velocity += acceleration * timeStep;
-    std::cout << velocity.y << std::endl;
     position += velocity * timeStep;
-    totalForce = glm::vec3(0);
 }
 
 void RigidBody::ApplyForce(glm::vec3 force)
 {
-    totalForce += force;
+    totalForce += force * mass;
 }
 
 void RigidBody::ApplyDragForce(float airDensity, float area)
 {
-    totalForce += 0.5f * (airDensity * area) * -velocity;
+    totalForce += 0.5f * airDensity * area * -velocity;
 }
 
 glm::vec3 RigidBody::GetLocalDir(glm::vec3 dir)
