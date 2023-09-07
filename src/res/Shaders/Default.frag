@@ -24,14 +24,10 @@ void main()
     vec3 lightDir = normalize(lightPos - pos);
     vec3 v = normalize(-pos);
     vec3 r = reflect(-lightDir, nor);
-    float LDDN = max(dot(lightDir, nor), 0.0);
+    float diff = max(dot(nor, lightDir), 0.0);
     vec3 ambient = ambientColor * ambientPower;
-    vec3 diffuse = lightDiffuse * LDDN;
-    vec3 spec = vec3(0.0);
-    if(LDDN > 0.0)
-    {
-        spec = lightSpec * pow(max(dot(r,v),0.0),shine);
-    }
+    vec3 diffuse = lightDiffuse * diff;
+    vec3 spec = lightSpec * pow(max(dot(r,v),0.0),shine);
     vec3 light = ambient + diffuse + spec;
-    out_color = texture(tex, uv) * vec4(light * color, 1.0f);
+    out_color = texture(tex, uv) * vec4(light, 1.0f);
 }
