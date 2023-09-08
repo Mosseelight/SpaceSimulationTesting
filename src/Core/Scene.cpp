@@ -100,7 +100,7 @@ void Scene::AddSpatialObject(Mesh mesh)
 
 }*/
 
-void Scene::DrawSingle(Shader *shader, glm::mat4 view, glm::mat4 proj)
+void Scene::DrawSingle(Shader *shader, glm::mat4 view, glm::mat4 proj, glm::vec3 camPos)
 {
     for (unsigned int i = 0; i < SpatialObjects.size(); i++)
     {

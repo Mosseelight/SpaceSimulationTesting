@@ -49,6 +49,10 @@ void RigidBody::Step(float timeStep)
 {
     totalForce = glm::vec3(0);
     totalRotation = glm::vec3(0);
+
+    //APPLY FORCE HERE
+    ApplyRotationForce(glm::vec3(0,10000.0f,0));
+
     acceleration = totalForce / mass;
     rotAcceleration = totalRotation / mass;
     Solver(velocity, acceleration * timeStep, 1.0f);

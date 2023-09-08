@@ -160,7 +160,7 @@ void Render(SDL_Window* window)
 
     glUseProgram(shader.shader);
     glBindTexture(GL_TEXTURE_2D, texture.id);
-    mainScene.DrawSingle(&shader, player->camera.GetViewMat(), player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f));
+    mainScene.DrawSingle(&shader, player->camera.GetViewMat(), player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f), player->position);
 
     if(DebugWindow)
     {
