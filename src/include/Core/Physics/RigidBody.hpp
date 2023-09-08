@@ -3,12 +3,28 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "../Globals.hpp"
+#include "../Mesh.hpp"
+
+class BoundingBox
+{
+private:
+public:
+    glm::vec3 min;
+    glm::vec3 max;
+
+    BoundingBox();
+    ~BoundingBox();
+
+    void ConstructBoundingBox(Mesh& mesh);
+};
 
 class RigidBody
 {
 private:
     
 public:
+
+    BoundingBox boundbox;
 
     float mass;
     glm::vec3 position;

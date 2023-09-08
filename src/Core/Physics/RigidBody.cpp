@@ -2,6 +2,32 @@
 
 void Solver(glm::vec3& out, glm::vec3 in, float step);
 
+BoundingBox::BoundingBox()
+{
+    min = glm::vec3(0);
+    max = glm::vec3(0);
+}
+
+BoundingBox::~BoundingBox()
+{
+
+}
+
+void BoundingBox::ConstructBoundingBox(Mesh& mesh)
+{
+    min = glm::vec3(FLT_MAX);
+    max = glm::vec3(FLT_MIN);
+    for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
+    {
+        if(mesh.vertexes[i].position.x < min.x && mesh.vertexes[i].position.y < min.y && mesh.vertexes[i].position.z < min.z)
+            min = mesh.vertexes[i].position;
+        if(mesh.vertexes[i].position.x > max.x && mesh.vertexes[i].position.y > max.y && mesh.vertexes[i].position.z > max.z)
+            max = mesh.vertexes[i].position;
+    }
+}
+
+
+
 RigidBody::RigidBody()
 {
     mass = 1.0f;
