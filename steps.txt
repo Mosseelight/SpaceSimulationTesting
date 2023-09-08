@@ -5,12 +5,15 @@ Engine stuff for uses in other things
 
 ----NEED IN ORDER----
 Basic physics
-    create own or use some library like bullet
     collisions
-    gravity
+        have a space paritioning
+            3d grid maybe 16 time faster?
+        
     raycasting
         from screen to world and world to screen
     colliders
+
+Fix Shader not lighting objects under -1 y
 __________________________
 console and logging system
 

@@ -33,6 +33,8 @@ void Scene::AddSpatialObject(Mesh mesh)
     unsigned int id = SpatialObjects.size();
     SpatialObjects.push_back(SpatialObject(mesh, id));
     SpatialObjects[id].SO_mesh.BufferGens();
+    SpatialObjects[id].SO_rigidbody.position = mesh.position;
+    SpatialObjects[id].SO_rigidbody.rotation = mesh.rotation;
     SpatialObjects[id].SO_rigidbody.boundbox.ConstructBoundingBox(mesh);
     idList.push_back(id);
 

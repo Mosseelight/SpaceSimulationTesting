@@ -85,8 +85,8 @@ int main()
 
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0,0,0), modelLoc + "Teapot.obj"));
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(4,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
     //mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 0));
     
     
