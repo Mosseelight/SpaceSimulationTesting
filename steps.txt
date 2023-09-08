@@ -8,6 +8,7 @@ Basic physics
     collisions
         have a space paritioning
             3d grid maybe 16 time faster?
+    Use gjk algorithim
         
     raycasting
         from screen to world and world to screen
