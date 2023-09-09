@@ -31,12 +31,12 @@ void Player::Movement(int key, float delta)
 {
     glm::vec3 moveDir;
     glm::mat4 rotMat = GetRotMat();
-    glm::vec3 forward(0.0f,0.0f,-1.0f);
-    glm::vec3 backward(0.0f,0.0f,1.0f);
-    glm::vec3 right(1.0f,0.0f,0.0f);
-    glm::vec3 left(-1.0f,0.0f,0.0f);
-    glm::vec3 up(0.0f,1.0f,0.0f);
-    glm::vec3 down(0.0f,-1.0f,0.0f);
+    glm::vec3 forward(0.0f,0.0f,-0.1f);
+    glm::vec3 backward(0.0f,0.0f,0.1f);
+    glm::vec3 right(0.1f,0.0f,0.0f);
+    glm::vec3 left(-0.1f,0.0f,0.0f);
+    glm::vec3 up(0.0f,0.1f,0.0f);
+    glm::vec3 down(0.0f,-0.1f,0.0f);
     //forward = glm::vec3(glm::vec4(forward, 1.0f) * rotMat);
     //backward = glm::vec3(glm::vec4(backward, 1.0f) * rotMat);
     //left = glm::vec3(glm::vec4(left, 1.0f) * rotMat);
@@ -65,4 +65,13 @@ void Player::Movement(int key, float delta)
     moveDir = glm::normalize(moveDir);
     position += moveDir * speed * delta;
     
+}
+
+void Player::MouseMovement(int x, int y, bool leftP, bool rightP)
+{
+    if(rightP)
+    {
+        rotation.x += x * sensitivity;
+        rotation.y += y * sensitivity;
+    }
 }

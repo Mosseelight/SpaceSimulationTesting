@@ -5,12 +5,12 @@
 
 struct Simplex
 {
-    glm::vec3 a, a2, a3, b, b2, b3, c, c2, c3, d, d2, d3;
+    glm::vec3 a, b, c, d;
     int count;
 
     Simplex() 
     {
-        a, a2, a3, b, b2, b3, c, c2, c3, d, d2, d3 = glm::vec3(0.0f);
+        a, b, c, d = glm::vec3(0.0f);
     }
 };
 

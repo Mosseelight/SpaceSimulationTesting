@@ -88,8 +88,8 @@ int main()
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
     //mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
-    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(2,0,0), glm::vec3(0,0,0), 1));
-    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 1));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 5));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 5));
     
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
     player->rotation.x = 180;
@@ -176,8 +176,13 @@ void Render(SDL_Window* window)
     SDL_GL_SwapWindow(window);
 }
 
+float xMouse = 0;
+float yMouse = 0;
+bool lockMouse = true;
 void input()
 {
+    if(lockMouse)
+        SDL_SetRelativeMouseMode(SDL_TRUE);
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         ImGui_ImplSDL2_ProcessEvent(&event);
@@ -188,6 +193,18 @@ void input()
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym)
             {
+            case SDLK_ESCAPE:
+                if(lockMouse)
+                {
+                    lockMouse = false;
+                    SDL_SetRelativeMouseMode(SDL_FALSE);
+                }
+                else
+                {
+                    lockMouse = true;
+                    SDL_SetRelativeMouseMode(SDL_FALSE);
+                }
+                break;
             case SDLK_BACKQUOTE:
                 DebugWindow = !DebugWindow;
                 break;
@@ -210,6 +227,15 @@ void input()
                 player->Movement(SDLK_LSHIFT, deltaTime);
                 break;
             }
+            break;
+        case SDL_MOUSEMOTION:
+            if(!lockMouse)
+                break;
+            float xDelta = event.motion.x - xMouse;
+            float yDelta = yMouse - event.motion.y;
+            xMouse = event.motion.x;
+            yMouse = event.motion.y;
+            player->MouseMovement(xDelta, yDelta, false, true);
             break;
         }
     }

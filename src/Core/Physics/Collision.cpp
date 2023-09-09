@@ -1,12 +1,13 @@
 #include "../../include/Core/Physics/Collision.hpp"
 
-glm::vec3 Simplex2(Simplex a, glm::vec3 dir);
-glm::vec3 Simplex3(Simplex a, glm::vec3 dir);
-glm::vec3 Simplex2Return(glm::vec3 mid, glm::vec3 inva, Simplex a);
-SimplexSolve Simplex4(Simplex a, glm::vec3 dir);
+glm::vec3 Simplex2(glm::vec3 dir);
+glm::vec3 Simplex3(glm::vec3 dir);
+glm::vec3 Simplex2Return(glm::vec3 mid, glm::vec3 inva);
+SimplexSolve Simplex4(glm::vec3 dir);
 glm::vec3 GetVertex(std::vector<Vertex> vertexes, glm::vec3 dir, glm::mat4 model);
 bool SameLine(glm::vec3 a, glm::vec3 b);
 
+Simplex a;
 bool CollisionCheck(SpatialObject own, SpatialObject other)
 {
     Simplex a;
@@ -19,7 +20,8 @@ bool CollisionCheck(SpatialObject own, SpatialObject other)
     //finds the closest points
     a.a = GetVertex(other.SO_mesh.vertexes, direction, other.SO_mesh.GetModelMat()) - GetVertex(own.SO_mesh.vertexes, -direction, own.SO_mesh.GetModelMat());
     direction = -a.a;
-    while(true)
+    
+    for (unsigned int i = 0; i < 64; i++)
     {
         a.d = a.c;
         a.c = a.b;
@@ -33,31 +35,27 @@ bool CollisionCheck(SpatialObject own, SpatialObject other)
 
         if(a.count == 2)
         {
-            direction = Simplex2(a, direction);
+            direction = Simplex2(direction);
         }
         if(a.count == 3)
         {
-            direction = Simplex3(a, direction);
+            direction = Simplex3(direction);
         }
         if(a.count == 4)
         {
             SimplexSolve s;
-            s = Simplex4(a, direction);
-            DrawDebugLine(a.a, a.a + glm::vec3(0,0.01f,0), glm::vec3(255,0,0));
-            std::cout << a.a.x << "x " << a.a.y << "y " << a.a.z << "z " << std::endl;
+            s = Simplex4(direction);
             if(s.check)
             {
                 return true;
             }
-            else
-                return false;
         }
     }
     return false;
     
 }
 
-glm::vec3 Simplex2(Simplex a, glm::vec3 dir) //line
+glm::vec3 Simplex2(glm::vec3 dir) //line
 {
     glm::vec3 mid = a.b - a.a;
     glm::vec3 inva = -a.a;
@@ -73,7 +71,7 @@ glm::vec3 Simplex2(Simplex a, glm::vec3 dir) //line
     }
 }
 
-glm::vec3 Simplex3(Simplex a, glm::vec3 dir) //triangle
+glm::vec3 Simplex3(glm::vec3 dir) //triangle
 {
     glm::vec3 tri = glm::cross(a.b - a.a, a.c - a.a);
     glm::vec3 mid = a.c - a.a;
@@ -90,7 +88,7 @@ glm::vec3 Simplex3(Simplex a, glm::vec3 dir) //triangle
         else
         {
             glm::vec3 mid2 = a.b - a.a;
-            return Simplex2Return(mid2, inva, a);
+            return Simplex2Return(mid2, inva);
         }
     }
     else
@@ -98,7 +96,7 @@ glm::vec3 Simplex3(Simplex a, glm::vec3 dir) //triangle
         glm::vec3 mid2 = a.b = a.a;
         if(SameLine(glm::cross(mid2, tri), inva))
         {
-            return Simplex2Return(mid2, inva, a);
+            return Simplex2Return(mid2, inva);
         }
         else
         {
@@ -119,7 +117,7 @@ glm::vec3 Simplex3(Simplex a, glm::vec3 dir) //triangle
     }
 }
 
-glm::vec3 Simplex2Return(glm::vec3 mid, glm::vec3 inva, Simplex a)
+glm::vec3 Simplex2Return(glm::vec3 mid, glm::vec3 inva)
 {
     if(SameLine(mid, inva))
     {
@@ -133,7 +131,7 @@ glm::vec3 Simplex2Return(glm::vec3 mid, glm::vec3 inva, Simplex a)
     }
 }
 
-SimplexSolve Simplex4(Simplex a, glm::vec3 dir) //tet
+SimplexSolve Simplex4(glm::vec3 dir) //tet
 {
     glm::vec3 tri1 = glm::cross(a.b - a.a, a.c - a.a);
     glm::vec3 tri2 = glm::cross(a.c - a.a, a.d - a.a);
@@ -143,7 +141,8 @@ SimplexSolve Simplex4(Simplex a, glm::vec3 dir) //tet
     if(SameLine(tri1, inva))
     {
         a.count = 3;
-        return SimplexSolve(Simplex3(a, dir), false);
+        glm::vec3 solve = Simplex3(dir);
+        return SimplexSolve(solve, false);
     }
 
     if(SameLine(tri2, inva))
@@ -151,7 +150,8 @@ SimplexSolve Simplex4(Simplex a, glm::vec3 dir) //tet
         a.b = a.c;
         a.c = a.d;
         a.count = 3;
-        return SimplexSolve(Simplex3(a, dir), false);
+        glm::vec3 solve = Simplex3(dir);
+        return SimplexSolve(solve, false);
     }
 
     if(SameLine(tri3, inva))
@@ -159,7 +159,8 @@ SimplexSolve Simplex4(Simplex a, glm::vec3 dir) //tet
         a.c = a.b;
         a.b = a.d;
         a.count = 3;
-        return SimplexSolve(Simplex3(a, dir), false);
+        glm::vec3 solve = Simplex3(dir);
+        return SimplexSolve(solve, false);
     }
 
     return SimplexSolve(glm::vec3(0.0f), true);
@@ -167,22 +168,23 @@ SimplexSolve Simplex4(Simplex a, glm::vec3 dir) //tet
 
 glm::vec3 GetVertex(std::vector<Vertex> vertexes, glm::vec3 dir, glm::mat4 model)
 {
-    float largestDot = glm::dot(vertexes[0].position, dir);
+    glm::vec3 dirModel = glm::vec3(glm::inverse(model) * glm::vec4(dir, 0.0f));
+    float largestDot = glm::dot(vertexes[0].position, dirModel);
     glm::vec3 largestPos = vertexes[0].position;
 
     for (unsigned int i = 0; i < vertexes.size(); i++)
     {
         glm::vec3 vertexPos = vertexes[i].position;
-        float currentDot = glm::dot(vertexPos, dir);
-        DrawDebugLine(vertexPos, vertexPos + glm::vec3(0,0.01f,0), glm::vec3(255,0,0));
+        float currentDot = glm::dot(vertexPos, dirModel);
 
         if(currentDot > largestDot)
         {
             largestDot = currentDot;
-            largestPos = vertexes[i].position;
+            largestPos = vertexPos;
         }
     }
-    return glm::vec3(model * glm::vec4(largestPos, 1.0f));
+    largestPos = glm::vec3(model * glm::vec4(largestPos, 1.0f));
+    return largestPos;
 }
 
 bool SameLine(glm::vec3 a, glm::vec3 b)

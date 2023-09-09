@@ -16,9 +16,11 @@ public:
     glm::vec3 position;
     glm::vec3 rotation;
     Camera camera;
+    float sensitivity = 0.2f;
 
     Player(float speed, Camera camera, glm::vec3 position);
     ~Player();
     void UpdatePlayer();
     void Movement(int key, float delta);
+    void MouseMovement(int x, int y, bool leftP, bool rightP);
 };

@@ -31,7 +31,6 @@ void RigidBody::Step(float timeStep, SpatialObject& own, SpatialObject& other)
 
     //APPLY FORCE HERE
     //ApplyForce(glm::vec3(0,-1,0));
-    CollisionCheck(own, other);
 
     acceleration = totalForce / mass;
     rotAcceleration = totalRotation / mass;
