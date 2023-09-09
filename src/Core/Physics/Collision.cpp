@@ -19,6 +19,7 @@ bool CollisionCheck(SpatialObject own, SpatialObject other)
     //finds the closest points
     a.a = GetVertex(other.SO_mesh.vertexes, direction, other.SO_mesh.GetModelMat()) - GetVertex(own.SO_mesh.vertexes, -direction, own.SO_mesh.GetModelMat());
     direction = -a.a;
+    
     while(true)
     {
         a.d = a.c;
@@ -43,8 +44,6 @@ bool CollisionCheck(SpatialObject own, SpatialObject other)
         {
             SimplexSolve s;
             s = Simplex4(a, direction);
-            DrawDebugLine(a.a, a.a + glm::vec3(0,0.01f,0), glm::vec3(255,0,0));
-            std::cout << a.a.x << "x " << a.a.y << "y " << a.a.z << "z " << std::endl;
             if(s.check)
             {
                 return true;
@@ -143,7 +142,8 @@ SimplexSolve Simplex4(Simplex a, glm::vec3 dir) //tet
     if(SameLine(tri1, inva))
     {
         a.count = 3;
-        return SimplexSolve(Simplex3(a, dir), false);
+        glm::vec3 solve = Simplex3(a, dir);
+        return SimplexSolve(solve, false);
     }
 
     if(SameLine(tri2, inva))
@@ -151,7 +151,8 @@ SimplexSolve Simplex4(Simplex a, glm::vec3 dir) //tet
         a.b = a.c;
         a.c = a.d;
         a.count = 3;
-        return SimplexSolve(Simplex3(a, dir), false);
+        glm::vec3 solve = Simplex3(a, dir);
+        return SimplexSolve(solve, false);
     }
 
     if(SameLine(tri3, inva))
@@ -159,7 +160,8 @@ SimplexSolve Simplex4(Simplex a, glm::vec3 dir) //tet
         a.c = a.b;
         a.b = a.d;
         a.count = 3;
-        return SimplexSolve(Simplex3(a, dir), false);
+        glm::vec3 solve = Simplex3(a, dir);
+        return SimplexSolve(solve, false);
     }
 
     return SimplexSolve(glm::vec3(0.0f), true);
@@ -174,15 +176,15 @@ glm::vec3 GetVertex(std::vector<Vertex> vertexes, glm::vec3 dir, glm::mat4 model
     {
         glm::vec3 vertexPos = vertexes[i].position;
         float currentDot = glm::dot(vertexPos, dir);
-        DrawDebugLine(vertexPos, vertexPos + glm::vec3(0,0.01f,0), glm::vec3(255,0,0));
 
         if(currentDot > largestDot)
         {
             largestDot = currentDot;
-            largestPos = vertexes[i].position;
+            largestPos = vertexPos;
         }
     }
-    return glm::vec3(model * glm::vec4(largestPos, 1.0f));
+    //fix this the matrix is horrible 
+    return largestPos;
 }
 
 bool SameLine(glm::vec3 a, glm::vec3 b)

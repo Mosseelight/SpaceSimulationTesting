@@ -83,7 +83,6 @@ void DrawDebugItems()
         glDeleteBuffers(1, &vbos[i]);
         glDeleteVertexArrays(1, &vaos[i]);
     }
-    std::cout << vaos.size() << std::endl;
     vaos.clear();
     vbos.clear();
 }
