@@ -21,7 +21,11 @@ bool CollisionCheck(SpatialObject own, SpatialObject other)
     a.a = GetVertex(other.SO_mesh.vertexes, direction, other.SO_mesh.GetModelMat()) - GetVertex(own.SO_mesh.vertexes, -direction, own.SO_mesh.GetModelMat());
     direction = -a.a;
     
+<<<<<<< HEAD
     for (unsigned int i = 0; i < 64; i++)
+=======
+    while(true)
+>>>>>>> 48807e8b63522eeb6ef5b25e560909477c0f436b
     {
         a.d = a.c;
         a.c = a.b;
@@ -44,7 +48,11 @@ bool CollisionCheck(SpatialObject own, SpatialObject other)
         if(a.count == 4)
         {
             SimplexSolve s;
+<<<<<<< HEAD
             s = Simplex4(direction);
+=======
+            s = Simplex4(a, direction);
+>>>>>>> 48807e8b63522eeb6ef5b25e560909477c0f436b
             if(s.check)
             {
                 return true;
@@ -141,7 +149,11 @@ SimplexSolve Simplex4(glm::vec3 dir) //tet
     if(SameLine(tri1, inva))
     {
         a.count = 3;
+<<<<<<< HEAD
         glm::vec3 solve = Simplex3(dir);
+=======
+        glm::vec3 solve = Simplex3(a, dir);
+>>>>>>> 48807e8b63522eeb6ef5b25e560909477c0f436b
         return SimplexSolve(solve, false);
     }
 
@@ -150,7 +162,11 @@ SimplexSolve Simplex4(glm::vec3 dir) //tet
         a.b = a.c;
         a.c = a.d;
         a.count = 3;
+<<<<<<< HEAD
         glm::vec3 solve = Simplex3(dir);
+=======
+        glm::vec3 solve = Simplex3(a, dir);
+>>>>>>> 48807e8b63522eeb6ef5b25e560909477c0f436b
         return SimplexSolve(solve, false);
     }
 
@@ -159,7 +175,11 @@ SimplexSolve Simplex4(glm::vec3 dir) //tet
         a.c = a.b;
         a.b = a.d;
         a.count = 3;
+<<<<<<< HEAD
         glm::vec3 solve = Simplex3(dir);
+=======
+        glm::vec3 solve = Simplex3(a, dir);
+>>>>>>> 48807e8b63522eeb6ef5b25e560909477c0f436b
         return SimplexSolve(solve, false);
     }
 
@@ -175,7 +195,11 @@ glm::vec3 GetVertex(std::vector<Vertex> vertexes, glm::vec3 dir, glm::mat4 model
     for (unsigned int i = 0; i < vertexes.size(); i++)
     {
         glm::vec3 vertexPos = vertexes[i].position;
+<<<<<<< HEAD
         float currentDot = glm::dot(vertexPos, dirModel);
+=======
+        float currentDot = glm::dot(vertexPos, dir);
+>>>>>>> 48807e8b63522eeb6ef5b25e560909477c0f436b
 
         if(currentDot > largestDot)
         {
@@ -183,7 +207,11 @@ glm::vec3 GetVertex(std::vector<Vertex> vertexes, glm::vec3 dir, glm::mat4 model
             largestPos = vertexPos;
         }
     }
+<<<<<<< HEAD
     largestPos = glm::vec3(model * glm::vec4(largestPos, 1.0f));
+=======
+    //fix this the matrix is horrible 
+>>>>>>> 48807e8b63522eeb6ef5b25e560909477c0f436b
     return largestPos;
 }
 
