@@ -85,10 +85,11 @@ int main()
 
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
-    //mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,0,0), glm::vec3(0,0,0), 0));
-    
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
+    //mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(2,0,0), glm::vec3(0,0,0), 1));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 1));
     
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
     player->rotation.x = 180;
@@ -162,6 +163,9 @@ void Render(SDL_Window* window)
     glBindTexture(GL_TEXTURE_2D, texture.id);
     mainScene.DrawSingle(&shader, player->camera.GetViewMat(), player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f), player->position);
 
+    //debuging sets
+    SetNeededDebug(player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f), player->camera.GetViewMat(), shaderLoc);
+    DrawDebugItems();
     if(DebugWindow)
     {
         ImGui::End();

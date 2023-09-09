@@ -1,32 +1,8 @@
 #include "../../include/Core/Physics/RigidBody.hpp"
+#include "../../include/Core/Physics/Collision.hpp"
+#include "../../include/Core/Scene.hpp"
 
 void Solver(glm::vec3& out, glm::vec3 in, float step);
-
-BoundingBox::BoundingBox()
-{
-    min = glm::vec3(0);
-    max = glm::vec3(0);
-}
-
-BoundingBox::~BoundingBox()
-{
-
-}
-
-void BoundingBox::ConstructBoundingBox(Mesh& mesh)
-{
-    min = glm::vec3(FLT_MAX);
-    max = glm::vec3(FLT_MIN);
-    for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
-    {
-        if(mesh.vertexes[i].position.x < min.x && mesh.vertexes[i].position.y < min.y && mesh.vertexes[i].position.z < min.z)
-            min = mesh.vertexes[i].position;
-        if(mesh.vertexes[i].position.x > max.x && mesh.vertexes[i].position.y > max.y && mesh.vertexes[i].position.z > max.z)
-            max = mesh.vertexes[i].position;
-    }
-}
-
-
 
 RigidBody::RigidBody()
 {
@@ -38,6 +14,7 @@ RigidBody::RigidBody()
     rotVelocity = glm::vec3(0.0f);
     rotAcceleration = glm::vec3(0.0f);
     totalForce = glm::vec3(0.0f);
+    isStatic = false;
 }
 
 RigidBody::~RigidBody()
@@ -45,13 +22,16 @@ RigidBody::~RigidBody()
 
 }
 
-void RigidBody::Step(float timeStep)
+void RigidBody::Step(float timeStep, SpatialObject& own, SpatialObject& other)
 {
+    if(isStatic)
+        return;
     totalForce = glm::vec3(0);
     totalRotation = glm::vec3(0);
 
     //APPLY FORCE HERE
-    ApplyRotationForce(glm::vec3(0,10000.0f,0));
+    //ApplyForce(glm::vec3(0,-1,0));
+    CollisionCheck(own, other);
 
     acceleration = totalForce / mass;
     rotAcceleration = totalRotation / mass;

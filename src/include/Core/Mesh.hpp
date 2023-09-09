@@ -66,6 +66,7 @@ public:
     void DrawMesh();
     void Delete();
     glm::mat4 GetModelMat();
+    glm::mat4 GetRotationMat();
     void FixWindingOrder();
     void CreateSmoothNormals();
     void SubdivideTriangle();

@@ -35,7 +35,6 @@ void Scene::AddSpatialObject(Mesh mesh)
     SpatialObjects[id].SO_mesh.BufferGens();
     SpatialObjects[id].SO_rigidbody.position = mesh.position;
     SpatialObjects[id].SO_rigidbody.rotation = mesh.rotation;
-    SpatialObjects[id].SO_rigidbody.boundbox.ConstructBoundingBox(mesh);
     idList.push_back(id);
 
     if(SpatialObjects[id].GetSizeUsage() / 1024 < 1000)
@@ -106,6 +105,7 @@ void Scene::DrawSingle(Shader *shader, glm::mat4 view, glm::mat4 proj, glm::vec3
     {
         shader->setMat4("model", SpatialObjects[i].SO_mesh.GetModelMat());
         shader->setVec3("color", glm::vec3(0.0f, 1.0f, 0.0f));
+        shader->setVec3("ViewPos", camPos);
         shader->setMat4("proj", proj);
         shader->setMat4("view", view);
         shader->setMat4("normalMat", glm::transpose(glm::inverse(SpatialObjects[i].SO_mesh.GetModelMat())));

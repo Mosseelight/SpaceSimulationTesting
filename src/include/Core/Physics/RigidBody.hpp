@@ -3,20 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "../Globals.hpp"
-#include "../Mesh.hpp"
 
-class BoundingBox
-{
-private:
-public:
-    glm::vec3 min;
-    glm::vec3 max;
-
-    BoundingBox();
-    ~BoundingBox();
-
-    void ConstructBoundingBox(Mesh& mesh);
-};
+struct SpatialObject;
 
 class RigidBody
 {
@@ -24,7 +12,7 @@ private:
     
 public:
 
-    BoundingBox boundbox;
+    bool isStatic;
 
     float mass;
     glm::vec3 position;
@@ -40,7 +28,7 @@ public:
 
     RigidBody();
     ~RigidBody();
-    void Step(float timeStep);
+    void Step(float timeStep, SpatialObject& own, SpatialObject& other);
     void ApplyForce(glm::vec3 force);
     void ApplyForceAtPos(glm::vec3 force, glm::vec3 pos);
     void ApplyImpulseForce(glm::vec3 dir, float power);

@@ -21,9 +21,9 @@ void Player::UpdatePlayer()
 glm::mat4 Player::GetRotMat()
 {
     glm::mat4 mat;
-    mat = glm::rotate(mat, rotation.x, glm::vec3(1.0f,0.0f,0.0f));
-    mat = glm::rotate(mat, rotation.y, glm::vec3(0.0f,1.0f,0.0f));
-    mat = glm::rotate(mat, rotation.z, glm::vec3(0.0f,0.0f,1.0f));
+    mat = glm::rotate(mat, rotation.x * M_PIf/180.0f, glm::vec3(1.0f,0.0f,0.0f));
+    mat = glm::rotate(mat, rotation.y * M_PIf/180.0f, glm::vec3(0.0f,1.0f,0.0f));
+    mat = glm::rotate(mat, rotation.z * M_PIf/180.0f, glm::vec3(0.0f,0.0f,1.0f));
     return mat;
 }
 
