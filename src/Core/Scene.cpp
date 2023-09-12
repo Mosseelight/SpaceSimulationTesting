@@ -144,6 +144,7 @@ MP (Mesh position.x)/(mesh position.y)/(mesh position.z)
 MR (Mesh rotation.x)/(mesh rotation.y)/(mesh rotation.z)
 MS (mesh scale)
 TL (Texture location)
+RB (isStatic)
 
 */
 void Scene::SaveScene(std::string location, std::string name)

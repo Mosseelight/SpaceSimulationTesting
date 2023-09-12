@@ -58,13 +58,14 @@ unsigned int vertCount, indCount;
 int run = 1;
 int main()
 {
-
+    
+    //Sdl creation
     SDL_Init(SDL_INIT_VIDEO);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
-
+    
     SDL_Window* window = SDL_CreateWindow("SpaceSim", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCRWIDTH, SCRHEIGHT, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(window);
     gladLoadGL();
@@ -74,22 +75,24 @@ int main()
     windowIcon = IMG_Load((imageLoc + "/IconSpace.png").c_str());
     SDL_SetWindowIcon(window, windowIcon);
 
+    //ImGui Creation
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     
-
     ImGui_ImplSDL2_InitForOpenGL(window, context);
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
+    //scene initilzation
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,10,0), glm::vec3(0), modelLoc + "Bunny.obj"));
-    mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,0,0), glm::vec3(0,0,0)));
+    //mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,0,0), glm::vec3(0,0,0)));
     //mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 3));
-    //mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 3));
+
     
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
     player->rotation.x = 180;
@@ -231,11 +234,7 @@ void input()
         case SDL_MOUSEMOTION:
             if(!lockMouse)
                 break;
-            float xDelta = event.motion.x - xMouse;
-            float yDelta = yMouse - event.motion.y;
-            xMouse = event.motion.x;
-            yMouse = event.motion.y;
-            player->MouseMovement(xDelta, yDelta, false, true);
+            player->MouseMovement(event.motion.xrel, event.motion.yrel, false, true);
             break;
         }
     }
@@ -254,12 +253,12 @@ void ImguiMenu()
 
     ImGui::Begin("SpaceTesting", nullptr, window_flags);
 
-    ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1 / deltaTime));
+    ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1.0f / deltaTime));
     ImGui::Text("%d verts, %d indices (%d tris)", vertCount, indCount, indCount / 3);
     ImGui::Text("Amount of Spatials: (%zu)", mainScene.SpatialObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
     ImGui::Text("Ram Usage: %.2fmb", GetRamUsage() / 1024);
-    ImGui::Text("Time Open %.1f minutes", (GetTime() / 60));
+    ImGui::Text("Time Open %.1f minutes", (GetTime() / 60.0f));
 
     ImGui::Spacing();
     ImGui::Checkbox("Wire Frame", &showWireFrame);

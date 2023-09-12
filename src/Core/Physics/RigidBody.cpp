@@ -6,22 +6,35 @@ void Solver(glm::vec3& out, glm::vec3 in, float step);
 
 BoundingBox::BoundingBox()
 {
-    min = glm::vec3(0);
     max = glm::vec3(0);
+    min = glm::vec3(0);
 }
 
-//fix
 void BoundingBox::ConstructBoundingBox(Mesh& mesh)
 {
-    min = glm::vec3(FLT_MAX);
-    max = glm::vec3(FLT_MIN);
+    
+    glm::vec3 mintmp = glm::vec3(FLT_MAX);
+    glm::vec3 maxtmp = glm::vec3(FLT_MIN);
     for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
     {
-        if(mesh.vertexes[i].position.x < min.x && mesh.vertexes[i].position.y < min.y && mesh.vertexes[i].position.z < min.z)
-            min = mesh.vertexes[i].position;
-        if(mesh.vertexes[i].position.x > max.x && mesh.vertexes[i].position.y > max.y && mesh.vertexes[i].position.z > max.z)
-            max = mesh.vertexes[i].position;
+        glm::vec3 vertexPos = glm::vec3(mesh.GetRotationMat() * glm::vec4(mesh.vertexes[i].position, 1.0f));
+
+        if (vertexPos.x < mintmp.x)
+            mintmp.x = vertexPos.x;
+        if (vertexPos.y < mintmp.y)
+            mintmp.y = vertexPos.y;
+        if (vertexPos.z < mintmp.z)
+            mintmp.z = vertexPos.z;
+
+        if (vertexPos.x > maxtmp.x)
+            maxtmp.x = vertexPos.x;
+        if (vertexPos.y > maxtmp.y)
+            maxtmp.y = vertexPos.y;
+        if (vertexPos.z > maxtmp.z)
+            maxtmp.z = vertexPos.z;
     }
+    max = ((mintmp - maxtmp) * 0.5f) + mesh.position;
+    min = ((mintmp - maxtmp) * -0.5f) + mesh.position;
 }
 
 
@@ -59,9 +72,7 @@ void RigidBody::Step(float timeStep, SpatialObject& own, SpatialObject& other)
         once = false;
     }
     
-    std::cout << CollisionCheckNarrow(own, other) << std::endl;
-    DrawDebugCube(boundbox.min, 0.05f, glm::vec3(255,0,0));
-    DrawDebugCube(boundbox.max, 0.05f, glm::vec3(0,255,0));
+    //std::cout << CollisionCheckNarrow(own, other) << std::endl;
 
     acceleration = totalForce / mass;
     rotAcceleration = totalRotation / mass;

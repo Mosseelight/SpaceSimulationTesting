@@ -69,9 +69,6 @@ void Player::Movement(int key, float delta)
 
 void Player::MouseMovement(int x, int y, bool leftP, bool rightP)
 {
-    if(rightP)
-    {
-        rotation.x += x * sensitivity;
-        rotation.y += y * sensitivity;
-    }
+    rotation.x += x * sensitivity;
+    rotation.y += y * sensitivity;
 }
