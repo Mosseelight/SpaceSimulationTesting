@@ -12,7 +12,7 @@ uniform sampler2D tex;
 void main()
 {
     vec4 finalColor;
-    vec4 colorNew = vec4(1.0,1.0,1.0,1.0);
+    vec4 colorNew = vec4(color,1.0);
     vec4 ambient = vec4(0.0,0.34,0.34,1.0);
     vec4 texelColor = texture(tex, uv);
     vec3 lightDot = vec3(0.0);
@@ -29,7 +29,7 @@ void main()
     if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), nor))), 16.0); // 16 refers to shine
     specular += specCo;
 
-    finalColor = (((colorNew + vec4(specular, 1.0))*vec4(lightDot, 1.0)));
+    finalColor = (texelColor *((colorNew + vec4(specular, 1.0))*vec4(lightDot, 1.0)));
     finalColor += texelColor*(ambient/10.0)*colorNew;
 
     out_color = pow(finalColor, vec4(1.0/2.2));

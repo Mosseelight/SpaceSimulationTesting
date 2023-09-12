@@ -22,6 +22,7 @@ RigidBody::~RigidBody()
 
 }
 
+bool once = true;
 void RigidBody::Step(float timeStep, SpatialObject& own, SpatialObject& other)
 {
     if(isStatic)
@@ -30,7 +31,14 @@ void RigidBody::Step(float timeStep, SpatialObject& own, SpatialObject& other)
     totalRotation = glm::vec3(0);
 
     //APPLY FORCE HERE
-    //ApplyForce(glm::vec3(0,-1,0));
+
+    //Force applied once
+    if(once)
+    {
+        once = false;
+    }
+    
+    std::cout << CollisionCheckNarrow(own, other) << std::endl;
 
     acceleration = totalForce / mass;
     rotAcceleration = totalRotation / mass;
