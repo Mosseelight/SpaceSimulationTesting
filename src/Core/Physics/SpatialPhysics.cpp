@@ -12,6 +12,7 @@ void RunSimulation(float deltaTime, Scene& scene)
             scene.SpatialObjects[i].SO_rigidbody.Step(PhysicsStep * PhysicsSpeed, scene.SpatialObjects[0], scene.SpatialObjects[1]);
             scene.SpatialObjects[i].SO_mesh.position = scene.SpatialObjects[i].SO_rigidbody.position;
             scene.SpatialObjects[i].SO_mesh.rotation = scene.SpatialObjects[i].SO_rigidbody.rotation;
+            scene.SpatialObjects[i].SO_rigidbody.boundbox.ConstructBoundingBox(scene.SpatialObjects[i].SO_mesh);
         }
         totalTime -= PhysicsStep;
     }

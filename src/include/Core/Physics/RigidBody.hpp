@@ -5,6 +5,19 @@
 #include "../Globals.hpp"
 
 struct SpatialObject;
+class Mesh;
+
+class BoundingBox
+{
+private:
+public:
+    glm::vec3 min;
+    glm::vec3 max;
+
+    BoundingBox();
+
+    void ConstructBoundingBox(Mesh& mesh);
+};
 
 class RigidBody
 {
@@ -12,6 +25,7 @@ private:
     
 public:
 
+    BoundingBox boundbox;
     bool isStatic;
 
     float mass;
