@@ -28,17 +28,6 @@ bool CollisionCheckNarrow(SpatialObject own, SpatialObject other)
     simplex.a = support;
     direction = -simplex.a;
 
-    for (unsigned int i = 0; i < own.SO_mesh.vertexes.size(); i++)
-    {
-        for (unsigned int g = 0; g < other.SO_mesh.vertexes.size(); g++)
-        {
-            glm::vec3 support = glm::vec3(other.SO_mesh.GetModelMat() * glm::vec4(other.SO_mesh.vertexes[g].position, 1.0f)) - glm::vec3(own.SO_mesh.GetModelMat() * glm::vec4(own.SO_mesh.vertexes[i].position, 1.0f));
-            DrawDebugCube(support, 0.04f, glm::vec3(255,0,0));
-        }
-    }
-    DrawDebugCube(glm::vec3(0,0,0), 0.05f, glm::vec3(255,0,255));
-    
-
     for (unsigned int i = 0; i < 64; i++)
     {
         simplex.d = simplex.c;
@@ -54,10 +43,6 @@ bool CollisionCheckNarrow(SpatialObject own, SpatialObject other)
 
         if(NextSimplex(simplex, direction))
         {
-            DrawDebugLine(glm::vec3(0), simplex.a, glm::vec3(255,255,0));
-            DrawDebugLine(glm::vec3(0), simplex.b, glm::vec3(255,255,0));
-            DrawDebugLine(glm::vec3(0), simplex.c, glm::vec3(255,255,0));
-            DrawDebugLine(glm::vec3(0), simplex.d, glm::vec3(255,255,0));
             return true;
         }
     }
