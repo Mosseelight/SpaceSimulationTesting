@@ -10,6 +10,7 @@
 #include <vector>
 #include <memory>
 #include <random>
+#include <chrono>
 
 //core
 #include "../include/Core/Globals.hpp"
@@ -89,15 +90,22 @@ int main()
 
     mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
     mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-3), glm::vec3(0), modelLoc + "Teapot.obj"));
-    //mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,5,0), glm::vec3(0,0,0), 3));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-3), glm::vec3(0), modelLoc + "Teapot.obj"));
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-0,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(3,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
+    }
 
     
-    player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));
-    player->rotation.x = 180;
-    player->rotation.y = 0;
+    player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(-76,32,-52)));
+    player->rotation.x = 300;
+    player->rotation.y = 20;
     player->rotation.z = 0;
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
 
@@ -139,10 +147,15 @@ void UpdateLogic(SDL_Window* window)
     lastTime = currentTime;
     drawCallAvg = DrawCallCount / (GetTime() / deltaTime);
 
+    auto start = std::chrono::high_resolution_clock::now();
     RunSimulation(deltaTime, mainScene);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
 
     player->UpdatePlayer();
     input();
+
+    std::cout << "Time taken by code: " << duration.count() << " seconds" << std::endl;
 }
 
 void Render(SDL_Window* window)

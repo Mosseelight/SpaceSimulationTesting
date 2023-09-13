@@ -4,7 +4,8 @@ const int SCRWIDTH = 1920;
 const int SCRHEIGHT = 1080;
 
 //Physics
-const float PhysicsStep = 0.0167f;
+const int maxPhysicSteps = 100;
+const float PhysicsStep = 0.02f;
 const float PhysicsSpeed = 1.0f;
 const float AirDensity = 0.1f;
 
