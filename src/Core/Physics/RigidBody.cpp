@@ -33,8 +33,8 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
         if (vertexPos.z > maxtmp.z)
             maxtmp.z = vertexPos.z;
     }
-    max = ((mintmp - maxtmp) * 0.5f) + mesh.position;
-    min = ((mintmp - maxtmp) * -0.5f) + mesh.position;
+    min = ((mintmp - maxtmp) * 0.5f) + mesh.position;
+    max = ((mintmp - maxtmp) * -0.5f) + mesh.position;
 }
 
 
@@ -72,7 +72,10 @@ void RigidBody::Step(float timeStep, SpatialObject& own, SpatialObject& other)
         once = false;
     }
     
-    //std::cout << CollisionCheckNarrow(own, other) << std::endl;
+    if(CollisionCheckBroad(own, other))
+    {
+        CollisionCheckNarrow(own, other);
+    }
 
     acceleration = totalForce / mass;
     rotAcceleration = totalRotation / mass;
