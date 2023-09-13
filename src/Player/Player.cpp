@@ -20,7 +20,7 @@ void Player::UpdatePlayer()
 
 glm::mat4 Player::GetRotMat()
 {
-    glm::mat4 mat;
+    glm::mat4 mat = glm::mat4(1.0f);
     mat = glm::rotate(mat, rotation.x * M_PIf/180.0f, glm::vec3(1.0f,0.0f,0.0f));
     mat = glm::rotate(mat, rotation.y * M_PIf/180.0f, glm::vec3(0.0f,1.0f,0.0f));
     mat = glm::rotate(mat, rotation.z * M_PIf/180.0f, glm::vec3(0.0f,0.0f,1.0f));
@@ -31,29 +31,21 @@ void Player::Movement(int key, float delta)
 {
     glm::vec3 moveDir;
     glm::mat4 rotMat = GetRotMat();
-    glm::vec3 forward(0.0f,0.0f,-0.1f);
-    glm::vec3 backward(0.0f,0.0f,0.1f);
-    glm::vec3 right(0.1f,0.0f,0.0f);
-    glm::vec3 left(-0.1f,0.0f,0.0f);
     glm::vec3 up(0.0f,0.1f,0.0f);
     glm::vec3 down(0.0f,-0.1f,0.0f);
-    //forward = glm::vec3(glm::vec4(forward, 1.0f) * rotMat);
-    //backward = glm::vec3(glm::vec4(backward, 1.0f) * rotMat);
-    //left = glm::vec3(glm::vec4(left, 1.0f) * rotMat);
-    //right = glm::vec3(glm::vec4(right, 1.0f) * rotMat);
     switch (key)
     {
     case SDLK_w:
-        moveDir = forward;
+        moveDir = camera.GetCameraDir();
         break;
     case SDLK_s:
-        moveDir = backward;
+        moveDir = -camera.GetCameraDir();
         break;
     case SDLK_a:
-        moveDir = left;
+        moveDir = -glm::cross(camera.GetCameraDir(), camera.GetCameraUp());
         break;
     case SDLK_d:
-        moveDir = right;
+        moveDir = glm::cross(camera.GetCameraDir(), camera.GetCameraUp());
         break;
     case SDLK_SPACE:
         moveDir = up;
