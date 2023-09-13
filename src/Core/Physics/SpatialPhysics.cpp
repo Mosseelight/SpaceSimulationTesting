@@ -5,8 +5,10 @@ void RunSimulation(float deltaTime, Scene& scene)
     static float totalTime;
     int counter = 0;
     totalTime += deltaTime;
-    while (totalTime >= PhysicsStep && counter < maxPhysicSteps)
+    while (totalTime >= PhysicsStep)
     {
+        if(counter > maxPhysicSteps)
+            break;
         //go through all spatials and update
         for (unsigned int i = 0; i < scene.SpatialObjects.size(); i++)
         {
