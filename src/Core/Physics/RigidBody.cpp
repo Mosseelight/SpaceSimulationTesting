@@ -57,7 +57,7 @@ RigidBody::~RigidBody()
 }
 
 bool once = true;
-void RigidBody::Step(float timeStep, SpatialObject& own, SpatialObject& other)
+void RigidBody::Step(float timeStep, std::vector<SpatialObject> objects, SpatialObject own)
 {
     if(isStatic)
         return;
@@ -71,11 +71,23 @@ void RigidBody::Step(float timeStep, SpatialObject& own, SpatialObject& other)
     {
         once = false;
     }
-    
-    if(CollisionCheckBroad(own, other))
+
+    ApplyForce(glm::vec3(0,-9.81,0));
+    for (unsigned int i = 0; i < objects.size(); i++)
     {
-        CollisionCheckNarrow(own, other);
+        if(own.SO_id != objects[i].SO_id)
+        {
+            if(CollisionCheckBroad(own, objects[i]))
+            {
+                if(CollisionCheckNarrow(own, objects[i]))
+                {
+                    velocity = glm::vec3(0);
+                    ApplyImpulseForce(-totalForce, 2.0f);
+                }
+            }
+        }
     }
+
 
     acceleration = totalForce / mass;
     rotAcceleration = totalRotation / mass;

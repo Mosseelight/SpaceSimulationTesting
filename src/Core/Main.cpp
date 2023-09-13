@@ -87,11 +87,12 @@ int main()
     //scene initilzation
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
-    //mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunny.obj"));
-    //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,0,0), glm::vec3(0,0,0)));
-    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,0,0), glm::vec3(0,0,0), 3));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
+    mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-3), glm::vec3(0), modelLoc + "Teapot.obj"));
+    //mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,5,0), glm::vec3(0,0,0), 3));
 
     
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(0,0,10)));

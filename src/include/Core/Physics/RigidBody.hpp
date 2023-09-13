@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "../Globals.hpp"
@@ -42,7 +43,7 @@ public:
 
     RigidBody();
     ~RigidBody();
-    void Step(float timeStep, SpatialObject& own, SpatialObject& other);
+    void Step(float timeStep, std::vector<SpatialObject> objects, SpatialObject own);
     void ApplyForce(glm::vec3 force);
     void ApplyForceAtPos(glm::vec3 force, glm::vec3 pos);
     void ApplyImpulseForce(glm::vec3 dir, float power);
