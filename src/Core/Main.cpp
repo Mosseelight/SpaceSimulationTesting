@@ -1,7 +1,7 @@
 #include "../include/glad/glad.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "../include/imgui/imgui.h"
+#include <imgui.h>
 #include "../include/backends/imgui_impl_sdl2.h"
 #include "../include/backends/imgui_impl_opengl3.h"
 #include <iostream>
