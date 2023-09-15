@@ -32,8 +32,14 @@ bool Simplex4(Simplex& simplex, glm::vec3& direction);
 
 bool CollisionCheckNarrow(SpatialObject own, SpatialObject other)
 {
-    glm::vec3 direction = glm::vec3(1.0f,0.0f,0.0f);
-    Simplex simplex;
+    static glm::vec3 direction = glm::vec3(1.0f,0.0f,0.0f);
+    static Simplex simplex;
+
+    if(simplex.count == 4)
+    {
+        if(NextSimplex(simplex, direction))
+            return true;
+    }
 
     glm::vec3 support = GetSupportPoint(own, direction) - GetSupportPoint(other, -direction);
     simplex.a = support;
