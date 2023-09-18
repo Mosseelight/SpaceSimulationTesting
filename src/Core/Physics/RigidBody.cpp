@@ -17,7 +17,7 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
     glm::vec3 maxtmp = glm::vec3(FLT_MIN);
     for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
     {
-        glm::vec3 vertexPos = glm::vec3(mesh.GetRotationMat() * glm::vec4(mesh.vertexes[i].position, 1.0f));
+        glm::vec3 vertexPos = mesh.vertexes[i].position;
 
         if (vertexPos.x < mintmp.x)
             mintmp.x = vertexPos.x;
@@ -34,8 +34,8 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
             maxtmp.z = vertexPos.z;
     }
 
-    min = ((mintmp - maxtmp) * 0.5f) + mesh.position;
-    max = ((mintmp - maxtmp) * -0.5f) + mesh.position;
+    min = glm::vec3(mesh.GetRotationMat() * glm::vec4(((mintmp - maxtmp) * 0.5f) + mesh.position, 1.0f));
+    max = glm::vec3(mesh.GetRotationMat() * glm::vec4(((mintmp - maxtmp) * -0.5f) + mesh.position, 1.0f));
     DrawDebugCube(min, 0.04f, glm::vec3(255,0,0));
     DrawDebugCube(max, 0.04f, glm::vec3(0,255,0));
 }
@@ -60,7 +60,7 @@ RigidBody::~RigidBody()
 }
 
 bool once = true;
-void RigidBody::Step(float timeStep, std::vector<SpatialObject> objects, SpatialObject own)
+void RigidBody::Step(float timeStep, std::vector<SpatialObject>& objects, SpatialObject& own)
 {
     if(isStatic)
         return;
@@ -82,11 +82,11 @@ void RigidBody::Step(float timeStep, std::vector<SpatialObject> objects, Spatial
         {
             if(CollisionCheckBroad(own, objects[i]))
             {
-                if(CollisionCheckNarrow(own, objects[i]))
-                {
+                //if(CollisionCheckNarrow(own, objects[i]))
+                //{
                     velocity = glm::vec3(0);
                     ApplyImpulseForce(-totalForce, 2.0f);
-                }
+                //}
             }
         }
     }

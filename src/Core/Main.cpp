@@ -38,6 +38,7 @@ float lastTime = 0.0f;
 int currentSCRWIDTH = 0;
 int currentSCRHEIGHT = 0;
 SDL_Surface *windowIcon;
+std::string platform;
 
 const std::string imageLoc = "res/Textures/";
 const std::string shaderLoc = "res/Shaders/";
@@ -76,6 +77,8 @@ int main()
     windowIcon = IMG_Load((imageLoc + "/IconSpace.png").c_str());
     SDL_SetWindowIcon(window, windowIcon);
 
+    platform = SDL_GetPlatform();
+
     //ImGui Creation
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -85,20 +88,30 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
+
     //scene initilzation
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
     mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
     mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
 
     for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
         mainScene.SpatialObjects[i].SO_rigidbody.boundbox.ConstructBoundingBox(mainScene.SpatialObjects[i].SO_mesh);
         vertCount += mainScene.SpatialObjects[i].SO_mesh.vertexes.size();
         indCount += mainScene.SpatialObjects[i].SO_mesh.indices.size();
+    }
+
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-0,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(3,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
     }
 
 
@@ -259,7 +272,8 @@ void ImguiMenu()
     ImGui::Text("%d verts, %d indices (%d tris)", vertCount, indCount, indCount / 3);
     ImGui::Text("Amount of Spatials: (%zu)", mainScene.SpatialObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
-    ImGui::Text("Ram Usage: %.2fmb", GetRamUsage() / 1024);
+    if(platform == "Linux")
+        ImGui::Text("Ram Usage: %.2fmb", GetRamUsage() / 1024);
     ImGui::Text("Time Open %.1f minutes", (GetTime() / 60.0f));
 
     ImGui::Spacing();

@@ -43,7 +43,7 @@ public:
 
     RigidBody();
     ~RigidBody();
-    void Step(float timeStep, std::vector<SpatialObject> objects, SpatialObject own);
+    void Step(float timeStep, std::vector<SpatialObject>& objects, SpatialObject& own);
     void ApplyForce(glm::vec3 force);
     void ApplyForceAtPos(glm::vec3 force, glm::vec3 pos);
     void ApplyImpulseForce(glm::vec3 dir, float power);

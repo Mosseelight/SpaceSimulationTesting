@@ -42,7 +42,7 @@ $(BUILD_DIR)/%.c.o: %.c
 $(BUILD_DIR)/%.cpp.o: %.cpp
 	mkdir -p $(dir $@)
 	cp -r $(RES) $(BUILD_DIR)
-	clang++ $(CPPFLAGS) $(CXXFLAGS) $(LIBS) $(INCLUDE) -g -O3 -c $< -o $@ 
+	clang++ $(CPPFLAGS) $(CXXFLAGS) $(LIBS) $(INCLUDE) -g -c $< -o $@ 
 
 .PHONY: clean
 clean:
