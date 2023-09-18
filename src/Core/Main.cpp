@@ -101,9 +101,6 @@ int main()
         indCount += mainScene.SpatialObjects[i].SO_mesh.indices.size();
     }
 
-    ChunkManager manager;
-    manager.InitChunks(mainScene.SpatialObjects);
-    manager.CreateChunks(mainScene.SpatialObjects);
 
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(-76,32,-52)));
     player->rotation.x = 300;
@@ -116,8 +113,6 @@ int main()
 
     while(run)
     {
-        DrawDebugCube(manager.minChunkSize, 1.0f, glm::vec3(255,0,0));
-        DrawDebugCube(manager.maxChunkSize, 1.0f, glm::vec3(0,255,0));
         UpdateLogic(window);
         Render(window);
     }

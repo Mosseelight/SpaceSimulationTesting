@@ -7,23 +7,25 @@
 class Chunk
 {
 public:
-    glm::vec3 min, max;
-    glm::vec3 move;
-    std::vector<unsigned int> ids;
-    void FindSpaceObjects(std::vector<SpatialObject>& objects);
-    Chunk();
-    ~Chunk();
-};
+    glm::vec3 min;
+    glm::vec3 max;
 
-class ChunkManager
-{
-public:
-    std::vector<Chunk> chunks;
-    //std::vector<unsigned int> ids;
-    glm::vec3 minChunkSize;
-    glm::vec3 maxChunkSize;
-    ChunkManager();
-    void InitChunks(std::vector<SpatialObject>& objects);
-    void UpdateChunks(std::vector<SpatialObject>& objects);
-    void CreateChunks(std::vector<SpatialObject>& objects);
+    SpatialObject *chunkObject;
+
+    Chunk *TLChunk;
+    Chunk *TRChunk;
+    Chunk *BLChunk;
+    Chunk *BRChunk;
+    Chunk *TLBChunk;
+    Chunk *TRBChunk;
+    Chunk *BLBChunk;
+    Chunk *BRBChunk;
+
+    Chunk();
+    Chunk(glm::vec3 min, glm::vec3 max);
+    ~Chunk();
+
+    void InsertChunk(SpatialObject& object);
+    SpatialObject* SearchChunk(glm::vec3 pos);
+    bool inChunk(glm::vec3 pos);
 };
