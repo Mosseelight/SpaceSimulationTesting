@@ -6,8 +6,12 @@ bool CollisionCheckBroad(SpatialObject own, SpatialObject other)
     BoundingBox boxOwn = own.SO_rigidbody.boundbox;
     BoundingBox boxOther = other.SO_rigidbody.boundbox;
 
-    return (boxOwn.min.x <= boxOther.max.x && boxOwn.max.x >= boxOther.min.x && boxOwn.min.y <= boxOther.max.y && 
-    boxOwn.max.y >= boxOther.min.y && boxOwn.min.z <= boxOther.max.z && boxOwn.max.z >= boxOther.min.z);
+    if (boxOwn.min.x <= boxOther.max.x && boxOwn.max.x >= boxOther.min.x && boxOwn.min.y <= boxOther.max.y && boxOwn.max.y >= boxOther.min.y
+    && boxOwn.min.z <= boxOther.max.z && boxOwn.max.z >= boxOther.min.z) 
+    {
+        return true;
+    }
+    return false;
 }
 
 

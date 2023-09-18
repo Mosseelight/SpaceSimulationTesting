@@ -33,8 +33,11 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
         if (vertexPos.z > maxtmp.z)
             maxtmp.z = vertexPos.z;
     }
+
     min = ((mintmp - maxtmp) * 0.5f) + mesh.position;
     max = ((mintmp - maxtmp) * -0.5f) + mesh.position;
+    DrawDebugCube(min, 0.04f, glm::vec3(255,0,0));
+    DrawDebugCube(max, 0.04f, glm::vec3(0,255,0));
 }
 
 

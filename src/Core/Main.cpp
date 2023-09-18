@@ -10,7 +10,6 @@
 #include <vector>
 #include <memory>
 #include <random>
-#include <chrono>
 
 //core
 #include "../include/Core/Globals.hpp"
@@ -23,6 +22,7 @@
 
 //physics
 #include "../include/Core/Physics/SpatialPhysics.hpp"
+#include "../include/Core/Physics/Chunks.hpp"
 
 //player
 #include "../include/Player/Camera.hpp"
@@ -90,36 +90,34 @@ int main()
 
     mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
     mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-3), glm::vec3(0), modelLoc + "Teapot.obj"));
-    for (unsigned int i = 0; i < 30; i++)
-    {
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-0,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(3,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
-    }
-
-    
-    player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(-76,32,-52)));
-    player->rotation.x = 300;
-    player->rotation.y = 20;
-    player->rotation.z = 0;
-    shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
-
-    glUseProgram(shader.shader);
-    shader.setInt("tex", 0);
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
 
     for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
+        mainScene.SpatialObjects[i].SO_rigidbody.boundbox.ConstructBoundingBox(mainScene.SpatialObjects[i].SO_mesh);
         vertCount += mainScene.SpatialObjects[i].SO_mesh.vertexes.size();
         indCount += mainScene.SpatialObjects[i].SO_mesh.indices.size();
     }
 
+    ChunkManager manager;
+    manager.InitChunks(mainScene.SpatialObjects);
+    manager.CreateChunks(mainScene.SpatialObjects);
+
+    player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(-76,32,-52)));
+    player->rotation.x = 300;
+    player->rotation.y = 20;
+    player->rotation.z = 0;
+
+    shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
+    glUseProgram(shader.shader);
+    shader.setInt("tex", 0);
+
     while(run)
     {
+        DrawDebugCube(manager.minChunkSize, 1.0f, glm::vec3(255,0,0));
+        DrawDebugCube(manager.maxChunkSize, 1.0f, glm::vec3(0,255,0));
         UpdateLogic(window);
         Render(window);
     }
@@ -147,15 +145,10 @@ void UpdateLogic(SDL_Window* window)
     lastTime = currentTime;
     drawCallAvg = DrawCallCount / (GetTime() / deltaTime);
 
-    auto start = std::chrono::high_resolution_clock::now();
     RunSimulation(deltaTime, mainScene);
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> duration = end - start;
 
     player->UpdatePlayer();
     input();
-
-    std::cout << "Time taken by code: " << duration.count() << " seconds" << std::endl;
 }
 
 void Render(SDL_Window* window)

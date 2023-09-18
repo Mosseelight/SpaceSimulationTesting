@@ -5,12 +5,20 @@ Engine stuff for uses in other things
 
 ----NEED IN ORDER----
 Basic physics
+
+    Multithreading
+        rendering on one thread
+        game logic and whatever on a second
+
     collisions
         have a space paritioning
             3d grid maybe 16 time faster?
         
     raycasting
         from screen to world and world to screen
+    
+    Lights
+    
 
 Fix Shader not lighting objects under -1 y
 __________________________
@@ -18,10 +26,6 @@ console and logging system
 
 ----MAYBE----
 fix smooth normal creater
-______________
-Multithreading
-    rendering on one thread
-    game logic and whatever on a second
 
 -------------------------------------
 
