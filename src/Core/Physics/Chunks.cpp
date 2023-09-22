@@ -72,6 +72,11 @@ Chunk::~Chunk()
         delete BRBChunk;
         BRBChunk = nullptr;
     }
+
+    if(chunkObject != nullptr)
+    {
+        chunkObject = nullptr;
+    }
 }
 
 void Chunk::InsertChunk(SpatialObject& object)
@@ -88,13 +93,13 @@ void Chunk::InsertChunk(SpatialObject& object)
     }
 
     //front
-    if ((max.x + min.x) / 2 >= object.SO_rigidbody.position.x && (max.z + min.z) / 2 >= object.SO_rigidbody.position.z) 
+    if ((max.x + min.x) * 0.5f >= object.SO_rigidbody.position.x && (max.z + min.z) * 0.5f >= object.SO_rigidbody.position.z) 
     {
         //topleft
-        if ((max.y + min.y) / 2 >= object.SO_rigidbody.position.y) 
+        if ((max.y + min.y) * 0.5f >= object.SO_rigidbody.position.y) 
         {
             if (TLChunk == NULL)
-                TLChunk = new Chunk(glm::vec3(max.x, max.y, max.z), glm::vec3((max.x + min.x) / 2, (max.y + min.y) / 2, (max.z + max.z) / 2));
+                TLChunk = new Chunk(glm::vec3(max.x, max.y, max.z), glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f));
             TLChunk->InsertChunk(object);
         }
  
@@ -102,7 +107,7 @@ void Chunk::InsertChunk(SpatialObject& object)
         else 
         {
             if (BLChunk == NULL)
-                BLChunk = new Chunk(glm::vec3(max.x, (max.y + min.y) / 2, max.z), glm::vec3((max.x + min.x) / 2, min.y, (max.z + max.z) / 2));
+                BLChunk = new Chunk(glm::vec3(max.x, (max.y + min.y) * 0.5f, max.z), glm::vec3((max.x + min.x) * 0.5f, min.y, (max.z + min.z) * 0.5f));
             BLChunk->InsertChunk(object);
         }
     }
@@ -112,7 +117,7 @@ void Chunk::InsertChunk(SpatialObject& object)
         if ((max.y + min.y) / 2 >= object.SO_rigidbody.position.y) 
         {
             if (TRChunk == NULL)
-                TRChunk = new Chunk(glm::vec3((max.x + min.x) / 2, max.y, max.z), glm::vec3(min.x, (max.y + min.y) / 2, (max.z + max.z) / 2));
+                TRChunk = new Chunk(glm::vec3((max.x + min.x) * 0.5f, max.y, max.z), glm::vec3(min.x, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f));
             TRChunk->InsertChunk(object);
         }
  
@@ -120,19 +125,19 @@ void Chunk::InsertChunk(SpatialObject& object)
         else 
         {
             if (BRChunk == NULL)
-                BRChunk = new Chunk(glm::vec3((max.x + min.x) / 2, (max.y + min.y) / 2, max.z), glm::vec3(min.x, min.y, (max.z + max.z) / 2));
+                BRChunk = new Chunk(glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, max.z), glm::vec3(min.x, min.y, (max.z + min.z) * 0.5f));
             BRChunk->InsertChunk(object);
         }
     }
 
     //back
-    if ((max.x + min.x) / 2 >= object.SO_rigidbody.position.x && (max.z + min.z) / 2 <= object.SO_rigidbody.position.z) 
+    if ((max.x + min.x) * 0.5f >= object.SO_rigidbody.position.x && (max.z + min.z) * 0.5f <= object.SO_rigidbody.position.z) 
     {
         //topleft
-        if ((max.y + min.y) / 2 >= object.SO_rigidbody.position.y) 
+        if ((max.y + min.y) * 0.5f >= object.SO_rigidbody.position.y) 
         {
             if (TLChunk == NULL)
-                TLChunk = new Chunk(glm::vec3(max.x, max.y, max.z), glm::vec3((max.x + min.x) / 2, (max.y + min.y) / 2, (max.z + max.z) / 2));
+                TLChunk = new Chunk(glm::vec3(max.x, max.y, (max.z + min.z) * 0.5f), glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, min.z));
             TLChunk->InsertChunk(object);
         }
  
@@ -140,17 +145,17 @@ void Chunk::InsertChunk(SpatialObject& object)
         else 
         {
             if (BLChunk == NULL)
-                BLChunk = new Chunk(glm::vec3(max.x, (max.y + min.y) / 2, max.z), glm::vec3((max.x + min.x) / 2, min.y, (max.z + max.z) / 2));
+                BLChunk = new Chunk(glm::vec3(max.x, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f), glm::vec3((max.x + min.x) * 0.5f, min.y, min.z));
             BLChunk->InsertChunk(object);
         }
     }
-    else if((max.z + min.z) / 2 <= object.SO_rigidbody.position.z) 
+    else if((max.z + min.z) * 0.5f <= object.SO_rigidbody.position.z) 
     {
         //topright
-        if ((max.y + min.y) / 2 >= object.SO_rigidbody.position.y) 
+        if ((max.y + min.y) * 0.5f >= object.SO_rigidbody.position.y) 
         {
             if (TRChunk == NULL)
-                TRChunk = new Chunk(glm::vec3((max.x + min.x) / 2, max.y, max.z), glm::vec3(min.x, (max.y + min.y) / 2, (max.z + max.z) / 2));
+                TRChunk = new Chunk(glm::vec3((max.x + min.x) * 0.5f, max.y, (max.z + min.z) * 0.5f), glm::vec3(min.x, (max.y + min.y) * 0.5f, min.z));
             TRChunk->InsertChunk(object);
         }
  
@@ -158,7 +163,7 @@ void Chunk::InsertChunk(SpatialObject& object)
         else 
         {
             if (BRChunk == NULL)
-                BRChunk = new Chunk(glm::vec3((max.x + min.x) / 2, (max.y + min.y) / 2, max.z), glm::vec3(min.x, min.y, (max.z + max.z) / 2));
+                BRChunk = new Chunk(glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f), glm::vec3(min.x, min.y, min.z));
             BRChunk->InsertChunk(object);
         }
     }
@@ -172,9 +177,9 @@ SpatialObject* Chunk::SearchChunk(glm::vec3 pos)
     if (chunkObject != NULL)
         return chunkObject;
  
-    if ((max.x + min.x) / 2 >= pos.x) {
+    if ((max.x + min.x) * 0.5f >= pos.x) {
         //topleft
-        if ((max.y + min.y) / 2 >= pos.y) {
+        if ((max.y + min.y) * 0.5f >= pos.y) {
             if (TLChunk == NULL)
                 return NULL;
             return TLChunk->SearchChunk(pos);
@@ -189,7 +194,7 @@ SpatialObject* Chunk::SearchChunk(glm::vec3 pos)
     }
     else {
         //topright
-        if ((max.y + min.y) / 2 >= pos.y) {
+        if ((max.y + min.y) * 0.5f >= pos.y) {
             if (TRChunk == NULL)
                 return NULL;
             return TRChunk->SearchChunk(pos);

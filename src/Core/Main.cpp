@@ -1,7 +1,7 @@
 #include "../include/glad/glad.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <imgui.h>
+#include "/usr/include/SDL2/SDL.h"
+#include "/usr/include/SDL2/SDL_image.h"
+#include "../include/imgui/imgui.h"
 #include "../include/backends/imgui_impl_sdl2.h"
 #include "../include/backends/imgui_impl_opengl3.h"
 #include <iostream>
@@ -326,13 +326,11 @@ void ImguiMenu()
 
     if(ShowObjectViewerMenu)
     {
-        static bool objectSelected = false;
         static int counter;
         static glm::vec3 selposition;
         static glm::vec3 selrotation;
         static int IcoSphereSub = 0;
         static char input[128] = "Mesh.obj";
-        MeshType type;
         ImGui::SetNextWindowSize(ImVec2(600,420), ImGuiCond_FirstUseEver);
         ImGui::Begin("Object Viewer");
 
@@ -371,21 +369,18 @@ void ImguiMenu()
             {
             case CubeMesh:
                 selmesh = CreateCubeMesh(selposition, selrotation);
-                objectSelected = true;
                 vertCount += selmesh.vertexes.size() * 3;
                 indCount += selmesh.indices.size();
                 mainScene.AddSpatialObject(selmesh);
                 break;
             case IcoSphereMesh:
                 selmesh = CreateSphereMesh(selposition, selrotation, IcoSphereSub);
-                objectSelected = true;
                 vertCount += selmesh.vertexes.size() * 3;
                 indCount += selmesh.indices.size();
                 mainScene.AddSpatialObject(selmesh);
                 break;
             case TriangleMesh:
                 selmesh = Create2DTriangle(selposition, selrotation);
-                objectSelected = true;
                 vertCount += selmesh.vertexes.size() * 3;
                 indCount += selmesh.indices.size();
                 mainScene.AddSpatialObject(selmesh);
@@ -398,7 +393,6 @@ void ImguiMenu()
                 else
                 {
                     selmesh = LoadModel(selposition, selrotation, modelLoc + input);
-                    objectSelected = true;
                     vertCount += selmesh.vertexes.size() * 3;
                     indCount += selmesh.indices.size();
                     mainScene.AddSpatialObject(selmesh);
