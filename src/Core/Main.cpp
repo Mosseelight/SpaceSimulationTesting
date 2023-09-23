@@ -51,6 +51,7 @@ void Render(SDL_Window* window);
 void ImguiMenu();
 void input();
 
+Chunk chunk;
 Shader shader;
 Texture texture;
 std::unique_ptr<Player> player;
@@ -92,11 +93,24 @@ int main()
     //scene initilzation
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
-    mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
+   // mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
+
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
+    for (unsigned int i = 0; i < 5; i++)
+    {
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-6,5 * (i * 0.2f),i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,5 * (i * 0.2f),i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-0,5 * (i * 0.2f),i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(3,5 * (i * 0.2f),i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(6,5 * (i * 0.2f),i * 2.5f), glm::vec3(0,0,0), 1));
+    }
+    for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
+    {
+        chunk.InsertChunk(mainScene.SpatialObjects[i]);
+    }
 
     for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
@@ -104,16 +118,6 @@ int main()
         vertCount += mainScene.SpatialObjects[i].SO_mesh.vertexes.size();
         indCount += mainScene.SpatialObjects[i].SO_mesh.indices.size();
     }
-
-    for (unsigned int i = 0; i < 30; i++)
-    {
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-0,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(3,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
-    }
-
 
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(-76,32,-52)));
     player->rotation.x = 300;
@@ -126,6 +130,7 @@ int main()
 
     while(run)
     {
+        chunk.DrawChunks();
         UpdateLogic(window);
         Render(window);
     }

@@ -1,215 +1,110 @@
 #include "../../include/Core/Physics/Chunks.hpp"
 
+std::vector<Chunk*> totalChunks;
 Chunk::Chunk()
 {
-    min = glm::vec3(0);
-    max = glm::vec3(0);
-    chunkObject = NULL;
-    TLChunk = NULL;
-    TRChunk = NULL;
-    BLChunk = NULL;
-    BRChunk = NULL;
-
+    min = glm::vec3(-10.0f);
+    max = glm::vec3(10.0f);
+    depth = 0;
+    objectCount = 0;
 }
 
-Chunk::Chunk(glm::vec3 min, glm::vec3 max)
+Chunk::Chunk(glm::vec3 min, glm::vec3 max, unsigned int depth)
 {
     this->min = min;
     this->max = max;
-    chunkObject = NULL;
-    TLChunk = NULL;
-    TRChunk = NULL;
-    BLChunk = NULL;
-    BRChunk = NULL;
+    this->depth = depth;
+    objectCount = 0;
 }
 
 Chunk::~Chunk()
 {
-    if (TLChunk != nullptr) 
-    {
-        delete TLChunk;
-        TLChunk = nullptr;
-    }
-
-    if (TRChunk != nullptr) 
-    {
-        delete TRChunk;
-        TRChunk = nullptr;
-    }
-
-    if (BLChunk != nullptr) 
-    {
-        delete BLChunk;
-        BLChunk = nullptr;
-    }
-
-    if (BRChunk != nullptr) 
-    {
-        delete BRChunk;
-        BRChunk = nullptr;
-    }
-
-    if (TLBChunk != nullptr) 
-    {
-        delete TLBChunk;
-        TLBChunk = nullptr;
-    }
-
-    if (TRBChunk != nullptr) 
-    {
-        delete TRBChunk;
-        TRBChunk = nullptr;
-    }
-
-    if (BLBChunk != nullptr) 
-    {
-        delete BLBChunk;
-        BLBChunk = nullptr;
-    }
-
-    if (BRBChunk != nullptr) 
-    {
-        delete BRBChunk;
-        BRBChunk = nullptr;
-    }
-
-    if(chunkObject != nullptr)
-    {
-        chunkObject = nullptr;
-    }
+    
 }
 
-void Chunk::InsertChunk(SpatialObject& object)
+void Chunk::CreateSubChunks()
 {
-
-    if (!inChunk(object.SO_rigidbody.position))
-        return;
- 
-    if (abs(max.x - min.x) <= 1 && abs(max.y - min.y) <= 1) 
-    {
-        if (chunkObject == NULL)
-            chunkObject = &object;
-        return;
-    }
-
-    //front
-    if ((max.x + min.x) * 0.5f >= object.SO_rigidbody.position.x && (max.z + min.z) * 0.5f >= object.SO_rigidbody.position.z) 
-    {
-        //topleft
-        if ((max.y + min.y) * 0.5f >= object.SO_rigidbody.position.y) 
-        {
-            if (TLChunk == NULL)
-                TLChunk = new Chunk(glm::vec3(max.x, max.y, max.z), glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f));
-            TLChunk->InsertChunk(object);
-        }
- 
-        //bottemleft
-        else 
-        {
-            if (BLChunk == NULL)
-                BLChunk = new Chunk(glm::vec3(max.x, (max.y + min.y) * 0.5f, max.z), glm::vec3((max.x + min.x) * 0.5f, min.y, (max.z + min.z) * 0.5f));
-            BLChunk->InsertChunk(object);
-        }
-    }
-    else if((max.z + min.z) * 0.5f >= object.SO_rigidbody.position.z) 
-    {
-        //topright
-        if ((max.y + min.y) * 0.5f >= object.SO_rigidbody.position.y) 
-        {
-            if (TRChunk == NULL)
-                TRChunk = new Chunk(glm::vec3((max.x + min.x) * 0.5f, max.y, max.z), glm::vec3(min.x, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f));
-            TRChunk->InsertChunk(object);
-        }
- 
-        //bottomright
-        else 
-        {
-            if (BRChunk == NULL)
-                BRChunk = new Chunk(glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, max.z), glm::vec3(min.x, min.y, (max.z + min.z) * 0.5f));
-            BRChunk->InsertChunk(object);
-        }
-    }
-
-    //back
-    if ((max.x + min.x) * 0.5f >= object.SO_rigidbody.position.x && (max.z + min.z) * 0.5f <= object.SO_rigidbody.position.z) 
-    {
-        //topleft
-        if ((max.y + min.y) * 0.5f >= object.SO_rigidbody.position.y) 
-        {
-            if (TLChunk == NULL)
-                TLChunk = new Chunk(glm::vec3(max.x, max.y, (max.z + min.z) * 0.5f), glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, min.z));
-            TLChunk->InsertChunk(object);
-        }
- 
-        //bottemleft
-        else 
-        {
-            if (BLChunk == NULL)
-                BLChunk = new Chunk(glm::vec3(max.x, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f), glm::vec3((max.x + min.x) * 0.5f, min.y, min.z));
-            BLChunk->InsertChunk(object);
-        }
-    }
-    else if((max.z + min.z) * 0.5f <= object.SO_rigidbody.position.z) 
-    {
-        //topright
-        if ((max.y + min.y) * 0.5f >= object.SO_rigidbody.position.y) 
-        {
-            if (TRChunk == NULL)
-                TRChunk = new Chunk(glm::vec3((max.x + min.x) * 0.5f, max.y, (max.z + min.z) * 0.5f), glm::vec3(min.x, (max.y + min.y) * 0.5f, min.z));
-            TRChunk->InsertChunk(object);
-        }
- 
-        //bottomright
-        else 
-        {
-            if (BRChunk == NULL)
-                BRChunk = new Chunk(glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f), glm::vec3(min.x, min.y, min.z));
-            BRChunk->InsertChunk(object);
-        }
-    }
+    if(chunks[0] == NULL)
+        chunks[0].reset(new Chunk(glm::vec3(max.x, max.y, max.z), glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f), depth + 1));
+    if(chunks[1] == NULL)
+        chunks[1].reset(new Chunk(glm::vec3(max.x, (max.y + min.y) * 0.5f, max.z), glm::vec3((max.x + min.x) * 0.5f, min.y, (max.z + min.z) * 0.5f), depth + 1));
+    if(chunks[2] == NULL)
+        chunks[2].reset(new Chunk(glm::vec3((max.x + min.x) * 0.5f, max.y, max.z), glm::vec3(min.x, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f), depth + 1));
+    if(chunks[3] == NULL)
+        chunks[3].reset(new Chunk(glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, max.z), glm::vec3(min.x, min.y, (max.z + min.z) * 0.5f), depth + 1));
+    if(chunks[4] == NULL)
+        chunks[4].reset(new Chunk(glm::vec3(max.x, max.y, (max.z + min.z) * 0.5f), glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, min.z), depth + 1));
+    if(chunks[5] == NULL)
+        chunks[5].reset(new Chunk(glm::vec3(max.x, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f), glm::vec3((max.x + min.x) * 0.5f, min.y, min.z), depth + 1));
+    if(chunks[6] == NULL)
+        chunks[6].reset(new Chunk(glm::vec3((max.x + min.x) * 0.5f, max.y, (max.z + min.z) * 0.5f), glm::vec3(min.x, (max.y + min.y) * 0.5f, min.z), depth + 1));
+    if(chunks[7] == NULL)
+        chunks[7].reset(new Chunk(glm::vec3((max.x + min.x) * 0.5f, (max.y + min.y) * 0.5f, (max.z + min.z) * 0.5f), glm::vec3(min.x, min.y, min.z), depth + 1));
 }
 
-SpatialObject* Chunk::SearchChunk(glm::vec3 pos)
+bool Chunk::InsertChunk(SpatialObject& object)
 {
-    if (!inChunk(pos))
-        return NULL;
- 
-    if (chunkObject != NULL)
-        return chunkObject;
- 
-    if ((max.x + min.x) * 0.5f >= pos.x) {
-        //topleft
-        if ((max.y + min.y) * 0.5f >= pos.y) {
-            if (TLChunk == NULL)
-                return NULL;
-            return TLChunk->SearchChunk(pos);
-        }
- 
-        //bottomleft
-        else {
-            if (BLChunk == NULL)
-                return NULL;
-            return BLChunk->SearchChunk(pos);
-        }
+    if(!inChunk(object.SO_rigidbody.position))
+        return false;
+    
+    bool root = chunks[0] == NULL && chunks[1] == NULL && chunks[2] == NULL && chunks[3] == NULL && chunks[4] == NULL && chunks[5] == NULL && chunks[6] == NULL && chunks[7] == NULL;
+    if(objectCount < 5)
+    {
+        objectCount++;
+        objects.push_back(std::make_shared<SpatialObject>(object));
+        return true;
     }
-    else {
-        //topright
-        if ((max.y + min.y) * 0.5f >= pos.y) {
-            if (TRChunk == NULL)
-                return NULL;
-            return TRChunk->SearchChunk(pos);
-        }
- 
-        //bottomright
-        else {
-            if (BRChunk == NULL)
-                return NULL;
-            return BRChunk->SearchChunk(pos);
-        }
+
+    if(root)
+        CreateSubChunks();
+    
+    for (size_t i = 0; i < 8; i++)
+    {
+        std::cout << chunks[i]->depth << std::endl;
+        totalChunks.push_back(chunks[i].get());
     }
+    
+
+    if(chunks[0]->InsertChunk(object) && depth < 4)
+        return true;
+    if(chunks[1]->InsertChunk(object) && depth < 4)
+        return true;
+    if(chunks[2]->InsertChunk(object) && depth < 4)
+        return true;
+    if(chunks[3]->InsertChunk(object) && depth < 4)
+        return true;
+    if(chunks[4]->InsertChunk(object) && depth < 4)
+        return true;
+    if(chunks[5]->InsertChunk(object) && depth < 4)
+        return true;
+    if(chunks[6]->InsertChunk(object) && depth < 4)
+        return true;
+    if(chunks[7]->InsertChunk(object) && depth < 4)
+        return true;
+
+    objectCount++;
+    objects.push_back(std::make_shared<SpatialObject>(object));
+    return false;
+    
 }
+
+void Chunk::DrawChunks()
+{
+    for (size_t i = 0; i < totalChunks.size(); i++)
+    {
+        DrawDebugCube(totalChunks[i]->max, 0.4f, glm::vec3(1, 0, 0));
+        DrawDebugCube(totalChunks[i]->min, 0.4f, glm::vec3(0, 255, 0));
+        DrawDebugLine(totalChunks[i]->max, totalChunks[i]->min, glm::vec3(0, 0, 255));
+    }
+    
+}
+
+/*std::vector<SpatialObject&> Chunk::SearchChunk(Chunk& chunk)
+{
+    return;
+}*/
 
 bool Chunk::inChunk(glm::vec3 pos)
 {
-    return (pos.x >= max.x && pos.x <= min.x && pos.y >= max.y && pos.y <= min.y);
+    return (pos.x <= max.x && pos.x >= min.x && pos.y <= max.y && pos.y >= min.y && pos.z <= max.z && pos.z >= min.z);
 }
