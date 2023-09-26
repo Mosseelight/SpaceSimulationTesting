@@ -149,3 +149,9 @@ void Solver(glm::vec3& out, glm::vec3 in, float step)
     temp4 = step * glm::vec3(temp3.x * (step * 0.5), temp3.y * (step * 0.5), temp3.z * (step * 0.5));
     out += (1.0f / 6.0f) * (temp1 + 2.0f * temp2 + 2.0f * temp3 + temp4);
 }
+
+
+void RigidBody::CalculateCollisionShape(SpatialObject& object)
+{
+
+}

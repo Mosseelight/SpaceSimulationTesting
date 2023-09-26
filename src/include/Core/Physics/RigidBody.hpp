@@ -27,6 +27,7 @@ private:
 public:
 
     BoundingBox boundbox;
+    std::vector<Vertex> collisionShape;
     bool isStatic;
 
     float mass;
@@ -52,4 +53,6 @@ public:
     void ApplyRotationForce(glm::vec3 force);
     void ApplyRotationImpulseForce(glm::vec3 dir, float power);
     glm::vec3 GetLocalDir(glm::vec3 dir);
+
+    void CalculateCollisionShape(SpatialObject& object);
 };
