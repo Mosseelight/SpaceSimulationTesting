@@ -36,8 +36,6 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
 
     min = glm::vec3(mesh.GetRotationMat() * glm::vec4(((mintmp - maxtmp) * 0.5f) + mesh.position, 1.0f));
     max = glm::vec3(mesh.GetRotationMat() * glm::vec4(((mintmp - maxtmp) * -0.5f) + mesh.position, 1.0f));
-    DrawDebugCube(min, 0.04f, glm::vec3(255,0,0));
-    DrawDebugCube(max, 0.04f, glm::vec3(0,255,0));
 }
 
 
@@ -82,11 +80,11 @@ void RigidBody::Step(float timeStep, std::vector<SpatialObject>& objects, Spatia
         {
             if(CollisionCheckBroad(own, objects[i]))
             {
-                if(CollisionCheckNarrow(own, objects[i]))
-                {
+                //if(CollisionCheckNarrow(own, objects[i]))
+                //{
                     velocity = glm::vec3(0);
                     ApplyImpulseForce(-totalForce, 2.0f);
-                }
+                //}
             }
         }
     }

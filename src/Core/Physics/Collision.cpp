@@ -52,7 +52,6 @@ bool CollisionCheckNarrow(SpatialObject& own, SpatialObject& other)
             return false;
 
         simplex.a = support;
-
         if(NextSimplex(simplex, direction))
         {
             return true;
@@ -75,6 +74,7 @@ bool NextSimplex(Simplex& simplex, glm::vec3& direction)
         return Simplex4(simplex, direction);
         break;
     }
+    return false;
 }
 
 bool Simplex2(Simplex& simplex, glm::vec3& direction)

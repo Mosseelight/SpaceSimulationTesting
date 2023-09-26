@@ -99,7 +99,7 @@ int main()
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
-    for (unsigned int i = 0; i < 35; i++)
+    for (unsigned int i = 0; i < 30; i++)
     {
         mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
         mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
@@ -108,7 +108,7 @@ int main()
         mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0), 1));
     }
 
-    for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
+    for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
         mainScene.SpatialObjects[i].SO_rigidbody.boundbox.ConstructBoundingBox(mainScene.SpatialObjects[i].SO_mesh);
         vertCount += mainScene.SpatialObjects[i].SO_mesh.vertexes.size();
@@ -197,7 +197,7 @@ void Render(SDL_Window* window)
 
 float xMouse = 0;
 float yMouse = 0;
-bool lockMouse = true;
+bool lockMouse = false;
 void input()
 {
     if(lockMouse)
@@ -302,7 +302,7 @@ void ImguiMenu()
 
         if (ImGui::TreeNode("Objects"))
         {
-            for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
+            for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
             {
                 if (i == 0)
                     ImGui::SetNextItemOpen(true, ImGuiCond_Once);
