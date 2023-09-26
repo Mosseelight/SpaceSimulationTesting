@@ -1,7 +1,7 @@
 #include "../../include/Core/Physics/Collision.hpp"
 
 
-bool CollisionCheckBroad(SpatialObject own, SpatialObject other)
+bool CollisionCheckBroad(SpatialObject& own, SpatialObject& other)
 {
     BoundingBox boxOwn = own.SO_rigidbody.boundbox;
     BoundingBox boxOther = other.SO_rigidbody.boundbox;
@@ -30,7 +30,7 @@ bool Simplex2(Simplex& simplex, glm::vec3& direction);
 bool Simplex3(Simplex& simplex, glm::vec3& direction);
 bool Simplex4(Simplex& simplex, glm::vec3& direction);
 
-bool CollisionCheckNarrow(SpatialObject own, SpatialObject other)
+bool CollisionCheckNarrow(SpatialObject& own, SpatialObject& other)
 {
     glm::vec3 direction = glm::vec3(1.0f,0.0f,0.0f);
     Simplex simplex;
