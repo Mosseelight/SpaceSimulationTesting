@@ -2,6 +2,7 @@
 #include "../glad/glad.h"
 #include "glm/glm.hpp"
 #include "ResUtil.hpp"
+#include "Globals.hpp"
 #include "Shader.hpp"
 #include <string>
 #include <iostream>

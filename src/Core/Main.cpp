@@ -99,18 +99,15 @@ int main()
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
-    for (unsigned int i = 0; i < 5; i++)
+    for (unsigned int i = 0; i < 12; i++)
     {
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-6,5 * (i * 0.2f),i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-3,5 * (i * 0.2f),i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(-0,5 * (i * 0.2f),i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(3,5 * (i * 0.2f),i * 2.5f), glm::vec3(0,0,0), 1));
-        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(6,5 * (i * 0.2f),i * 2.5f), glm::vec3(0,0,0), 1));
+        mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(6.5f,6.5f,6.5f), glm::vec3(0,0,0), 1));
     }
-    for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
-    {
-        chunk.InsertChunk(mainScene.SpatialObjects[i]);
-    }
+    chunk.InsertChunk(mainScene.SpatialObjects[0]);
+    chunk.InsertChunk(mainScene.SpatialObjects[1]);
+    chunk.InsertChunk(mainScene.SpatialObjects[2]);
+    chunk.InsertChunk(mainScene.SpatialObjects[3]);
+    chunk.InsertChunk(mainScene.SpatialObjects[4]);
 
     for (int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
@@ -158,7 +155,7 @@ void UpdateLogic(SDL_Window* window)
     lastTime = currentTime;
     drawCallAvg = DrawCallCount / (GetTime() / deltaTime);
 
-    RunSimulation(deltaTime, mainScene);
+    //RunSimulation(deltaTime, mainScene);
 
     player->UpdatePlayer();
     input();

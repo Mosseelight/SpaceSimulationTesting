@@ -1,20 +1,17 @@
 #include "../../include/Core/Physics/Chunks.hpp"
 
-std::vector<Chunk*> totalChunks;
 Chunk::Chunk()
 {
-    min = glm::vec3(-10.0f);
-    max = glm::vec3(10.0f);
-    depth = 0;
-    objectCount = 0;
+    this->min = glm::vec3(-10.0f);
+    this->max = glm::vec3(10.0f);
+    this->depth = 0;
 }
 
-Chunk::Chunk(glm::vec3 min, glm::vec3 max, unsigned int depth)
+Chunk::Chunk(glm::vec3 max, glm::vec3 min, unsigned int depth)
 {
-    this->min = min;
     this->max = max;
+    this->min = min;
     this->depth = depth;
-    objectCount = 0;
 }
 
 Chunk::~Chunk()
@@ -44,57 +41,42 @@ void Chunk::CreateSubChunks()
 
 bool Chunk::InsertChunk(SpatialObject& object)
 {
-    if(!inChunk(object.SO_rigidbody.position))
+    std::cout << (!inChunk(object.SO_rigidbody.boundbox)) << " " << object.SO_id << std::endl;
+    if(!inChunk(object.SO_rigidbody.boundbox))
         return false;
     
-    bool root = chunks[0] == NULL && chunks[1] == NULL && chunks[2] == NULL && chunks[3] == NULL && chunks[4] == NULL && chunks[5] == NULL && chunks[6] == NULL && chunks[7] == NULL;
-    if(objectCount < 5)
+    if(objects.size() < 1)
     {
-        objectCount++;
-        objects.push_back(std::make_shared<SpatialObject>(object));
+        objects.push_back(std::make_unique<SpatialObject>(object));
         return true;
     }
 
-    if(root)
-        CreateSubChunks();
-    
-    for (size_t i = 0; i < 8; i++)
+    CreateSubChunks();
+
+    for (int i = 0; i < 8; ++i)
     {
-        std::cout << chunks[i]->depth << std::endl;
-        totalChunks.push_back(chunks[i].get());
+        if (chunks[i]->InsertChunk(object))
+        {
+            return true;
+        }
     }
-    
 
-    if(chunks[0]->InsertChunk(object) && depth < 4)
-        return true;
-    if(chunks[1]->InsertChunk(object) && depth < 4)
-        return true;
-    if(chunks[2]->InsertChunk(object) && depth < 4)
-        return true;
-    if(chunks[3]->InsertChunk(object) && depth < 4)
-        return true;
-    if(chunks[4]->InsertChunk(object) && depth < 4)
-        return true;
-    if(chunks[5]->InsertChunk(object) && depth < 4)
-        return true;
-    if(chunks[6]->InsertChunk(object) && depth < 4)
-        return true;
-    if(chunks[7]->InsertChunk(object) && depth < 4)
-        return true;
-
-    objectCount++;
-    objects.push_back(std::make_shared<SpatialObject>(object));
     return false;
     
 }
 
 void Chunk::DrawChunks()
 {
-    for (size_t i = 0; i < totalChunks.size(); i++)
+    DrawDebugCube(glm::vec3(max), 0.1f, glm::vec3(1, 0, 0));
+    DrawDebugCube(glm::vec3(min), 0.1f, glm::vec3(0, 255, 0));
+    DrawDebugLine(glm::vec3(max), glm::vec3(min), glm::vec3(0, 0, 255));
+
+    for (int i = 0; i < 8; ++i)
     {
-        DrawDebugCube(totalChunks[i]->max, 0.4f, glm::vec3(1, 0, 0));
-        DrawDebugCube(totalChunks[i]->min, 0.4f, glm::vec3(0, 255, 0));
-        DrawDebugLine(totalChunks[i]->max, totalChunks[i]->min, glm::vec3(0, 0, 255));
+        if (chunks[i] != NULL)
+        {
+            chunks[i]->DrawChunks();
+        }
     }
     
 }
@@ -104,7 +86,8 @@ void Chunk::DrawChunks()
     return;
 }*/
 
-bool Chunk::inChunk(glm::vec3 pos)
+bool Chunk::inChunk(BoundingBox box)
 {
-    return (pos.x <= max.x && pos.x >= min.x && pos.y <= max.y && pos.y >= min.y && pos.z <= max.z && pos.z >= min.z);
+    return (box.min.x <= max.x && box.max.x >= min.x && box.min.y <= max.y && box.max.y >= min.y
+    && box.min.z <= max.z && box.max.z >= min.z);
 }
