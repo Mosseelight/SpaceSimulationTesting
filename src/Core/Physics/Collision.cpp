@@ -23,7 +23,7 @@ struct Simplex
     }
 };
 
-glm::vec3 GetSupportPoint(SpatialObject object, glm::vec3 dir);
+glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir);
 bool NextSimplex(Simplex& simplex, glm::vec3& direction);
 bool SameLine(glm::vec3 dir, glm::vec3 ao);
 bool Simplex2(Simplex& simplex, glm::vec3& direction);
@@ -179,7 +179,7 @@ bool Simplex4(Simplex& simplex, glm::vec3& direction)
 	return true;
 }
 
-glm::vec3 GetSupportPoint(SpatialObject object, glm::vec3 dir)
+glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir)
 {
     glm::vec3 maxP;
     float maxDist = FLT_MIN;

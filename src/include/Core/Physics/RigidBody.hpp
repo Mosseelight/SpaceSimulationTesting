@@ -6,6 +6,7 @@
 #include "../Globals.hpp"
 
 struct SpatialObject;
+struct Vertex;
 class Mesh;
 
 class BoundingBox
