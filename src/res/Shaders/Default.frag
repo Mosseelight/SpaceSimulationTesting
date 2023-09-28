@@ -14,7 +14,15 @@ void main()
     vec4 finalColor;
     vec4 colorNew = vec4(color,1.0);
     vec4 ambient = vec4(0.0,0.34,0.34,1.0);
-    vec4 texelColor = texture(tex, uv);
+    vec4 texelColor;
+    if (all(equal(uv, vec2(0.0))))
+    {
+        texelColor = vec4(1.0);
+    }
+    else
+    {
+        texelColor = texture(tex, uv);
+    }
     vec3 lightDot = vec3(0.0);
     vec3 nor = normalize(normal);
     vec3 viewD = normalize(viewPos - pos);
@@ -26,7 +34,7 @@ void main()
     lightDot += vec3(1.0,1.0,1.0)*NdotL;
 
     float specCo = 0.0;
-    if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), nor))), 16.0); // 16 refers to shine
+    if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), nor))), 128.0); 
     specular += specCo;
 
     finalColor = (texelColor *((colorNew + vec4(specular, 1.0))*vec4(lightDot, 1.0)));
