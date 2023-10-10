@@ -10,6 +10,23 @@ ChunkManager::~ChunkManager()
 
 }
 
+std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialObject>& objects, unsigned int objectID)
+{
+    std::vector<unsigned int> objectsInSameChunk;
+    glm::vec3 pos = getChunkpos(objects[objectID].SO_rigidbody.position);
+    unsigned int key = getKayVal(getHashVal(pos));
+
+    for (unsigned int i = 0; i < objects.size(); i++)
+    {
+        unsigned int currentKey = spatialLookup[i].first;
+        if (currentKey != key)
+            break;
+
+        objectsInSameChunk.push_back(objects[spatialLookup[i].second].SO_id);
+    }
+    return objectsInSameChunk;
+}
+
 void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
 {
     if(spatialLookup.size() == 0)
@@ -25,18 +42,23 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
 
         glm::vec3 pos = getChunkpos(objects[i].SO_rigidbody.position);
         unsigned int key = getKayVal(getHashVal(pos));
-        spatialLookup.push_back(std::make_pair(key, i));
+        spatialLookup[i] = std::make_pair(key, i);
         startLookup.push_back(4294967295);
     }
-    
-    std::sort(spatialLookup.begin(), spatialLookup.end());
 
-    for (size_t i = spatialLookup.size() / 2 - 1; i < spatialLookup.size(); i++)
+    std::sort(spatialLookup.begin(), spatialLookup.end());
+    
+    for (unsigned int i = 0; i < objects.size(); i++)
     {
-        std::cout << spatialLookup[i].first << " " << spatialLookup[i].second << " " << i << std::endl;
+        unsigned int key = spatialLookup[i].first;
+        unsigned int keyPrev;
+        if(i == 0)
+            keyPrev = 4294967295;
+        else
+            keyPrev = spatialLookup[i - 1].first;
+        if(key != keyPrev)
+            startLookup[key] = i;
     }
-    
-    
 }
 
 glm::vec3 ChunkManager::getChunkpos(glm::vec3 pos)
@@ -48,7 +70,7 @@ unsigned int ChunkManager::getHashVal(glm::vec3 pos)
 {
     unsigned int a = pos.x * 12289;
     unsigned int b = pos.y * 786433;
-    unsigned int c = pos.z * 50331653;
+    unsigned int c = pos.z * 50331652;
     return a + b + c;
 }
 
