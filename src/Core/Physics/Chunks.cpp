@@ -36,14 +36,21 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
 
     for (unsigned int i = 0; i < objects.size(); i++)
     {
+        glm::vec3 newPos = glm::vec3(objects[i].SO_rigidbody.boundbox.max);
+        glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
+        while (newPos.x >= min.x && newPos.y >= min.y && newPos.z >= min.z)
+        {
+            glm::vec3 pos = getChunkpos(objects[i].SO_rigidbody.position);
+            unsigned int key = getKayVal(getHashVal(pos));
+            spatialLookup[i] = std::make_pair(key, i);
+            startLookup.push_back(4294967295);
+            newPos -= glm::normalize(newPos - min) * 10.0f;
+            DrawDebugCube(newPos, 0.4f, glm::vec3(0,0,255));
+        }
+        
         //start at object max and step 10 to min until euqal or greater
         //get pos at each step and get hash and key
         // add to spatial lookup with the same id
-
-        glm::vec3 pos = getChunkpos(objects[i].SO_rigidbody.position);
-        unsigned int key = getKayVal(getHashVal(pos));
-        spatialLookup[i] = std::make_pair(key, i);
-        startLookup.push_back(4294967295);
     }
 
     std::sort(spatialLookup.begin(), spatialLookup.end());

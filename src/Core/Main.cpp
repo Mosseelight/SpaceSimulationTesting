@@ -51,7 +51,6 @@ void Render(SDL_Window* window);
 void ImguiMenu();
 void input();
 
-ChunkManager chunkManager;
 Shader shader;
 Texture texture;
 std::unique_ptr<Player> player;
@@ -114,8 +113,6 @@ int main()
         vertCount += mainScene.SpatialObjects[i].SO_mesh.vertexes.size();
         indCount += mainScene.SpatialObjects[i].SO_mesh.indices.size();
     }
-
-    chunkManager.UpdateChunks(mainScene.SpatialObjects);
 
     player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(-76,32,-52)));
     player->rotation.x = 300;
