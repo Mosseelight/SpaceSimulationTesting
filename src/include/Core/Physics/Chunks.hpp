@@ -3,26 +3,18 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <algorithm>
-#include <array>
-#include <memory>
 
-class Chunk
+class ChunkManager
 {
 public:
-    unsigned int depth;
-    glm::vec3 min;
-    glm::vec3 max;
+    float ChunkSize;
+    std::vector<std::pair<unsigned int, unsigned int>> spatialLookup;
+    std::vector<unsigned int> startLookup;
 
-    std::vector<std::unique_ptr<SpatialObject>> objects;
-    std::array<std::unique_ptr<Chunk>, 8> chunks;
-
-    Chunk();
-    Chunk(glm::vec3 max, glm::vec3 min, unsigned int depth);
-    ~Chunk();
-
-    bool InsertChunk(SpatialObject& object);
-    void CreateSubChunks();
-    void DrawChunks();
-    //std::vector<SpatialObject&> SearchChunk(Chunk& chunk);
-    bool inChunk(BoundingBox box);
+    ChunkManager();
+    ~ChunkManager();
+    void UpdateChunks(std::vector<SpatialObject>& objects);
+    glm::vec3 getChunkpos(glm::vec3 pos);
+    unsigned int getHashVal(glm::vec3 pos);
+    unsigned int getKayVal(unsigned int hash);
 };
