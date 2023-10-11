@@ -32,11 +32,15 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
     if(spatialLookup.size() == 0)
     {
         spatialLookup.resize(objects.size());
+        chunkSpans.resize(objects.size());
+        unsigned int totalSpan = 0;
         //create spots for an object that covers multiple chunks
         for (unsigned int i = 0; i < objects.size(); i++)
         {
             if(!glm::distance(objects[i].SO_rigidbody.boundbox.max, objects[i].SO_rigidbody.boundbox.min) / 10.0f < 1)
             {
+                totalSpan += glm::distance(objects[i].SO_rigidbody.boundbox.max, objects[i].SO_rigidbody.boundbox.min) / 10.0f;
+                chunkSpans[i] = totalSpan;
                 glm::vec3 newPos = objects[i].SO_rigidbody.boundbox.max;
                 glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
                 while (newPos.x >= min.x && newPos.y >= min.y && newPos.z >= min.z)
@@ -46,6 +50,8 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                     newPos -= glm::normalize(newPos - min) * 10.0f;
                 }
             }
+            else
+                chunkSpans[i] = 0;
         }
     }
 
@@ -61,8 +67,8 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
         {
             glm::vec3 pos = getChunkpos(objects[i].SO_rigidbody.position);
             unsigned int key = getKayVal(getHashVal(pos));
-            spatialLookup[i] = std::make_pair(key, i);
-            std::cout << i << std::endl;
+            spatialLookup[i + chunkSpans[i] - 1] = std::make_pair(key, i);
+            //std::cout << i + chunkSpans[i] - 1 << std::endl;
             startLookup.push_back(4294967295);
             DrawDebugCube(objects[i].SO_rigidbody.position, 0.4f, glm::vec3(0,0,255));
         }
@@ -76,7 +82,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
             {
                 glm::vec3 pos = getChunkpos(newPos);
                 unsigned int key = getKayVal(getHashVal(pos));
-                spatialLookup[i] = std::make_pair(key, i + g);
+                spatialLookup[i + g] = std::make_pair(key, i + g);
                 //std::cout << i + g << std::endl;
                 startLookup.push_back(4294967295);
                 newPos -= glm::normalize(newPos - min) * 10.0f;
