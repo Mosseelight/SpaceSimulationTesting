@@ -16,7 +16,7 @@ std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialOb
     glm::vec3 pos = getChunkpos(objects[objectID].SO_rigidbody.position);
     unsigned int key = getKayVal(getHashVal(pos));
 
-    for (unsigned int i = 0; i < objects.size(); i++)
+    for (unsigned int i = 0; i < spatialLookup.size(); i++)
     {
         unsigned int currentKey = spatialLookup[i].first;
         if (currentKey != key)
@@ -32,20 +32,56 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
     if(spatialLookup.size() == 0)
     {
         spatialLookup.resize(objects.size());
+        //create spots for an object that covers multiple chunks
+        for (unsigned int i = 0; i < objects.size(); i++)
+        {
+            if(!glm::distance(objects[i].SO_rigidbody.boundbox.max, objects[i].SO_rigidbody.boundbox.min) / 10.0f < 1)
+            {
+                glm::vec3 newPos = objects[i].SO_rigidbody.boundbox.max;
+                glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
+                while (newPos.x >= min.x && newPos.y >= min.y && newPos.z >= min.z)
+                {
+                    spatialLookup.insert(spatialLookup.begin() + i, std::make_pair(0, 0));
+                    startLookup.push_back(4294967295);
+                    newPos -= glm::normalize(newPos - min) * 10.0f;
+                }
+            }
+        }
     }
 
     for (unsigned int i = 0; i < objects.size(); i++)
     {
-        glm::vec3 newPos = glm::vec3(objects[i].SO_rigidbody.boundbox.max);
-        glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
-        while (newPos.x >= min.x && newPos.y >= min.y && newPos.z >= min.z)
+        //--FIX--
+        // if a object only has one chunk then it needs to start at its span 
+        // have an array of values that are the span of chunk it covers with the id?
+        // at object 0 it says this goes over 14 chunks so next object starts at 14 index
+        //-------
+        // object will only span across one chunk
+        if(glm::distance(objects[i].SO_rigidbody.boundbox.max, objects[i].SO_rigidbody.boundbox.min) / 10.0f < 1)
         {
             glm::vec3 pos = getChunkpos(objects[i].SO_rigidbody.position);
             unsigned int key = getKayVal(getHashVal(pos));
             spatialLookup[i] = std::make_pair(key, i);
+            std::cout << i << std::endl;
             startLookup.push_back(4294967295);
-            newPos -= glm::normalize(newPos - min) * 10.0f;
-            DrawDebugCube(newPos, 0.4f, glm::vec3(0,0,255));
+            DrawDebugCube(objects[i].SO_rigidbody.position, 0.4f, glm::vec3(0,0,255));
+        }
+        // object spans across multiple chunks
+        else
+        {
+            glm::vec3 newPos = objects[i].SO_rigidbody.boundbox.max;
+            glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
+            unsigned int count = glm::distance(objects[i].SO_rigidbody.boundbox.max, objects[i].SO_rigidbody.boundbox.min) / 10.0f;
+            for (unsigned int g = 0; g < count; g++)
+            {
+                glm::vec3 pos = getChunkpos(newPos);
+                unsigned int key = getKayVal(getHashVal(pos));
+                spatialLookup[i] = std::make_pair(key, i + g);
+                //std::cout << i + g << std::endl;
+                startLookup.push_back(4294967295);
+                newPos -= glm::normalize(newPos - min) * 10.0f;
+                DrawDebugCube(newPos, 0.4f, glm::vec3(0,0,255));
+            }
         }
         
         //start at object max and step 10 to min until euqal or greater
@@ -54,6 +90,12 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
     }
 
     std::sort(spatialLookup.begin(), spatialLookup.end());
+
+    for (size_t i = 0; i < spatialLookup.size(); i++)
+    {
+        //std::cout << spatialLookup[i].first << " " << spatialLookup[i].second << std::endl;
+    }
+    
     
     for (unsigned int i = 0; i < objects.size(); i++)
     {

@@ -76,15 +76,15 @@ void RigidBody::Step(float timeStep, std::vector<unsigned int> objectIds, std::v
     ApplyForce(glm::vec3(0,-9.81,0));
     for (unsigned int i = 0; i < objectIds.size(); i++)
     {
-        if(own.SO_id != objects[i].SO_id)
+        if(own.SO_id != objects[objectIds[i]].SO_id)
         {
             if(CollisionCheckBroad(own, objects[objectIds[i]]))
             {
-                //if(CollisionCheckNarrow(own, objects[i]))
-                //{
+                if(CollisionCheckNarrow(own, objects[objectIds[i]]))
+                {
                     velocity = glm::vec3(0);
                     ApplyImpulseForce(-totalForce, 2.0f);
-                //}
+                }
             }
         }
     }
