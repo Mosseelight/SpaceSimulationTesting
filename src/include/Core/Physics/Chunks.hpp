@@ -10,6 +10,7 @@ public:
     float ChunkSize;
     std::vector<std::pair<unsigned int, unsigned int>> spatialLookup;
     std::vector<unsigned int> startLookup;
+    std::vector<unsigned int> chunkOffsets;
 
     ChunkManager();
     ~ChunkManager();

@@ -103,7 +103,7 @@ int main()
     
     for (int i = -48; i < 48; i += 3)
     {
-        for (int g = -48; g < 48; g += 3)
+        for (int g = -48; g < 148; g += 3)
         {
             mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,0,g), glm::vec3(0,0,0)));
         }

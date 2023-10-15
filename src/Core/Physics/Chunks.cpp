@@ -39,8 +39,10 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
     {
         spatialLookup.resize(objects.size());
         startLookup.resize(objects.size());
+        chunkOffsets.resize(objects.size() + 1);
         for (unsigned int i = 0; i < objects.size(); i++)
         {
+            unsigned int offset = 0;
             if(glm::distance(objects[i].SO_rigidbody.boundbox.max, objects[i].SO_rigidbody.boundbox.min) / ChunkSize > 1)
             {
                 glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
@@ -53,11 +55,14 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                         {
                             spatialLookup.push_back(std::make_pair(0, 0));
                             startLookup.push_back(0);
+                            offset++;
                         }
                     }
                 }
-                spatialLookup.erase(spatialLookup.begin() + i);
+                chunkOffsets[i + 1] = offset;
             }
+            else
+                chunkOffsets[i + 1] = 0;
         }
     }
 
@@ -84,8 +89,8 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                     {
                         glm::vec3 pos = getChunkpos(glm::vec3(x,y,z));
                         unsigned int key = getKeyVal(getHashVal(pos));
-                        spatialLookup[objects.size() - 1 + count] = std::make_pair(key, i);
-                        startLookup[objects.size() - 1 + count] = UINT32_MAX;
+                        spatialLookup[objects.size() - 1 + count + chunkOffsets[i]] = std::make_pair(key, i);
+                        startLookup[objects.size() - 1 + count + chunkOffsets[i]] = UINT32_MAX;
                         count++;
                     }
                 }
