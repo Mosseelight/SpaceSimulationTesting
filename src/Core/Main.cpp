@@ -99,13 +99,12 @@ int main()
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
     
-    for (unsigned int i = 0; i < 40; i++)
+    for (int i = -50; i < 50; i += 3)
     {
-        mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(-6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0)));
-        mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(-3,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0)));
-        mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(-0,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0)));
-        mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(3,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0)));
-        mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(6,5 * (i * 0.2f),-50 + i * 2.5f), glm::vec3(0,0,0)));
+        for (int g = -50; g < 50; g += 3)
+        {
+            mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,0,g), glm::vec3(0,0,0)));
+        }
     }
 
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
