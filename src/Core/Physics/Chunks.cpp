@@ -46,7 +46,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                         for (int z = min.z; z < max.z; z += ChunkSize)
                         {
                             spatialLookup.push_back(std::make_pair(0, 0));
-                            startLookup.push_back(4294967295);
+                            //startLookup.push_back(4294967295);
                         }
                     }
                 }
@@ -79,7 +79,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                         glm::vec3 pos = getChunkpos(glm::vec3(x,y,z));
                         unsigned int key = getKeyVal(getHashVal(pos));
                         spatialLookup[objects.size() - 1 + count] = std::make_pair(key, i);
-                        startLookup[objects.size() - 1 + count] = 4294967295;
+                        //startLookup[objects.size() - 1 + count] = 4294967295;
                         count++;
                     }
                 }
@@ -88,12 +88,6 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
     }
 
     std::sort(spatialLookup.begin(), spatialLookup.end());
-
-    std::cout << spatialLookup.size() << std::endl;
-    for (size_t i = 0; i < spatialLookup.size(); i++)
-    {
-        std::cout << spatialLookup[i].first << " " << spatialLookup[i].second << std::endl;
-    }
     
     /*for (unsigned int i = 0; i < objects.size(); i++)
     {
@@ -118,7 +112,6 @@ unsigned int ChunkManager::getHashVal(glm::vec3 pos)
     unsigned int a = pos.x * 12289;
     unsigned int b = pos.y * 786433;
     unsigned int c = pos.z * 50331652;
-    //std::cout << a + b + c << std::endl;
     return a + b + c;
 }
 
