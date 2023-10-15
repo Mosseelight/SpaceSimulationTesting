@@ -270,7 +270,7 @@ void Mesh::Balloon(float delta = 0.0f, float speed = 0.0f, float percentage = 0.
         else
             vertexes[i].position = vertexes[i].position * (1.0f - percentage) + finPos * percentage;
     }
-    
+    ReGenBuffer();
 }
 
 Mesh LoadModel(glm::vec3 position, glm::vec3 rotation, std::string location)
