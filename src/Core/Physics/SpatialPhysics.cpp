@@ -12,8 +12,6 @@ void RunSimulation(float deltaTime, Scene& scene)
             break;
         //go through all spatials and update
         cManager.UpdateChunks(scene.SpatialObjects);
-        DrawDebugCube(glm::vec3(-10, 10, -10), 0.5f, glm::vec3(255,0,0));
-        DrawDebugCube(glm::vec3(10), 0.5f, glm::vec3(255,0,0));
         for (unsigned int i = 0; i < scene.SpatialObjects.size(); i++)
         {
             scene.SpatialObjects[i].SO_rigidbody.Step(PhysicsStep * PhysicsSpeed, cManager.FindObjectsInChunk(scene.SpatialObjects, scene.SpatialObjects[i].SO_id), scene.SpatialObjects, scene.SpatialObjects[i]);
