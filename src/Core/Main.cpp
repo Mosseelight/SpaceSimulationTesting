@@ -94,14 +94,16 @@ int main()
 
     mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
     mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,100), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
+    mainScene.SpatialObjects[1].SO_rigidbody.isStatic = true;
 
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
     
-    for (int i = -50; i < 50; i += 3)
+    for (int i = -48; i < 48; i += 3)
     {
-        for (int g = -50; g < 50; g += 3)
+        for (int g = -48; g < 48; g += 3)
         {
             mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,0,g), glm::vec3(0,0,0)));
         }
@@ -268,7 +270,7 @@ void ImguiMenu()
     ImGui::Begin("SpaceTesting", nullptr, window_flags);
 
     ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1.0f / deltaTime));
-    ImGui::Text("%d verts, %d indices (%d tris)", vertCount, indCount, indCount / 3);
+    ImGui::Text("%u verts, %u indices (%u tris)", vertCount, indCount, indCount / 3);
     ImGui::Text("Amount of Spatials: (%zu)", mainScene.SpatialObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
     if(platform == "Linux")
@@ -280,6 +282,8 @@ void ImguiMenu()
     ImGui::DragFloat3("Player Position", glm::value_ptr(player->position), 1.0f, -50.0f, 50.0f);
     ImGui::DragFloat3("Player Rotation", glm::value_ptr(player->rotation), 1.0f, -360.0f, 360.0f);
     ImGui::SliderFloat("Cam Fov", &player->camera.fov, 179.9f, 0.01f);
+    glm::vec3 chunkpos = player->position / glm::vec3(10);
+    ImGui::Text("Player in ChunkPos: %dx %dy %dz", (unsigned int)chunkpos.x, (unsigned int)chunkpos.y, (unsigned int)chunkpos.z);
 
     if (ImGui::BeginMenuBar())
     {

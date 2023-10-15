@@ -56,6 +56,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                         }
                     }
                 }
+                spatialLookup.erase(spatialLookup.begin() + i);
             }
         }
     }
