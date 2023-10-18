@@ -29,8 +29,9 @@ bool SameLine(glm::vec3 dir, glm::vec3 ao);
 bool Simplex2(Simplex& simplex, glm::vec3& direction);
 bool Simplex3(Simplex& simplex, glm::vec3& direction);
 bool Simplex4(Simplex& simplex, glm::vec3& direction);
+glm::vec3 GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& other);
 
-bool CollisionCheckNarrow(SpatialObject& own, SpatialObject& other)
+std::pair<bool, glm::vec3> CollisionCheckNarrow(SpatialObject& own, SpatialObject& other)
 {
     glm::vec3 direction = glm::vec3(1.0f,0.0f,0.0f);
     Simplex simplex;
@@ -49,15 +50,21 @@ bool CollisionCheckNarrow(SpatialObject& own, SpatialObject& other)
         support = GetSupportPoint(own, direction) - GetSupportPoint(other, -direction);
 
         if(glm::dot(support, direction) < 0)
-            return false;
+            return std::make_pair(false, glm::vec3(0));
 
         simplex.a = support;
         if(NextSimplex(simplex, direction))
         {
-            return true;
+            return std::make_pair(true, GetCollisionPoint(simplex, own, other));
         }
     }
-    return false;
+    return std::make_pair(false, glm::vec3(0));
+}
+
+glm::vec3 GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& other)
+{
+    
+    return glm::vec3(0);
 }
 
 bool NextSimplex(Simplex& simplex, glm::vec3& direction)

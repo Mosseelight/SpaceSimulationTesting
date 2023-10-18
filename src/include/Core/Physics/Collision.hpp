@@ -3,5 +3,5 @@
 #include "../Scene.hpp"
 #include "../Debug.hpp"
 
-bool CollisionCheckNarrow(SpatialObject& own, SpatialObject& other);
+std::pair<bool, glm::vec3> CollisionCheckNarrow(SpatialObject& own, SpatialObject& other);
 bool CollisionCheckBroad(SpatialObject& own, SpatialObject& other);

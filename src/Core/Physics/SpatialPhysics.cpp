@@ -7,10 +7,10 @@ void RunSimulation(float deltaTime, Scene& scene)
     static ChunkManager cManager;
     int counter = 0;
     totalTime += deltaTime;
+    std::cout << "update step" << std::endl;
     while (totalTime >= PhysicsStep)
     {
-        if(counter > maxPhysicSteps)
-            break;
+        std::cout << "physics step" << std::endl;
         //go through all spatials and update
         cManager.UpdateChunks(scene.SpatialObjects);
         for (unsigned int i = 0; i < scene.SpatialObjects.size(); i++)
@@ -22,6 +22,17 @@ void RunSimulation(float deltaTime, Scene& scene)
             scene.SpatialObjects[i].SO_rigidbody.boundbox.ConstructBoundingBox(scene.SpatialObjects[i].SO_mesh);
         }
         counter++;
-        totalTime -= PhysicsStep;
+
+        if(deltaTime >= PhysicsStep)
+        {
+            if(counter == maxPhysicSteps)
+                break;
+            totalTime -= PhysicsStep;
+        }
+        else
+        {
+            totalTime = 0;
+            break;
+        }
     }
 }
