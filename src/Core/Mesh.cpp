@@ -127,7 +127,7 @@ void Mesh::DrawMesh()
     }
 }
 
-glm::mat4 Mesh::GetModelMat()
+void Mesh::CreateModelMat()
 {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);
@@ -135,16 +135,16 @@ glm::mat4 Mesh::GetModelMat()
     model = glm::rotate(model, rotation.y * M_PIf/180.0f, glm::vec3(0.0f,1.0f,0.0f));
     model = glm::rotate(model, rotation.z * M_PIf/180.0f, glm::vec3(0.0f,0.0f,1.0f));
     model = glm::scale(model, glm::vec3(scale, scale, scale));
-    return model;
+    modelMatrix = model;
 }
 
-glm::mat4 Mesh::GetRotationMat()
+void Mesh::CreateRotationMat()
 {
     glm::mat4 mat = glm::mat4(1.0f);
     mat = glm::rotate(mat, rotation.x * M_PIf/180.0f, glm::vec3(1.0f,0.0f,0.0f));
     mat = glm::rotate(mat, rotation.y * M_PIf/180.0f, glm::vec3(0.0f,1.0f,0.0f));
     mat = glm::rotate(mat, rotation.z * M_PIf/180.0f, glm::vec3(0.0f,0.0f,1.0f));
-    return mat;
+    rotMatrix = mat;
 }
 
 void Mesh::FixWindingOrder()

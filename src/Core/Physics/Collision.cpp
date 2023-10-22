@@ -200,7 +200,7 @@ glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir)
             maxP = object.SO_mesh.vertexes[i].position;
         }
     }
-    return glm::vec3(object.SO_mesh.GetModelMat() * glm::vec4(maxP, 1.0f));
+    return glm::vec3(object.SO_mesh.modelMatrix * glm::vec4(maxP, 1.0f));
 }
 
 bool SameLine(glm::vec3 dir, glm::vec3 ao)

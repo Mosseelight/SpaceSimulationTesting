@@ -7,10 +7,8 @@ void RunSimulation(float deltaTime, Scene& scene)
     static ChunkManager cManager;
     int counter = 0;
     totalTime += deltaTime;
-    std::cout << "update step" << std::endl;
     while (totalTime >= PhysicsStep)
     {
-        std::cout << "physics step" << std::endl;
         //go through all spatials and update
         cManager.UpdateChunks(scene.SpatialObjects);
         for (unsigned int i = 0; i < scene.SpatialObjects.size(); i++)

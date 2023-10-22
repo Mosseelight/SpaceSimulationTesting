@@ -105,12 +105,14 @@ int main()
     {
         for (int g = -48; g < 148; g += 3)
         {
-            mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,0,g), glm::vec3(0,0,0)));
+            mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,3,g), glm::vec3(0,0,0)));
         }
     }
 
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
+        mainScene.SpatialObjects[i].SO_mesh.CreateModelMat();
+        mainScene.SpatialObjects[i].SO_mesh.CreateRotationMat();
         mainScene.SpatialObjects[i].SO_rigidbody.boundbox.ConstructBoundingBox(mainScene.SpatialObjects[i].SO_mesh);
         vertCount += mainScene.SpatialObjects[i].SO_mesh.vertexes.size();
         indCount += mainScene.SpatialObjects[i].SO_mesh.indices.size();
@@ -153,6 +155,12 @@ void UpdateLogic(SDL_Window* window)
     deltaTime = currentTime - lastTime;
     lastTime = currentTime;
     drawCallAvg = DrawCallCount / (GetTime() / deltaTime);
+
+    for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
+    {
+        mainScene.SpatialObjects[i].SO_mesh.CreateModelMat();
+        mainScene.SpatialObjects[i].SO_mesh.CreateRotationMat();
+    }
 
     RunSimulation(deltaTime, mainScene);
 

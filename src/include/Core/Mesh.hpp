@@ -56,6 +56,8 @@ public:
     std::vector<unsigned int> indices;
     glm::vec3 position, rotation;
     float scale;
+    glm::mat4 modelMatrix;
+    glm::mat4 rotMatrix;
 
     Mesh();
     Mesh(const Mesh &other);
@@ -65,8 +67,8 @@ public:
     void ReGenBuffer();
     void DrawMesh();
     void Delete();
-    glm::mat4 GetModelMat();
-    glm::mat4 GetRotationMat();
+    void CreateModelMat();
+    void CreateRotationMat();
     void FixWindingOrder();
     void CreateSmoothNormals();
     void SubdivideTriangle();

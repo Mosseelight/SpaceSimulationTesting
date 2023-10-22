@@ -12,12 +12,12 @@ BoundingBox::BoundingBox()
 
 void BoundingBox::ConstructBoundingBox(Mesh& mesh)
 {
-    
     glm::vec3 mintmp = glm::vec3(FLT_MAX);
     glm::vec3 maxtmp = glm::vec3(FLT_MIN);
+    glm::mat4 mat = mesh.rotMatrix;
     for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
     {
-        glm::vec3 vertexPos = mesh.vertexes[i].position;
+        glm::vec3 vertexPos = mat * glm::vec4(mesh.vertexes[i].position, 1.0f);
 
         if (vertexPos.x < mintmp.x)
             mintmp.x = vertexPos.x;
@@ -34,8 +34,8 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
             maxtmp.z = vertexPos.z;
     }
 
-    min = glm::vec3(mesh.GetRotationMat() * glm::vec4(((mintmp - maxtmp) * 0.5f) + mesh.position, 1.0f));
-    max = glm::vec3(mesh.GetRotationMat() * glm::vec4(((mintmp - maxtmp) * -0.5f) + mesh.position, 1.0f));
+    min = (mintmp - maxtmp) * 0.5f + mesh.position;
+    max = (mintmp - maxtmp) * -0.5f + mesh.position;
 }
 
 
