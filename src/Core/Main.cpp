@@ -96,12 +96,16 @@ int main()
     mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
     mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,100), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
     mainScene.SpatialObjects[1].SO_rigidbody.isStatic = true;
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(100,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
+    mainScene.SpatialObjects[2].SO_rigidbody.isStatic = true;
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(100,-0.7f,100), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
+    mainScene.SpatialObjects[3].SO_rigidbody.isStatic = true;
 
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunny.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
     
-    for (int i = -48; i < 48; i += 3)
+    for (int i = -48; i < 148; i += 3)
     {
         for (int g = -48; g < 148; g += 3)
         {

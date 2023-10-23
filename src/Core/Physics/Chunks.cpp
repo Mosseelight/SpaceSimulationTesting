@@ -40,11 +40,13 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
         spatialLookup.resize(objects.size());
         startLookup.resize(objects.size());
         chunkOffsets.resize(objects.size() + 1);
+        unsigned int spanCount = 0;
         for (unsigned int i = 0; i < objects.size(); i++)
         {
             unsigned int offset = 0;
             if(glm::distance(objects[i].SO_rigidbody.boundbox.max, objects[i].SO_rigidbody.boundbox.min) / ChunkSize > 1)
             {
+                spanCount++;
                 glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
                 glm::vec3 max = objects[i].SO_rigidbody.boundbox.max;
                 for (int x = min.x; x < max.x; x += ChunkSize)
@@ -59,7 +61,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                         }
                     }
                 }
-                chunkOffsets[i + 1] = offset;
+                chunkOffsets[i + 1] = offset * spanCount;
             }
             else
                 chunkOffsets[i + 1] = 0;

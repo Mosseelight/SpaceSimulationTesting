@@ -16,7 +16,7 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
     float xArr[mesh.vertexes.size()];
     float yArr[mesh.vertexes.size()];
     float zArr[mesh.vertexes.size()];
-    glm::mat4 mat = mesh.rotMatrix;
+    glm::mat4 mat = mesh.modelMatrix;
 
     for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
     {
@@ -29,12 +29,9 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
     std::sort(xArr, xArr + mesh.vertexes.size());
     std::sort(yArr, yArr + mesh.vertexes.size());
     std::sort(zArr, zArr + mesh.vertexes.size());
-
-    glm::vec3 mintmp(xArr[0], yArr[0], zArr[0]);
-    glm::vec3 maxtmp(xArr[mesh.vertexes.size() - 1], yArr[mesh.vertexes.size() - 1], zArr[mesh.vertexes.size() - 1]);
-
-    min = ((mintmp - maxtmp) * 0.5f + mesh.position) * mesh.scale;
-    max = ((mintmp - maxtmp) * -0.5f + mesh.position) * mesh.scale;
+    
+    min = glm::vec3(xArr[0], yArr[0], zArr[0]);
+    max = glm::vec3(xArr[mesh.vertexes.size() - 1], yArr[mesh.vertexes.size() - 1], zArr[mesh.vertexes.size() - 1]);
 }
 
 
@@ -71,7 +68,7 @@ void RigidBody::Step(float timeStep, std::vector<unsigned int>& objectIds, std::
     {
         once = false;
     }
-
+    
     ApplyForce(glm::vec3(0,-9.81,0));
     for (unsigned int i = 0; i < objectIds.size(); i++)
     {
@@ -79,11 +76,11 @@ void RigidBody::Step(float timeStep, std::vector<unsigned int>& objectIds, std::
         {
             if(CollisionCheckBroad(own, objects[objectIds[i]]))
             {
-                //if(CollisionCheckNarrow(own, objects[objectIds[i]]).first)
-                //{
+                if(CollisionCheckNarrow(own, objects[objectIds[i]]).first)
+                {
                     velocity = glm::vec3(0);
                     ApplyImpulseForce(-totalForce, 2.0f);
-                //}
+                }
             }
         }
     }

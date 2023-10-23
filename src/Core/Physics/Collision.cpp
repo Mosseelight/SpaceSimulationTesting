@@ -190,7 +190,6 @@ glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir)
 {
     glm::vec3 maxP;
     float maxDist = FLT_MIN;
-    //dir = glm::vec3(glm::inverse(object.SO_mesh.GetModelMat()) * glm::vec4{dir, 0.0f});
     for (unsigned int i = 0; i < object.SO_mesh.vertexes.size(); i++)
     {
         float distance = dot(object.SO_mesh.vertexes[i].position, dir);
