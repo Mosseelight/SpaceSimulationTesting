@@ -18,10 +18,9 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
     float yArr[mesh.vertexes.size()];
     float zArr[mesh.vertexes.size()];
     glm::mat4 mat = mesh.modelMatrix;
-    glm::vec4 pos;
     for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
     {
-        glm::vec3 vertexPos = mat * glm::vec4(mesh.vertexes[i].position, 1.0f);
+        glm::vec3 vertexPos = TransformVec4(glm::vec4(mesh.vertexes[i].position, 1.0f), mat);
         xArr[i] = vertexPos.x;
         yArr[i] = vertexPos.y;
         zArr[i] = vertexPos.z;
