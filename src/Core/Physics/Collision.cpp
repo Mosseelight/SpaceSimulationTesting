@@ -10,6 +10,16 @@ bool CollisionCheckBroad(SpatialObject& own, SpatialObject& other)
     && boxOwn.min.z <= boxOther.max.z && boxOwn.max.z >= boxOther.min.z);
 }
 
+bool CollisionCheckBroader(SpatialObject& own, SpatialObject& other)
+{
+    float dist1 = glm::distance(own.SO_rigidbody.position, own.SO_rigidbody.boundbox.max);
+    float dist2 = glm::distance(other.SO_rigidbody.position, other.SO_rigidbody.boundbox.max);
+
+    if(dist1 + dist2 > glm::distance(own.SO_rigidbody.position, other.SO_rigidbody.position))
+        return true;
+    return false;
+}
+
 
 struct Simplex
 {

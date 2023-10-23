@@ -6,3 +6,4 @@
 
 std::pair<bool, glm::vec3> CollisionCheckNarrow(SpatialObject& own, SpatialObject& other);
 bool CollisionCheckBroad(SpatialObject& own, SpatialObject& other);
+bool CollisionCheckBroader(SpatialObject& own, SpatialObject& other);
