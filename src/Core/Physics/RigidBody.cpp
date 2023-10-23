@@ -1,6 +1,7 @@
 #include "../../include/Core/Physics/RigidBody.hpp"
 #include "../../include/Core/Physics/Collision.hpp"
 #include "../../include/Core/Scene.hpp"
+#include "../../include/Core/Math.hpp"
 
 void Solver(glm::vec3& out, glm::vec3 in, float step);
 
@@ -17,7 +18,7 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
     float yArr[mesh.vertexes.size()];
     float zArr[mesh.vertexes.size()];
     glm::mat4 mat = mesh.modelMatrix;
-
+    glm::vec4 pos;
     for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
     {
         glm::vec3 vertexPos = mat * glm::vec4(mesh.vertexes[i].position, 1.0f);
