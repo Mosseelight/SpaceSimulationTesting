@@ -73,6 +73,7 @@ int main()
     gladLoadGL();
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
+    glEnable(GL_CULL_FACE);
 
     windowIcon = IMG_Load((imageLoc + "/IconSpace.png").c_str());
     SDL_SetWindowIcon(window, windowIcon);
@@ -92,22 +93,24 @@ int main()
     //scene initilzation
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
-    mainScene.SpatialObjects[0].SO_rigidbody.isStatic = true;
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,-0.7f,100), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
-    mainScene.SpatialObjects[1].SO_rigidbody.isStatic = true;
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(100,-0.7f,0), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
-    mainScene.SpatialObjects[2].SO_rigidbody.isStatic = true;
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(100,-0.7f,100), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
-    mainScene.SpatialObjects[3].SO_rigidbody.isStatic = true;
+    unsigned int count = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int g = 0; g < 4; g++)
+        {
+            mainScene.AddSpatialObject(LoadModel(glm::vec3(i * 100, -0.7f, g * 100), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
+            mainScene.SpatialObjects[count].SO_rigidbody.isStatic = true;
+            count++;
+        }
+    }
 
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunny.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
     
-    for (int i = -48; i < 148; i += 3)
+    for (int i = -48; i < 48 + (100 * 3); i += 3)
     {
-        for (int g = -48; g < 148; g += 3)
+        for (int g = -48; g < 48 + (100 * 3); g += 3)
         {
             mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,3,g), glm::vec3(0,0,0)));
         }
@@ -186,16 +189,17 @@ void Render(SDL_Window* window)
     glClearColor(0.0f, 0.54f, 0.54f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDepthFunc(GL_LESS);
+    glCullFace(GL_FRONT);
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     if(showWireFrame)
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     glUseProgram(shader.shader);
     glBindTexture(GL_TEXTURE_2D, texture.id);
-    mainScene.DrawSingle(&shader, player->camera.GetViewMat(), player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f), player->position);
+    mainScene.DrawSingle(&shader, player->camera.GetViewMat(), player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.1f, 100000.0f), player->position);
 
     //debuging sets
-    SetNeededDebug(player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.001f, 100000.0f), player->camera.GetViewMat(), shaderLoc);
+    SetNeededDebug(player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.1f, 100000.0f), player->camera.GetViewMat(), shaderLoc);
     DrawDebugItems();
     if(DebugWindow)
     {
