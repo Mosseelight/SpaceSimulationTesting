@@ -166,7 +166,7 @@ void UpdateLogic(SDL_Window* window)
     currentTime = GetTime();
     deltaTime = currentTime - lastTime;
     lastTime = currentTime;
-    drawCallAvg = DrawCallCount / (GetTime() / deltaTime);
+    drawCallAvg = DrawCallCount / (GetTime() / (1.0f / io->Framerate));
 
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
