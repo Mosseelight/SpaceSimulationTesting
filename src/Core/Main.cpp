@@ -38,6 +38,7 @@ float deltaTime = 0.0f;
 float lastTime = 0.0f;
 int currentSCRWIDTH = 0;
 int currentSCRHEIGHT = 0;
+bool vsync = true;
 SDL_Surface *windowIcon;
 ImGuiIO *io;
 std::string platform;
@@ -72,6 +73,7 @@ int main()
     
     SDL_Window* window = SDL_CreateWindow("SpaceSim", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCRWIDTH, SCRHEIGHT, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(window);
+    SDL_GL_SetSwapInterval(vsync);
     gladLoadGL();
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
@@ -166,7 +168,7 @@ void UpdateLogic(SDL_Window* window)
     currentTime = GetTime();
     deltaTime = currentTime - lastTime;
     lastTime = currentTime;
-    drawCallAvg = DrawCallCount / (GetTime() / (1.0f / io->Framerate));
+    drawCallAvg = DrawCallCount / (GetTime() / 1.0f / io->Framerate);
 
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
@@ -324,7 +326,7 @@ void ImguiMenu()
 
     //needs to be io.framerate because the actal deltatime is polled too fast and the 
     //result is hard to read
-    ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", 1.0f / io->Framerate, io->Framerate);
+    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1.0f / io->Framerate, io->Framerate);
     ImGui::Text("%u verts, %u indices (%u tris)", vertCount, indCount, indCount / 3);
     ImGui::Text("Amount of Spatials: (%zu)", mainScene.SpatialObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
@@ -343,9 +345,13 @@ void ImguiMenu()
         ImPlot::PlotShaded("FrameTime", &frameTimes.Data[0].x, &frameTimes.Data[0].y, frameTimes.Data.size(), -INFINITY, 0, frameTimes.Offset, 2 * sizeof(float));
         ImPlot::EndPlot();
     }
+    ImGui::Checkbox("Wire Frame", &showWireFrame);
+    if(ImGui::Checkbox("Vsync", &vsync))
+    {
+        SDL_GL_SetSwapInterval(vsync);
+    }
 
     ImGui::Spacing();
-    ImGui::Checkbox("Wire Frame", &showWireFrame);
     ImGui::DragFloat3("Player Position", glm::value_ptr(player->position), 1.0f, -50.0f, 50.0f);
     ImGui::DragFloat3("Player Rotation", glm::value_ptr(player->rotation), 1.0f, -360.0f, 360.0f);
     ImGui::SliderFloat("Cam Fov", &player->camera.fov, 179.9f, 0.01f);
