@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "../include/imgui/imgui.h"
+#include "../include/imgui/implot.h"
 #include "../include/backends/imgui_impl_sdl2.h"
 #include "../include/backends/imgui_impl_opengl3.h"
 #include <iostream>
@@ -83,6 +84,7 @@ int main()
     //ImGui Creation
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     
     ImGui_ImplSDL2_InitForOpenGL(window, context);
@@ -146,6 +148,7 @@ int main()
     SDL_FreeSurface(windowIcon);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
     SDL_GL_DeleteContext(context);
     SDL_DestroyWindow(window);
@@ -276,10 +279,42 @@ void input()
 bool ShowSceneViewerMenu = false;
 bool ShowObjectViewerMenu = false;
 bool ShowConsoleViewerMenu = false;
+
+struct ScrollingBuffer {
+    int MaxSize;
+    int Offset;
+    ImVector<ImVec2> Data;
+    ScrollingBuffer(int max_size = 2000) {
+        MaxSize = max_size;
+        Offset  = 0;
+        Data.reserve(MaxSize);
+    }
+    void AddPoint(float x, float y) {
+        if (Data.size() < MaxSize)
+            Data.push_back(ImVec2(x,y));
+        else {
+            Data[Offset] = ImVec2(x,y);
+            Offset =  (Offset + 1) % MaxSize;
+        }
+    }
+    void Erase() {
+        if (Data.size() > 0) {
+            Data.shrink(0);
+            Offset  = 0;
+        }
+    }
+};
+
 void ImguiMenu()
 {
-    
-    ImGuiWindowFlags window_flags = 0;
+
+    static ScrollingBuffer frameTimes;
+    static float HighestFT = 0.0f;
+    if(deltaTime > HighestFT)
+        HighestFT = deltaTime;
+    frameTimes.AddPoint(GetTime(), deltaTime);
+
+    static ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
     window_flags |= ImGuiWindowFlags_MenuBar;
 
@@ -292,6 +327,16 @@ void ImguiMenu()
     if(platform == "Linux")
         ImGui::Text("Ram Usage: %.2fmb", GetRamUsage() / 1024);
     ImGui::Text("Time Open %.1f minutes", (GetTime() / 60.0f));
+
+    if (ImPlot::BeginPlot("##Scrolling", ImVec2(ImGui::GetContentRegionAvail().x,100))) 
+    {
+        ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoTickLabels, ImPlotAxisFlags_AutoFit);
+        ImPlot::SetupAxisLimits(ImAxis_X1,GetTime() - 5.0f, GetTime(), ImGuiCond_Always);
+        ImPlot::SetupAxisLimits(ImAxis_Y1,0,HighestFT + (HighestFT * 0.25f), ImGuiCond_Always);
+        ImPlot::SetNextFillStyle(ImVec4(0,0.5,0.5,1),1.0f);
+        ImPlot::PlotShaded("FrameTime", &frameTimes.Data[0].x, &frameTimes.Data[0].y, frameTimes.Data.size(), -INFINITY, 0, frameTimes.Offset, 2 * sizeof(float));
+        ImPlot::EndPlot();
+    }
 
     ImGui::Spacing();
     ImGui::Checkbox("Wire Frame", &showWireFrame);
