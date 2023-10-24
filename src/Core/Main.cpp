@@ -39,6 +39,7 @@ float lastTime = 0.0f;
 int currentSCRWIDTH = 0;
 int currentSCRHEIGHT = 0;
 SDL_Surface *windowIcon;
+ImGuiIO *io;
 std::string platform;
 
 const std::string imageLoc = "res/Textures/";
@@ -85,8 +86,9 @@ int main()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImPlot::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     
+    ImGuiIO& IO = ImGui::GetIO();
+    io = &IO;
+    io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     
     ImGui_ImplSDL2_InitForOpenGL(window, context);
     ImGui_ImplOpenGL3_Init();
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
@@ -320,7 +322,9 @@ void ImguiMenu()
 
     ImGui::Begin("SpaceTesting", nullptr, window_flags);
 
-    ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", deltaTime * 1000, round(1.0f / deltaTime));
+    //needs to be io.framerate because the actal deltatime is polled too fast and the 
+    //result is hard to read
+    ImGui::Text("App avg %.3f ms/frame (%.1f FPS)", 1.0f / io->Framerate, io->Framerate);
     ImGui::Text("%u verts, %u indices (%u tris)", vertCount, indCount, indCount / 3);
     ImGui::Text("Amount of Spatials: (%zu)", mainScene.SpatialObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
