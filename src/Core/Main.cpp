@@ -328,10 +328,12 @@ void ImguiMenu()
         ImGui::Text("Ram Usage: %.2fmb", GetRamUsage() / 1024);
     ImGui::Text("Time Open %.1f minutes", (GetTime() / 60.0f));
 
+    static float frameTimeHistory = 2.75f;
+    ImGui::SliderFloat("FrameTimeHistory", &frameTimeHistory, 0.1f, 10.0f);
     if (ImPlot::BeginPlot("##Scrolling", ImVec2(ImGui::GetContentRegionAvail().x,100))) 
     {
         ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoTickLabels, ImPlotAxisFlags_AutoFit);
-        ImPlot::SetupAxisLimits(ImAxis_X1,GetTime() - 5.0f, GetTime(), ImGuiCond_Always);
+        ImPlot::SetupAxisLimits(ImAxis_X1,GetTime() - frameTimeHistory, GetTime()), ImGuiCond_Always);
         ImPlot::SetupAxisLimits(ImAxis_Y1,0,HighestFT + (HighestFT * 0.25f), ImGuiCond_Always);
         ImPlot::SetNextFillStyle(ImVec4(0,0.5,0.5,1),1.0f);
         ImPlot::PlotShaded("FrameTime", &frameTimes.Data[0].x, &frameTimes.Data[0].y, frameTimes.Data.size(), -INFINITY, 0, frameTimes.Offset, 2 * sizeof(float));
