@@ -56,7 +56,6 @@ bool Simplex2(Simplex& simplex, glm::vec3& direction);
 bool Simplex3(Simplex& simplex, glm::vec3& direction);
 bool Simplex4(Simplex& simplex, glm::vec3& direction);
 CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& other, unsigned int type);
-CollisionPoint GetBBCollisionPoint(SpatialObject& own, SpatialObject& other);
 
 std::pair<bool, CollisionPoint> CollisionCheckNarrow(SpatialObject& own, SpatialObject& other, unsigned int type)
 {
@@ -82,10 +81,7 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrow(SpatialObject& own, Spatial
         simplex.a = support;
         if(NextSimplex(simplex, direction))
         {
-			if(type == 1)
-            	return std::make_pair(true, GetBBCollisionPoint(own, other));
-			else
-				return std::make_pair(true, GetCollisionPoint(simplex, own, other, type));
+			return std::make_pair(true, GetCollisionPoint(simplex, own, other, type));
         }
     }
     return std::make_pair(false, CollisionPoint());
@@ -138,27 +134,6 @@ void AddIfUniqueEdge(std::vector<std::pair<unsigned int, unsigned int>>& edges, 
 		edges.emplace_back(faces[a], faces[b]);
 	}
 }
-
-CollisionPoint GetBBCollisionPoint(SpatialObject& own, SpatialObject& other)
-{
-	glm::vec3 dir = glm::normalize(other.SO_rigidbody.position - own.SO_rigidbody.position);
-	if(dir.x + 0.0001f > dir.y && dir.x + 0.0001f > dir.z)
-	{
-		dir = glm::vec3(ceil(dir.x),0,0);
-	}
-	if(dir.y + 0.0001f > dir.x && dir.y + 0.0001f > dir.z)
-	{
-		dir = glm::vec3(0,ceil(dir.y),0);
-	}
-	if(dir.z + 0.0001f > dir.x && dir.z + 0.0001f > dir.y)
-	{
-		dir = glm::vec3(0,0,ceil(dir.z));
-	}
-
-	float dist = glm::length((dir + own.SO_rigidbody.position) - (dir + other.SO_rigidbody.position));
-	return CollisionPoint(dir, dist);
-}
-
 
 CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& other, unsigned int type)
 {

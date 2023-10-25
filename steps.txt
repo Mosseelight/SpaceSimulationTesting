@@ -8,6 +8,8 @@ Basic physics
 
     collisions
         make gjk faster
+        maybe add a way for high mesh counts over like 500 tris to use the oobb gjk method
+        switch to oobb instead of aabb as getting the box is much quicker?
         
     raycasting
         from screen to world and world to screen
