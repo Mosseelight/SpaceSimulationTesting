@@ -18,6 +18,9 @@ void RunSimulation(float deltaTime, Scene& scene)
             scene.SpatialObjects[i].SO_mesh.position = scene.SpatialObjects[i].SO_rigidbody.position;
             scene.SpatialObjects[i].SO_mesh.rotation = scene.SpatialObjects[i].SO_rigidbody.rotation;
             scene.SpatialObjects[i].SO_rigidbody.boundbox.ConstructBoundingBox(scene.SpatialObjects[i].SO_mesh);
+            scene.SpatialObjects[i].SO_rigidbody.ooBoundBox.ConstructOrientiedBox(scene.SpatialObjects[i]);
+            DrawDebugCube(scene.SpatialObjects[i].SO_rigidbody.ooBoundBox.max, 0.1f, glm::vec3(255,0,0));
+            DrawDebugCube(scene.SpatialObjects[i].SO_rigidbody.ooBoundBox.min, 0.1f, glm::vec3(0,0,255));
         }
         counter++;
 

@@ -15,6 +15,8 @@ public:
     ~CollisionPoint();
 };
 
-std::pair<bool, CollisionPoint> CollisionCheckNarrow(SpatialObject& own, SpatialObject& other);
+/// @brief 0 for taking in the vertexes of the mesh and 1 for using the orientied bounding box
+/// @return 
+std::pair<bool, CollisionPoint> CollisionCheckNarrow(SpatialObject& own, SpatialObject& other, unsigned int type);
 bool CollisionCheckBroad(SpatialObject& own, SpatialObject& other);
 bool CollisionCheckBroader(SpatialObject& own, SpatialObject& other);

@@ -34,6 +34,34 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
     max = glm::vec3(xArr[mesh.vertexes.size() - 1], yArr[mesh.vertexes.size() - 1], zArr[mesh.vertexes.size() - 1]);
 }
 
+void BoundingBox::ConstructOrientiedBox(SpatialObject& object)
+{
+    //faster to sort this way and I dont know why, array allocations maybe slow down the std::sort method?
+    glm::vec3 mintmp = glm::vec3(FLT_MAX);
+    glm::vec3 maxtmp = glm::vec3(FLT_MIN);
+    for (unsigned int i = 0; i < object.SO_mesh.vertexes.size(); i++)
+    {
+        glm::vec3 vertexPos = object.SO_mesh.vertexes[i].position;
+
+        if (vertexPos.x < mintmp.x)
+            mintmp.x = vertexPos.x;
+        if (vertexPos.y < mintmp.y)
+            mintmp.y = vertexPos.y;
+        if (vertexPos.z < mintmp.z)
+            mintmp.z = vertexPos.z;
+
+        if (vertexPos.x > maxtmp.x)
+            maxtmp.x = vertexPos.x;
+        if (vertexPos.y > maxtmp.y)
+            maxtmp.y = vertexPos.y;
+        if (vertexPos.z > maxtmp.z)
+            maxtmp.z = vertexPos.z;
+    }
+
+    min = TransformVec4(glm::vec4(mintmp, 1.0f), object.SO_mesh.modelMatrix);
+    max = TransformVec4(glm::vec4(maxtmp, 1.0f), object.SO_mesh.modelMatrix);
+}
+
 
 RigidBody::RigidBody()
 {
@@ -78,11 +106,12 @@ void RigidBody::Step(float timeStep, std::vector<unsigned int>& objectIds, std::
             {
                 if(CollisionCheckBroad(own, objects[objectIds[i]]))
                 {
-                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrow(own, objects[objectIds[i]]);
+                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrow(own, objects[objectIds[i]], 1);
                     if(point.first)
                     {
-                        glm::vec3 vel = velocity;
                         velocity = glm::vec3(0);
+                        own.SO_rigidbody.position += -point.second.point * (point.second.dist * 0.5f);
+                        std::cout << point.second.point.x << " " << point.second.point.y << " " << point.second.point.z << std::endl;
                         ApplyImpulseForce(-point.second.point, 2.0f);
                     }
                 }

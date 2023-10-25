@@ -49,21 +49,22 @@ CollisionPoint::~CollisionPoint()
 
 }
 
-glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir);
+glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir , unsigned int type);
 bool NextSimplex(Simplex& simplex, glm::vec3& direction);
 bool SameLine(glm::vec3 dir, glm::vec3 ao);
 bool Simplex2(Simplex& simplex, glm::vec3& direction);
 bool Simplex3(Simplex& simplex, glm::vec3& direction);
 bool Simplex4(Simplex& simplex, glm::vec3& direction);
-CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& other);
+CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& other, unsigned int type);
+CollisionPoint GetBBCollisionPoint(SpatialObject& own, SpatialObject& other);
 
-std::pair<bool, CollisionPoint> CollisionCheckNarrow(SpatialObject& own, SpatialObject& other)
+std::pair<bool, CollisionPoint> CollisionCheckNarrow(SpatialObject& own, SpatialObject& other, unsigned int type)
 {
     glm::vec3 direction = glm::vec3(1.0f,0.0f,0.0f);
     Simplex simplex;
     glm::vec3 support;
 
-    support = GetSupportPoint(own, direction) - GetSupportPoint(other, -direction);
+    support = GetSupportPoint(own, direction, type) - GetSupportPoint(other, -direction, type);
     simplex.a = support;
     direction = -simplex.a;
 
@@ -73,7 +74,7 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrow(SpatialObject& own, Spatial
         simplex.c = simplex.b;
         simplex.b = simplex.a;
         simplex.count++;
-        support = GetSupportPoint(own, direction) - GetSupportPoint(other, -direction);
+        support = GetSupportPoint(own, direction, type) - GetSupportPoint(other, -direction, type);
 
         if(glm::dot(support, direction) < 0)
             return std::make_pair(false, CollisionPoint());
@@ -81,7 +82,10 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrow(SpatialObject& own, Spatial
         simplex.a = support;
         if(NextSimplex(simplex, direction))
         {
-            return std::make_pair(true, GetCollisionPoint(simplex, own, other));
+			if(type == 1)
+            	return std::make_pair(true, GetBBCollisionPoint(own, other));
+			else
+				return std::make_pair(true, GetCollisionPoint(simplex, own, other, type));
         }
     }
     return std::make_pair(false, CollisionPoint());
@@ -104,7 +108,7 @@ std::pair<std::vector<glm::vec4>, unsigned int> GetTriNormal(std::vector<glm::ve
 
 		if (distance < 0) 
         {
-			normal   *= -1;
+			normal *= -1;
 			distance *= -1;
 		}
 
@@ -135,25 +139,51 @@ void AddIfUniqueEdge(std::vector<std::pair<unsigned int, unsigned int>>& edges, 
 	}
 }
 
+CollisionPoint GetBBCollisionPoint(SpatialObject& own, SpatialObject& other)
+{
+	glm::vec3 dir = glm::normalize(other.SO_rigidbody.position - own.SO_rigidbody.position);
+	if(dir.x + 0.0001f > dir.y && dir.x + 0.0001f > dir.z)
+	{
+		dir = glm::vec3(ceil(dir.x),0,0);
+	}
+	if(dir.y + 0.0001f > dir.x && dir.y + 0.0001f > dir.z)
+	{
+		dir = glm::vec3(0,ceil(dir.y),0);
+	}
+	if(dir.z + 0.0001f > dir.x && dir.z + 0.0001f > dir.y)
+	{
+		dir = glm::vec3(0,0,ceil(dir.z));
+	}
 
-CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& other)
+	float dist = glm::length((dir + own.SO_rigidbody.position) - (dir + other.SO_rigidbody.position));
+	return CollisionPoint(dir, dist);
+}
+
+
+CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& other, unsigned int type)
 {
     std::vector<glm::vec3> polytope {a.a, a.b, a.c, a.d};
-    std::vector<unsigned int> faces = own.SO_mesh.indices;
+    std::vector<unsigned int> faces = 
+    {
+		0, 1, 2,
+		0, 3, 1,
+		0, 2, 3,
+		1, 3, 2
+	};
 
     auto [normals, minFace] = GetTriNormal(polytope, faces);
 
     glm::vec3 minNormal;
 	float minDistance = FLT_MAX;
 	
-	for (unsigned int i = 0; i < 64; i++)
+	unsigned int maxCheck = 0;
+	while (minDistance == FLT_MAX && !(maxCheck >= 1024))
     {
-        if(minDistance != FLT_MAX)
-            break;
+
 		minNormal = normals[minFace];
 		minDistance = normals[minFace].w;
  
-		glm::vec3 support = GetSupportPoint(own, minNormal) - GetSupportPoint(other, -minNormal);
+		glm::vec3 support = GetSupportPoint(own, minNormal, type) - GetSupportPoint(other, -minNormal, type);
 		float sDistance = dot(minNormal, support);
  
 		if (abs(sDistance - minDistance) > 0.001f)
@@ -213,6 +243,7 @@ CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& 
 			faces.insert(faces.end(), newFaces.begin(), newFaces.end());
 			normals.insert(normals.end(), newNormals.begin(), newNormals.end());
 		}
+		maxCheck++;
 	}
  
 	return CollisionPoint(minNormal, minDistance + 0.001f);
@@ -337,19 +368,70 @@ bool Simplex4(Simplex& simplex, glm::vec3& direction)
 	return true;
 }
 
-glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir)
+glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir, unsigned int type)
 {
-    glm::vec3 maxP;
-    float maxDist = FLT_MIN;
-    for (unsigned int i = 0; i < object.SO_mesh.vertexes.size(); i++)
-    {
-        float distance = dot(object.SO_mesh.vertexes[i].position, dir);
-        if(distance > maxDist)
-        {
-            maxDist = distance;
-            maxP = object.SO_mesh.vertexes[i].position;
-        }
-    }
+	glm::vec3 maxP;
+	switch (type)
+	{
+	case 0:
+		{
+			float maxDist = FLT_MIN;
+			for (unsigned int i = 0; i < object.SO_mesh.vertexes.size(); i++)
+			{
+				float distance = dot(object.SO_mesh.vertexes[i].position, dir);
+				if(distance > maxDist)
+				{
+					maxDist = distance;
+					maxP = object.SO_mesh.vertexes[i].position;
+				}
+			}
+			break;
+		}
+	case 1:
+		{
+			float maxDist = FLT_MIN;
+			for (unsigned int i = 0; i < 8; i++)
+			{
+				float distance = dot(object.SO_mesh.vertexes[i].position, dir);
+				if(distance > maxDist)
+				{
+					maxDist = distance;
+					maxP = object.SO_mesh.vertexes[i].position;
+				}
+			}
+			break;
+		}
+	
+	default:
+		{
+			float maxDist = FLT_MIN;
+			glm::vec3 max = object.SO_rigidbody.ooBoundBox.max;
+			glm::vec3 min = object.SO_rigidbody.ooBoundBox.min;
+			glm::vec3 bounds[8] = 
+			{
+				max,
+				glm::vec3(max.x, min.y, max.z),
+				glm::vec3(min.x, max.y, max.z),
+				glm::vec3(min.x, min.y, max.z),
+				glm::vec3(max.x, max.y, min.z),
+				glm::vec3(max.x, min.y, min.z),
+				glm::vec3(min.x, max.y, min.z),
+				min
+
+			};
+			for (unsigned int i = 0; i < 8; i++)
+			{
+				float distance = dot(bounds[i], dir);
+				if(distance > maxDist)
+				{
+					maxDist = distance;
+					maxP = bounds[i];
+				}
+			}
+			break;
+		}
+	}
+
     return TransformVec4(glm::vec4(maxP, 1.0f), object.SO_mesh.modelMatrix);
     
 }
