@@ -11,6 +11,7 @@
 #include <vector>
 #include <memory>
 #include <random>
+#include <assert.h>
 
 //core
 #include "../include/Core/Globals.hpp"
@@ -65,7 +66,7 @@ int main()
 {
     
     //Sdl creation
-    SDL_Init(SDL_INIT_VIDEO);
+    assert(!SDL_Init(SDL_INIT_VIDEO));
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -74,7 +75,7 @@ int main()
     SDL_Window* window = SDL_CreateWindow("Spatial Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCRWIDTH, SCRHEIGHT, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(window);
     SDL_GL_SetSwapInterval(vsync);
-    gladLoadGL();
+    assert(gladLoadGL());
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_CULL_FACE);

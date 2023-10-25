@@ -81,16 +81,14 @@ void RigidBody::Step(float timeStep, std::vector<unsigned int>& objectIds, std::
                     std::pair<bool, CollisionPoint> point = CollisionCheckNarrow(own, objects[objectIds[i]]);
                     if(point.first)
                     {
-                        DrawDebugCube(point.second.point, 0.1f, glm::vec3(255,0,0));
                         glm::vec3 vel = velocity;
                         velocity = glm::vec3(0);
-                        ApplyImpulseForce(-totalForce, 2.0f);
+                        ApplyImpulseForce(-point.second.point, 2.0f);
                     }
                 }
             }
         }
     }
-
 
     acceleration = totalForce / mass;
     rotAcceleration = totalRotation / mass;

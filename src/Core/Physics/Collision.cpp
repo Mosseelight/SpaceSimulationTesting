@@ -146,7 +146,10 @@ CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& 
     glm::vec3 minNormal;
 	float minDistance = FLT_MAX;
 	
-	while (minDistance == FLT_MAX) {
+	for (unsigned int i = 0; i < 64; i++)
+    {
+        if(minDistance != FLT_MAX)
+            break;
 		minNormal = normals[minFace];
 		minDistance = normals[minFace].w;
  
