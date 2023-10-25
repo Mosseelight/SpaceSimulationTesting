@@ -115,9 +115,9 @@ int main()
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
     
-    for (int i = -5; i < 5 + (100 * 0); i += 3)
+    for (int i = -10; i < 10 + (100 * 0); i += 3)
     {
-        for (int g = -5; g < 5 + (100 * 0); g += 3)
+        for (int g = -10; g < 10 + (100 * 0); g += 3)
         {
             mainScene.AddSpatialObject(LoadModel(glm::vec3(i,3,g), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
         }
