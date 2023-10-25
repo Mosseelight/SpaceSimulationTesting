@@ -4,6 +4,17 @@
 #include "../Debug.hpp"
 #include "../Math.hpp"
 
-std::pair<bool, glm::vec3> CollisionCheckNarrow(SpatialObject& own, SpatialObject& other);
+class CollisionPoint
+{
+public:
+    glm::vec3 point;
+    float dist;
+
+    CollisionPoint();
+    CollisionPoint(glm::vec3 point, float dist);
+    ~CollisionPoint();
+};
+
+std::pair<bool, CollisionPoint> CollisionCheckNarrow(SpatialObject& own, SpatialObject& other);
 bool CollisionCheckBroad(SpatialObject& own, SpatialObject& other);
 bool CollisionCheckBroader(SpatialObject& own, SpatialObject& other);

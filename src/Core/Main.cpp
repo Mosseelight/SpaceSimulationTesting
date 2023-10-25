@@ -71,7 +71,7 @@ int main()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
     
-    SDL_Window* window = SDL_CreateWindow("SpaceSim", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCRWIDTH, SCRHEIGHT, SDL_WINDOW_OPENGL);
+    SDL_Window* window = SDL_CreateWindow("Spatial Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCRWIDTH, SCRHEIGHT, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(window);
     SDL_GL_SetSwapInterval(vsync);
     gladLoadGL();
@@ -100,9 +100,9 @@ int main()
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
     unsigned int count = 0;
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 1; i++)
     {
-        for (int g = 0; g < 3; g++)
+        for (int g = 0; g < 1; g++)
         {
             mainScene.AddSpatialObject(LoadModel(glm::vec3(i * 100, -0.7f, g * 100), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
             mainScene.SpatialObjects[count].SO_rigidbody.isStatic = true;
@@ -114,9 +114,9 @@ int main()
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
     
-    for (int i = -48; i < 48 + (100 * 2); i += 3)
+    for (int i = -48; i < 48 + (100 * 0); i += 3)
     {
-        for (int g = -48; g < 48 + (100 * 2); g += 3)
+        for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
             mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,3,g), glm::vec3(0,0,0)));
         }
@@ -196,7 +196,7 @@ void Render(SDL_Window* window)
     glClearColor(0.0f, 0.54f, 0.54f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDepthFunc(GL_LESS);
-    glCullFace(GL_FRONT);
+    //glCullFace(GL_FRONT);
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     if(showWireFrame)
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
