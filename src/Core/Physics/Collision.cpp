@@ -20,7 +20,6 @@ bool CollisionCheckBroader(SpatialObject& own, SpatialObject& other)
     return false;
 }
 
-
 struct Simplex
 {
     glm::vec3 a, b, c, d;
@@ -50,6 +49,7 @@ CollisionPoint::~CollisionPoint()
 }
 
 glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir);
+glm::vec3 GetSupportPointNonTrans(SpatialObject& object, glm::vec3 dir);
 bool NextSimplex(Simplex& simplex, glm::vec3& direction);
 bool SameLine(glm::vec3 dir, glm::vec3 ao);
 bool Simplex2(Simplex& simplex, glm::vec3& direction);
@@ -155,15 +155,15 @@ CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& 
 
 	while(minDistance == FLT_MAX)
 	{
-		if(count >= 64)
+		if(count >= 1024)
 			break;
 		minNormal = normals[minFace];
 		minDistance = normals[minFace].w;
  
-		glm::vec3 support = GetSupportPoint(own, minNormal) - GetSupportPoint(other, -minNormal);
+		glm::vec3 support = GetSupportPointNonTrans(own, minNormal) - GetSupportPointNonTrans(other, -minNormal);
 		float sDistance = dot(minNormal, support);
  
-		if (abs(sDistance - minDistance) > 0.001f)
+		if (abs(sDistance - minDistance) > 0.00001f)
         {
 			minDistance = FLT_MAX;
             std::vector<std::pair<unsigned int, unsigned int>> uniqueEdges;
@@ -223,7 +223,7 @@ CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& 
 		count++;
 	}
 	
-	return CollisionPoint(minNormal, minDistance + 0.001f);
+	return CollisionPoint(minNormal, minDistance + 0.00001f);
 }
 
 bool NextSimplex(Simplex& simplex, glm::vec3& direction)
@@ -359,8 +359,24 @@ glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir)
         }
     }
     return TransformVec4(glm::vec4(maxP, 1.0f), object.SO_mesh.modelMatrix);
-    
 }
+
+glm::vec3 GetSupportPointNonTrans(SpatialObject& object, glm::vec3 dir)
+{
+    glm::vec3 maxP;
+    float maxDist = FLT_MIN;
+    for (unsigned int i = 0; i < object.SO_mesh.vertexes.size(); i++)
+    {
+        float distance = dot(object.SO_mesh.vertexes[i].position, dir);
+        if(distance > maxDist)
+        {
+            maxDist = distance;
+            maxP = object.SO_mesh.vertexes[i].position;
+        }
+    }
+    return maxP;
+}
+
 
 bool SameLine(glm::vec3 dir, glm::vec3 ao)
 {
