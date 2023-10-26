@@ -1,6 +1,6 @@
 #include "../../include/Core/Physics/SpatialPhysics.hpp"
 
-void RunSimulation(float deltaTime, Scene& scene)
+void RunSimulation(float deltaTime, Scene& scene, int runSim)
 {
     static std::vector<unsigned int> ids;
     static float totalTime;
@@ -14,7 +14,8 @@ void RunSimulation(float deltaTime, Scene& scene)
         for (unsigned int i = 0; i < scene.SpatialObjects.size(); i++)
         {
             ids = cManager.FindObjectsInChunk(scene.SpatialObjects, scene.SpatialObjects[i].SO_id);
-            scene.SpatialObjects[i].SO_rigidbody.Step(PhysicsStep * PhysicsSpeed, ids, scene.SpatialObjects, scene.SpatialObjects[i]);
+            if(runSim == 1)
+                scene.SpatialObjects[i].SO_rigidbody.Step(PhysicsStep * PhysicsSpeed, ids, scene.SpatialObjects, scene.SpatialObjects[i]);
             scene.SpatialObjects[i].SO_mesh.position = scene.SpatialObjects[i].SO_rigidbody.position;
             scene.SpatialObjects[i].SO_mesh.rotation = scene.SpatialObjects[i].SO_rigidbody.rotation;
             scene.SpatialObjects[i].SO_rigidbody.boundbox.ConstructBoundingBox(scene.SpatialObjects[i].SO_mesh);

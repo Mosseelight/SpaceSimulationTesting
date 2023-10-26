@@ -11,26 +11,32 @@ BoundingBox::BoundingBox()
     min = glm::vec3(0);
 }
 
+
 void BoundingBox::ConstructBoundingBox(Mesh& mesh)
 {
-    float xArr[mesh.vertexes.size()];
-    float yArr[mesh.vertexes.size()];
-    float zArr[mesh.vertexes.size()];
-    glm::mat4 mat = mesh.modelMatrix;
+    glm::vec3 mintmp = glm::vec3(FLT_MAX);
+    glm::vec3 maxtmp = glm::vec3(FLT_MIN);
     for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
     {
-        glm::vec3 vertexPos = TransformVec4(glm::vec4(mesh.vertexes[i].position, 1.0f), mat);
-        xArr[i] = vertexPos.x;
-        yArr[i] = vertexPos.y;
-        zArr[i] = vertexPos.z;
+        glm::vec3 vertexPos = TransformVec4(glm::vec4(mesh.vertexes[i].position, 1.0f), mesh.rotMatrix);
+
+        if (vertexPos.x < mintmp.x)
+            mintmp.x = vertexPos.x;
+        if (vertexPos.y < mintmp.y)
+            mintmp.y = vertexPos.y;
+        if (vertexPos.z < mintmp.z)
+            mintmp.z = vertexPos.z;
+
+        if (vertexPos.x > maxtmp.x)
+            maxtmp.x = vertexPos.x;
+        if (vertexPos.y > maxtmp.y)
+            maxtmp.y = vertexPos.y;
+        if (vertexPos.z > maxtmp.z)
+            maxtmp.z = vertexPos.z;
     }
 
-    std::sort(xArr, xArr + mesh.vertexes.size());
-    std::sort(yArr, yArr + mesh.vertexes.size());
-    std::sort(zArr, zArr + mesh.vertexes.size());
-    
-    min = glm::vec3(xArr[0], yArr[0], zArr[0]);
-    max = glm::vec3(xArr[mesh.vertexes.size() - 1], yArr[mesh.vertexes.size() - 1], zArr[mesh.vertexes.size() - 1]);
+    min = mintmp + mesh.position * mesh.scale;
+    max = maxtmp + mesh.position * mesh.scale;
 }
 
 

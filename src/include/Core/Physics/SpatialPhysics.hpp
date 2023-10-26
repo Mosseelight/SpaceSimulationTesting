@@ -3,4 +3,4 @@
 #include "../Scene.hpp"
 #include "Chunks.hpp"
 
-void RunSimulation(float deltaTime, Scene& scene);
+void RunSimulation(float deltaTime, Scene& scene, int runSim);
