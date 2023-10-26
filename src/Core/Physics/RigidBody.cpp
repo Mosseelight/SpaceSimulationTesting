@@ -13,7 +13,6 @@ BoundingBox::BoundingBox()
 
 void BoundingBox::ConstructBoundingBox(Mesh& mesh)
 {
-
     float xArr[mesh.vertexes.size()];
     float yArr[mesh.vertexes.size()];
     float zArr[mesh.vertexes.size()];
@@ -78,13 +77,12 @@ void RigidBody::Step(float timeStep, std::vector<unsigned int>& objectIds, std::
             {
                 if(CollisionCheckBroad(own, objects[objectIds[i]]))
                 {
-                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrow(own, objects[objectIds[i]]);
-                    if(point.first)
-                    {
-                        glm::vec3 vel = velocity;
+                    //std::pair<bool, CollisionPoint> point = CollisionCheckNarrow(own, objects[objectIds[i]]);
+                    //if(point.first)
+                    //{
                         velocity = glm::vec3(0);
-                        ApplyImpulseForce(-point.second.point, 2.0f);
-                    }
+                        ApplyImpulseForce(-totalForce, 2.0f);
+                    //}
                 }
             }
         }

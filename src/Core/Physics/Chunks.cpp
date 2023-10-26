@@ -49,7 +49,10 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                 spanCount++;
                 glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
                 glm::vec3 max = objects[i].SO_rigidbody.boundbox.max;
-                for (int x = min.x; x < max.x; x += ChunkSize)
+                
+                // This is really stupid I need to find a better way
+
+                if(min.x == 0 && max.x == 0)
                 {
                     for (int y = min.y; y < max.y; y += ChunkSize)
                     {
@@ -58,6 +61,45 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                             spatialLookup.push_back(std::make_pair(0, 0));
                             startLookup.push_back(0);
                             offset++;
+                        }
+                    }
+                }
+                else if(min.y == 0 && max.y == 0)
+                {
+                    for (int x = min.x; x < max.x; x += ChunkSize)
+                    {
+                        for (int z = min.z; z < max.z; z += ChunkSize)
+                        {
+                            spatialLookup.push_back(std::make_pair(0, 0));
+                            startLookup.push_back(0);
+                            offset++;
+                        }
+                    }
+                }
+                else if(min.z == 0 && max.z == 0)
+                {
+                    for (int x = min.x; x < max.x; x += ChunkSize)
+                    {
+                        for (int y = min.y; y < max.y; y += ChunkSize)
+                        {
+                            spatialLookup.push_back(std::make_pair(0, 0));
+                            startLookup.push_back(0);
+                            offset++;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int x = min.x; x < max.x; x += ChunkSize)
+                    {
+                        for (int y = min.y; y < max.y; y += ChunkSize)
+                        {
+                            for (int z = min.z; z < max.z; z += ChunkSize)
+                            {
+                                spatialLookup.push_back(std::make_pair(0, 0));
+                                startLookup.push_back(0);
+                                offset++;
+                            }
                         }
                     }
                 }
@@ -83,17 +125,66 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
             glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
             glm::vec3 max = objects[i].SO_rigidbody.boundbox.max;
             unsigned int count = 0;
-            for (int x = min.x; x < max.x; x += ChunkSize)
+
+            // find a replacement for the if statements if there is any
+
+            if(min.x == 0 && max.x == 0)
             {
                 for (int y = min.y; y < max.y; y += ChunkSize)
                 {
                     for (int z = min.z; z < max.z; z += ChunkSize)
                     {
-                        glm::vec3 pos = getChunkpos(glm::vec3(x,y,z));
+                        glm::vec3 pos = getChunkpos(glm::vec3(0,y,z));
                         unsigned int key = getKeyVal(getHashVal(pos));
                         spatialLookup[objects.size() - 1 + count + chunkOffsets[i]] = std::make_pair(key, i);
                         startLookup[objects.size() - 1 + count + chunkOffsets[i]] = UINT32_MAX;
                         count++;
+                    }
+                }
+            }
+            else if(min.y == 0 && max.y == 0)
+            {
+                for (int x = min.x; x < max.x; x += ChunkSize)
+                {
+                    for (int z = min.z; z < max.z; z += ChunkSize)
+                    {
+                        glm::vec3 pos = getChunkpos(glm::vec3(x,0,z));
+                        unsigned int key = getKeyVal(getHashVal(pos));
+                        spatialLookup[objects.size() - 1 + count + chunkOffsets[i]] = std::make_pair(key, i);
+                        startLookup[objects.size() - 1 + count + chunkOffsets[i]] = UINT32_MAX;
+                        count++;
+                    }
+                }
+            }
+            else if(min.z == 0 && max.z == 0)
+            {
+                for (int x = min.x; x < max.x; x += ChunkSize)
+                {
+                    for (int y = min.y; y < max.y; y += ChunkSize)
+                    {
+                        glm::vec3 pos = getChunkpos(glm::vec3(x,y,0));
+                        unsigned int key = getKeyVal(getHashVal(pos));
+                        spatialLookup[objects.size() - 1 + count + chunkOffsets[i]] = std::make_pair(key, i);
+                        startLookup[objects.size() - 1 + count + chunkOffsets[i]] = UINT32_MAX;
+                        count++;
+                    }
+                }
+            }
+            else
+            {
+                for (int x = min.x; x < max.x; x += ChunkSize)
+                {
+                    for (int y = min.y; y < max.y; y += ChunkSize)
+                    {
+                        for (int z = min.z; z < max.z; z += ChunkSize)
+                        {
+                            std::cout << "test" << std::endl;
+                            glm::vec3 pos = getChunkpos(glm::vec3(x,y,z));
+                            unsigned int key = getKeyVal(getHashVal(pos));
+                            spatialLookup[objects.size() - 1 + count + chunkOffsets[i]] = std::make_pair(key, i);
+                            startLookup[objects.size() - 1 + count + chunkOffsets[i]] = UINT32_MAX;
+                            count++;
+                        }
                     }
                 }
             }
