@@ -112,17 +112,17 @@ int main()
         }
     }
 
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,0,0), glm::vec3(0), modelLoc + "Bunny.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(3,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
     
-    for (int i = -48; i < 48 + (100 * 0); i += 3)
+    /*for (int i = -48; i < 48 + (100 * 0); i += 3)
     {
         for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
             mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,3,g), glm::vec3(0,0,0)));
         }
-    }
+    }*/
 
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
@@ -272,6 +272,9 @@ void input()
                 break;
             case SDLK_t:
                 runningSim *= -1;
+                break;
+            case SDLK_y:
+                RunSimulation(deltaTime, mainScene, 1);
                 break;
             }
             break;

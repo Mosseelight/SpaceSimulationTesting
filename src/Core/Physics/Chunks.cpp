@@ -50,11 +50,11 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                 glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
                 glm::vec3 max = objects[i].SO_rigidbody.boundbox.max;
                 
-                for (float x = min.x; x < max.x + 0.001f; x += ChunkSize)
+                for (float x = min.x; x < max.x + 0.0001f; x += ChunkSize)
                 {
-                    for (float y = min.y; y < (max.y + 0.001f); y += ChunkSize)
+                    for (float y = min.y; y < (max.y + 0.0001f); y += ChunkSize)
                     {
-                        for (float z = min.z; z < max.z + 0.001f; z += ChunkSize)
+                        for (float z = min.z; z < max.z + 0.0001f; z += ChunkSize)
                         {
                             spatialLookup.push_back(std::make_pair(0, 0));
                             startLookup.push_back(0);
@@ -85,11 +85,11 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
             glm::vec3 max = objects[i].SO_rigidbody.boundbox.max;
             unsigned int count = 0;
 
-            for (float x = min.x; x < max.x + 0.001f; x += ChunkSize)
+            for (float x = min.x; x < max.x + 0.0001f; x += ChunkSize)
             {
-                for (float y = min.y; y < max.y + 0.001f; y += ChunkSize)
+                for (float y = min.y; y < max.y + 0.0001f; y += ChunkSize)
                 {
-                    for (float z = min.z; z < max.z + 0.001f; z += ChunkSize)
+                    for (float z = min.z; z < max.z + 0.0001f; z += ChunkSize)
                     {
                         glm::vec3 pos = getChunkpos(glm::vec3(x,y,z));
                         unsigned int key = getKeyVal(getHashVal(pos));

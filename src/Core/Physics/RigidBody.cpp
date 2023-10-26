@@ -83,12 +83,14 @@ void RigidBody::Step(float timeStep, std::vector<unsigned int>& objectIds, std::
             {
                 if(CollisionCheckBroad(own, objects[objectIds[i]]))
                 {
-                    //std::pair<bool, CollisionPoint> point = CollisionCheckNarrow(own, objects[objectIds[i]]);
-                    //if(point.first)
-                    //{
+                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrow(own, objects[objectIds[i]]);
+                    if(point.first)
+                    {
                         velocity = glm::vec3(0);
-                        ApplyImpulseForce(-totalForce, 2.0f);
-                    //}
+                        position += point.second.point.x * (point.second.dist);
+                        //ApplyImpulseForce(-point.second.point, 1.0f);
+                        std::cout << point.second.point.x << " " << point.second.point.y << " " << point.second.point.z << std::endl;
+                    }
                 }
             }
         }
