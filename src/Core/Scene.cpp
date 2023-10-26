@@ -108,7 +108,6 @@ void Scene::DrawSingle(Shader *shader, glm::mat4 view, glm::mat4 proj, glm::vec3
         shader->setVec3("ViewPos", camPos);
         shader->setMat4("proj", proj);
         shader->setMat4("view", view);
-        shader->setMat4("normalMat", SpatialObjects[i].SO_mesh.modelMatrix);
         SpatialObjects[i].SO_mesh.DrawMesh();
     }
     

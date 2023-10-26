@@ -11,7 +11,6 @@ out vec2 uv;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
-uniform mat4 normalMat;
 
 void main()
 {
