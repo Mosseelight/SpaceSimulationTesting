@@ -17,7 +17,7 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
     glm::vec3 maxtmp = glm::vec3(FLT_MIN);
     for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
     {
-        glm::vec3 vertexPos = TransformVec4(glm::vec4(mesh.vertexes[i].position, 1.0f), mesh.modelMatrix);
+        glm::vec3 vertexPos = TransformVec4(glm::vec4(mesh.vertexes[i].position, 1.0f), mesh.rotMatrix);
 
         if (vertexPos.x < mintmp.x)
             mintmp.x = vertexPos.x;
@@ -34,8 +34,10 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
             maxtmp.z = vertexPos.z;
     }
 
-    min = mintmp;
-    max = maxtmp;
+    min = mintmp + mesh.position * mesh.scale;
+    max = maxtmp + mesh.position * mesh.scale;
+    DrawDebugCube(min, 0.3f, glm::vec3(255,0,0));
+    DrawDebugCube(max, 0.3f, glm::vec3(0,0,255));
 }
 
 void BoundingBox::ConstructOrientiedBox(SpatialObject& object)
@@ -85,6 +87,8 @@ RigidBody::RigidBody()
     rotAcceleration = glm::vec3(0.0f);
     totalForce = glm::vec3(0.0f);
     isStatic = false;
+    boundbox = BoundingBox();
+    ooBoundBox = BoundingBox();
 }
 
 RigidBody::~RigidBody()
@@ -122,7 +126,7 @@ void RigidBody::Step(float timeStep, std::vector<unsigned int>& objectIds, std::
                     {
                         velocity = glm::vec3(0);
                         own.SO_rigidbody.position += -point.second.point * (point.second.dist * 0.5f);
-                        //ApplyImpulseForce(-point.second.point, 2.0f);
+                        ApplyImpulseForce(-point.second.point, 2.0f);
                     }
                 }
             }

@@ -376,35 +376,6 @@ glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir, unsigned int typ
 			}
 			break;
 		}
-	
-	default:
-		{
-			float maxDist = FLT_MIN;
-			glm::vec3 max = object.SO_rigidbody.ooBoundBox.max;
-			glm::vec3 min = object.SO_rigidbody.ooBoundBox.min;
-			glm::vec3 bounds[8] = 
-			{
-				max,
-				glm::vec3(max.x, min.y, max.z),
-				glm::vec3(min.x, max.y, max.z),
-				glm::vec3(min.x, min.y, max.z),
-				glm::vec3(max.x, max.y, min.z),
-				glm::vec3(max.x, min.y, min.z),
-				glm::vec3(min.x, max.y, min.z),
-				min
-
-			};
-			for (unsigned int i = 0; i < 8; i++)
-			{
-				float distance = dot(bounds[i], dir);
-				if(distance > maxDist)
-				{
-					maxDist = distance;
-					maxP = bounds[i];
-				}
-			}
-			break;
-		}
 	}
 
     return TransformVec4(glm::vec4(maxP, 1.0f), object.SO_mesh.modelMatrix);
