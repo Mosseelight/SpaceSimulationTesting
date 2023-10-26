@@ -20,7 +20,6 @@ public:
     BoundingBox();
 
     void ConstructBoundingBox(Mesh& mesh);
-    void ConstructOrientiedBox(SpatialObject& object);
 };
 
 class RigidBody
@@ -30,7 +29,6 @@ private:
 public:
 
     BoundingBox boundbox;
-    BoundingBox ooBoundBox;
     std::vector<Vertex> collisionShape;
     bool isStatic;
 

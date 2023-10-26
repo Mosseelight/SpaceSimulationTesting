@@ -33,7 +33,6 @@
 #define GetTime() SDL_GetTicks64() / 1000.0f
 
 bool DebugWindow = false;
-int simRunning = 1;
 bool showWireFrame = false;
 float currentTime = 0.0f;
 float deltaTime = 0.0f;
@@ -178,7 +177,7 @@ void UpdateLogic(SDL_Window* window)
         mainScene.SpatialObjects[i].SO_mesh.CreateRotationMat();
     }
 
-    RunSimulation(deltaTime, mainScene, simRunning);
+    RunSimulation(deltaTime, mainScene);
 
     player->UpdatePlayer();
     input();
@@ -269,9 +268,6 @@ void input()
                 break;
             case SDLK_LSHIFT:
                 player->Movement(SDLK_LSHIFT, deltaTime);
-                break;
-            case SDLK_t:
-                simRunning *= -1;
                 break;
             }
             break;
