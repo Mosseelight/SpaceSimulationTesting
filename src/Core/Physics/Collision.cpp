@@ -138,7 +138,7 @@ void AddIfUniqueEdge(std::vector<std::pair<unsigned int, unsigned int>>& edges, 
 
 CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& other)
 {
-    std::vector<glm::vec3> polytope {a.a, a.b, a.c, a.d};
+    std::vector<glm::vec3> polytope = {a.a, a.b, a.c, a.d};
     std::vector<unsigned int> faces = 
 	{
 		0, 1, 2,
@@ -156,11 +156,11 @@ CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& 
 	while(minDistance == FLT_MAX)
 	{
 		if(count >= 1024)
-			break;
+		//	break;
 		minNormal = normals[minFace];
 		minDistance = normals[minFace].w;
  
-		glm::vec3 support = GetSupportPointNonTrans(own, minNormal) - GetSupportPointNonTrans(other, -minNormal);
+		glm::vec3 support = GetSupportPoint(own, minNormal) - GetSupportPoint(other, -minNormal);
 		float sDistance = dot(minNormal, support);
  
 		if (abs(sDistance - minDistance) > 0.00001f)
@@ -223,6 +223,7 @@ CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& 
 		count++;
 	}
 	
+    std::cout << minDistance << std::endl;
 	return CollisionPoint(minNormal, minDistance + 0.00001f);
 }
 
