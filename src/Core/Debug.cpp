@@ -144,7 +144,6 @@ void DrawDebugCube(glm::vec3 pos, float scale, glm::vec3 color)
         };
     
 	float points[6 * 36];
-    unsigned int counter = 0;
     for (unsigned int i = 0; i < 36; i++)
     {
         for (unsigned int j = 0; j < 6; j++)

@@ -9,7 +9,7 @@ void Texture::LoadTexture(std::string location)
 {
     SDL_Surface *image;
     GLenum textureFormat;
-    GLenum pixelSize;
+    GLenum pixelSize = 3;
     int bpp;
     image = IMG_Load(location.c_str());
     if(image == nullptr)
@@ -24,7 +24,7 @@ void Texture::LoadTexture(std::string location)
         else
             textureFormat = GL_BGRA;
     }
-    else if (bpp == 3)
+    if (bpp == 3)
     {
         pixelSize = GL_RGB;
         if (image->format->Rmask == 0x000000ff)

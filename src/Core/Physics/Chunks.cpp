@@ -12,11 +12,25 @@ ChunkManager::~ChunkManager()
 
 std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialObject>& objects, unsigned int objectID)
 {
-    //use the start lookup array maybe?
     std::vector<unsigned int> objectsInSameChunk;
     glm::vec3 pos = getChunkpos(objects[objectID].SO_rigidbody.position);
     unsigned int key = getKeyVal(getHashVal(pos));
     unsigned int startIndex = startLookup[key];
+
+    for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
+    {
+        unsigned int currentKey = spatialLookup[i].first;
+        if (currentKey == key && objects[spatialLookup[i].second].SO_id != objectID)
+            objectsInSameChunk.push_back(objects[spatialLookup[i].second].SO_id);
+            
+        else
+            break;
+    }
+
+    //get objects in chunk that is ahead of the current object
+    pos = getChunkpos(objects[objectID].SO_rigidbody.position + objects[objectID].SO_rigidbody.velocity * ChunkSize);
+    key = getKeyVal(getHashVal(pos));
+    startIndex = startLookup[key];
 
     for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
     {
@@ -30,14 +44,15 @@ std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialOb
     return objectsInSameChunk;
 }
 
-unsigned int objectCount = 0;
 void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
 {
+    static unsigned int objectCount = 0;
 
     //array space allocation to fit any new objects or objects that span multiple chunks
-    if(objectCount == 0 || objectCount != objects.size())
+    if(objectCount != objects.size())
     {
         spatialLookup.resize(objects.size());
+        startLookup.clear();
         startLookup.resize(objects.size());
         chunkOffsets.resize(objects.size() + 1);
         unsigned int spanCount = 0;
@@ -116,7 +131,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
         if(key != keyPrev)
             startLookup[key] = i;
     }
-    
+
     objectCount = objects.size();
 }
 

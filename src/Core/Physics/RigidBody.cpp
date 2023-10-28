@@ -79,6 +79,7 @@ void RigidBody::Step(float timeStep, std::vector<unsigned int>& objectIds, std::
     {
         if(own.SO_id != objects[objectIds[i]].SO_id)
         {
+            //DrawDebugCube(objects[objectIds[i]].SO_rigidbody.position, 0.1f, glm::vec3(i / 255, 0, 0));
             if(CollisionCheckBroader(own, objects[objectIds[i]]))
             {
                 if(CollisionCheckBroad(own, objects[objectIds[i]]))

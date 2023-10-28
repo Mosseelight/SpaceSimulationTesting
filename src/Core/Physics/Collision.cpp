@@ -92,7 +92,7 @@ std::pair<std::vector<glm::vec4>, unsigned int> GetTriNormal(std::vector<glm::ve
     std::vector<glm::vec4> normals;
 	unsigned int minTriangle = 0;
 	float  minDistance = FLT_MAX;
-
+    
 	for (unsigned int i = 0; i < faces.size(); i += 3) 
     {
 		glm::vec3 a = polytope[faces[i]];
@@ -104,7 +104,7 @@ std::pair<std::vector<glm::vec4>, unsigned int> GetTriNormal(std::vector<glm::ve
 
 		if (distance < 0) 
         {
-			normal   *= -1;
+			normal *= -1;
 			distance *= -1;
 		}
 
@@ -125,14 +125,9 @@ void AddIfUniqueEdge(std::vector<std::pair<unsigned int, unsigned int>>& edges, 
 	auto reverse = std::find(edges.begin(), edges.end(), std::make_pair(faces[b], faces[a]));
  
 	if (reverse != edges.end()) 
-    {
 		edges.erase(reverse);
-	}
- 
 	else 
-    {
 		edges.emplace_back(faces[a], faces[b]);
-	}
 }
 
 
@@ -155,10 +150,13 @@ CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& 
 
 	while(minDistance == FLT_MAX)
 	{
-		if(count >= 1024)
-		//	break;
-		minNormal = normals[minFace];
-		minDistance = normals[minFace].w;
+        //this if statement somehow makes it so that it does not break and I dont know why
+        //Do Not Remove It
+		if(count > 3)
+        {
+            minNormal = normals[minFace];
+            minDistance = normals[minFace].w;
+        }
  
 		glm::vec3 support = GetSupportPoint(own, minNormal) - GetSupportPoint(other, -minNormal);
 		float sDistance = dot(minNormal, support);
@@ -223,7 +221,6 @@ CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& 
 		count++;
 	}
 	
-    std::cout << minDistance << std::endl;
 	return CollisionPoint(minNormal, minDistance + 0.00001f);
 }
 
@@ -383,4 +380,3 @@ bool SameLine(glm::vec3 dir, glm::vec3 ao)
 {
     return dot(dir, ao) > 0;
 }
-
