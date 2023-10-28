@@ -125,7 +125,7 @@ int main()
     {
         for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
-            for (int j = 3; j < 50; j += 5)
+            for (int j = 3; j < 15; j += 3)
             {
                 mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j,g), glm::vec3(0,0,0)));
             }
@@ -134,9 +134,6 @@ int main()
 
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
-        mainScene.SpatialObjects[i].SO_mesh.CreateModelMat();
-        mainScene.SpatialObjects[i].SO_mesh.CreateRotationMat();
-        mainScene.SpatialObjects[i].SO_rigidbody.boundbox.ConstructBoundingBox(mainScene.SpatialObjects[i].SO_mesh);
         vertCount += mainScene.SpatialObjects[i].SO_mesh.vertexes.size();
         indCount += mainScene.SpatialObjects[i].SO_mesh.indices.size();
     }
