@@ -10,14 +10,21 @@ Basic physics
         make gjk faster
         maybe add a way for high mesh counts over like 500 tris to use the oobb gjk method
         switch to oobb instead of aabb as getting the box is much quicker?
+        contunuis collision check
+        Collision Response
+
+    More rigidbody functions?
+    Mesh updating in the gpu subBuffer()?
+    
+
         
     raycasting
         from screen to world and world to screen
     
-    Lights
-    
-
+__________________________
 Fix Shader not lighting objects under -1 y
+lights
+shader matrix issues
 __________________________
 console and logging system
 

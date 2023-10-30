@@ -9,6 +9,7 @@
 #include <vector>
 #include <chrono>
 
+
 struct DebugShaderStuff
 {
     glm::mat4 m_proj;
@@ -16,6 +17,7 @@ struct DebugShaderStuff
     std::string m_shaderLoc;
 };
 
+std::vector<std::string>* GetLogContent();
 void DebugLog(std::string content);
 void CreateFileLog(std::string location);
 void DrawDebugLine(glm::vec3 start, glm::vec3 end, glm::vec3 color);

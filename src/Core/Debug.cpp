@@ -13,6 +13,11 @@ enum types
     Cube = 36
 };
 
+std::vector<std::string>* GetLogContent()
+{
+    return &logContent;
+}
+
 void DebugLog(std::string content)
 {
     logContent.push_back(content);
