@@ -44,12 +44,15 @@ public:
     glm::vec3 totalForce;
     glm::vec3 totalRotation;
 
+    float gForce;
+
     RigidBody();
     ~RigidBody();
-    void Step(float timeStep, std::vector<unsigned int>& objectIds, std::vector<SpatialObject>& objects, SpatialObject& own);
+    void Step(float timeStep, float deltaTime,  std::vector<unsigned int>& objectIds, std::vector<SpatialObject>& objects, SpatialObject& own);
     void ApplyForce(glm::vec3 force);
     void ApplyForceAtPos(glm::vec3 force, glm::vec3 pos);
     void ApplyImpulseForce(glm::vec3 dir, float power);
+    void ApplyImpulseForceAtPos(glm::vec3 dir, glm::vec3 pos, float power);
     void ApplyDragForce(float airDensity, float area);
 
     void ApplyRotationForce(glm::vec3 force);

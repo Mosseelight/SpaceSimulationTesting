@@ -87,6 +87,7 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrow(SpatialObject& own, Spatial
     return std::make_pair(false, CollisionPoint());
 }
 
+//fix this giving a empty array
 std::pair<std::vector<glm::vec4>, unsigned int> GetTriNormal(std::vector<glm::vec3>& polytope, std::vector<unsigned int>& faces)
 {
     std::vector<glm::vec4> normals;
@@ -146,6 +147,8 @@ CollisionPoint GetCollisionPoint(Simplex& a, SpatialObject& own, SpatialObject& 
 
     glm::vec3 minNormal;
 	float minDistance = FLT_MAX;
+
+    
 	unsigned int count = 0;
 
 	while(minDistance == FLT_MAX)

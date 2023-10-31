@@ -116,7 +116,7 @@ int main()
         }
     }
 
-    //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,3,0), glm::vec3(0,0,0)));
+    mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,30,0), glm::vec3(0,0,0)));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,25,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
@@ -127,7 +127,7 @@ int main()
         {
             for (int j = 3; j < 15; j += 3)
             {
-                mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j,g), glm::vec3(0,0,0)));
+                //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j,g), glm::vec3(0,0,0)));
             }
         }
     }
@@ -195,9 +195,7 @@ void Render(SDL_Window* window)
     {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();glEnable(GL_DEBUG_OUTPUT);
-glDebugMessageCallback(GLDebugMessageCallback, NULL);
-  
+        ImGui::NewFrame();
         ImguiMenu();
     }
 
@@ -405,6 +403,7 @@ void ImguiMenu()
                     ImGui::DragFloat3("Object RotationVelocity", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.rotVelocity), 0.0f, 0.0f, 0.0f);
                     ImGui::DragFloat3("Object RotationAcceleration", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.rotAcceleration), 0.1f, 100.0f, 100.0f);
                     ImGui::DragFloat3("Object NetForce", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.totalForce), 0.0f, 0.0f, 0.0f);
+                    ImGui::Text("Object is experiencing %.1fg's", mainScene.SpatialObjects[i].SO_rigidbody.gForce);
                     ImGui::TreePop();
                 }
             }

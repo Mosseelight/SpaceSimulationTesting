@@ -8,10 +8,11 @@ class CollisionPoint
 {
 public:
     glm::vec3 point;
+    glm::vec3 normal;
     float dist;
 
     CollisionPoint();
-    CollisionPoint(glm::vec3 point, float dist);
+    CollisionPoint(glm::vec3 normal, float dist);
     ~CollisionPoint();
 };
 

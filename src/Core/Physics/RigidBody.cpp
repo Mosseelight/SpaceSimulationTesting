@@ -51,6 +51,7 @@ RigidBody::RigidBody()
     rotAcceleration = glm::vec3(0.0f);
     totalForce = glm::vec3(0.0f);
     isStatic = false;
+    gForce = 0;
 }
 
 RigidBody::~RigidBody()
@@ -59,7 +60,7 @@ RigidBody::~RigidBody()
 }
 
 bool once = true;
-void RigidBody::Step(float timeStep, std::vector<unsigned int>& objectIds, std::vector<SpatialObject>& objects, SpatialObject& own)
+void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>& objectIds, std::vector<SpatialObject>& objects, SpatialObject& own)
 {
     if(isStatic)
         return;
@@ -86,12 +87,13 @@ void RigidBody::Step(float timeStep, std::vector<unsigned int>& objectIds, std::
                     std::pair<bool, CollisionPoint> point = CollisionCheckNarrow(own, objects[objectIds[i]]);
                     if(point.first)
                     {
+                        glm::vec3 vel = velocity;
                         velocity = glm::vec3(0);
                         glm::vec3 normal = -glm::normalize(point.second.point);
                         position += normal * point.second.dist;
-                        float bounce = 0.8f;
-                        float j = glm::dot(velocity * -(1 + bounce), normal) / ((1 / mass) + (1 / objects[objectIds[i]].SO_rigidbody.mass));
-                        ApplyImpulseForce(-glm::normalize(point.second.point), j);
+                        float bounce = 0.3f;
+                        float j = glm::dot(vel * -(1 + bounce), normal) / ((1 / mass) + (1 / objects[objectIds[i]].SO_rigidbody.mass));
+                        ApplyImpulseForce(normal, j);
                         break;
                     }
                 }
@@ -105,6 +107,8 @@ void RigidBody::Step(float timeStep, std::vector<unsigned int>& objectIds, std::
     Solver(rotVelocity, rotAcceleration * timeStep, 1.0f);
     Solver(rotation, rotVelocity * timeStep, 1.0f);
     Solver(position, velocity * timeStep, 1.0f);
+
+    gForce = glm::length(acceleration) / 9.81f;
 }
 
 void RigidBody::ApplyForce(glm::vec3 force)
@@ -121,6 +125,12 @@ void RigidBody::ApplyForceAtPos(glm::vec3 force, glm::vec3 pos)
 void RigidBody::ApplyImpulseForce(glm::vec3 dir, float power)
 {
     velocity += glm::normalize(dir) * power;
+}
+
+void RigidBody::ApplyImpulseForceAtPos(glm::vec3 dir, glm::vec3 pos, float power)
+{
+    velocity += glm::normalize(dir) * power;
+    ApplyRotationImpulseForce(glm::cross(pos, dir), power);
 }
 
 void RigidBody::ApplyDragForce(float airDensity, float area)
