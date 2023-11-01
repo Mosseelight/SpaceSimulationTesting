@@ -40,6 +40,7 @@ void Scene::AddSpatialObject(Mesh mesh)
     SpatialObjects[id].SO_mesh.CreateModelMat();
     SpatialObjects[id].SO_mesh.CreateRotationMat();
     SpatialObjects[id].SO_rigidbody.boundbox.ConstructBoundingBox(SpatialObjects[id].SO_mesh);
+    SpatialObjects[id].SO_rigidbody.oriBoundBox.ConstructOriBoundingBox(SpatialObjects[id].SO_mesh);
 
     if(SpatialObjects[id].GetSizeUsage() / 1024 < 1000)
         DebugLog("Added spatial object mesh: " + mesh.modelLocation + ", size: " + std::to_string(SpatialObjects[id].GetSizeUsage() / 1024.0f) + "kb");

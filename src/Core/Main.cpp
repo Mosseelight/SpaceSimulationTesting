@@ -116,8 +116,9 @@ int main()
         }
     }
 
-    mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,30,0), glm::vec3(0,0,0)));
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(-5,5,0), glm::vec3(0,0,0)));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,3,0), glm::vec3(0), modelLoc + "Teapot.obj"));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0.5f,10,0), glm::vec3(0), modelLoc + "Teapot.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,25,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
     
@@ -391,14 +392,11 @@ void ImguiMenu()
         {
             for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
             {
-                if (i == 0)
-                    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-
                 if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
                 {
-                    ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.position), 0.01f, -100000.0f, 100000.0f);
+                    ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.position), 0.05f, -100000.0f, 100000.0f);
                     ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.rotation), 0.1f, -360.0f, 360.0f);
-                    ImGui::DragFloat3("Object Velocity", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.velocity), 0.0f, 0.0f, 0.0f);
+                    ImGui::DragFloat3("Object Velocity", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.velocity), 0.5f, -1000.0f, 1000.0f);
                     ImGui::DragFloat3("Object Acceleration", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.acceleration), 0.1f, 100.0f, 100.0f);
                     ImGui::DragFloat3("Object RotationVelocity", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.rotVelocity), 0.0f, 0.0f, 0.0f);
                     ImGui::DragFloat3("Object RotationAcceleration", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.rotAcceleration), 0.1f, 100.0f, 100.0f);

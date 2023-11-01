@@ -16,10 +16,14 @@ private:
 public:
     glm::vec3 min;
     glm::vec3 max;
+    glm::vec3 minOri;
+    glm::vec3 maxOri;
+    bool foundBox;
 
     BoundingBox();
 
     void ConstructBoundingBox(Mesh& mesh);
+    void ConstructOriBoundingBox(Mesh& mesh);
 };
 
 class RigidBody
@@ -29,6 +33,7 @@ private:
 public:
 
     BoundingBox boundbox;
+    BoundingBox oriBoundBox;
     std::vector<Vertex> collisionShape;
     bool isStatic;
 

@@ -9,6 +9,9 @@ BoundingBox::BoundingBox()
 {
     max = glm::vec3(0);
     min = glm::vec3(0);
+    maxOri = glm::vec3(0);
+    minOri = glm::vec3(0);
+    foundBox = false;
 }
 
 
@@ -18,7 +21,7 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
     glm::vec3 maxtmp = glm::vec3(FLT_MIN);
     for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
     {
-        glm::vec3 vertexPos = TransformVec4(glm::vec4(mesh.vertexes[i].position, 1.0f), mesh.rotMatrix);
+        glm::vec3 vertexPos = TransformVec4(glm::vec4(mesh.vertexes[i].position, 1.0f), mesh.modelMatrix);
 
         if (vertexPos.x < mintmp.x)
             mintmp.x = vertexPos.x;
@@ -34,9 +37,50 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
         if (vertexPos.z > maxtmp.z)
             maxtmp.z = vertexPos.z;
     }
+    
+    min = mintmp;
+    max = maxtmp;
+}
 
-    min = mintmp + mesh.position * mesh.scale;
-    max = maxtmp + mesh.position * mesh.scale;
+void BoundingBox::ConstructOriBoundingBox(Mesh& mesh)
+{
+    if(!foundBox)
+    {
+        glm::vec3 mintmp = glm::vec3(FLT_MAX);
+        glm::vec3 maxtmp = glm::vec3(FLT_MIN);
+        for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
+        {
+            glm::vec3 vertexPos = mesh.vertexes[i].position;
+
+            if (vertexPos.x < mintmp.x)
+                mintmp.x = vertexPos.x;
+            if (vertexPos.y < mintmp.y)
+                mintmp.y = vertexPos.y;
+            if (vertexPos.z < mintmp.z)
+                mintmp.z = vertexPos.z;
+
+            if (vertexPos.x > maxtmp.x)
+                maxtmp.x = vertexPos.x;
+            if (vertexPos.y > maxtmp.y)
+                maxtmp.y = vertexPos.y;
+            if (vertexPos.z > maxtmp.z)
+                maxtmp.z = vertexPos.z;
+        }
+
+        minOri = mintmp;
+        maxOri = maxtmp;
+        foundBox = true;
+    }
+
+    min = TransformVec4(glm::vec4(minOri, 1.0f), mesh.modelMatrix);
+    max = TransformVec4(glm::vec4(maxOri, 1.0f), mesh.modelMatrix);
+
+    if(min.x > max.x || min.y > max.y || min.z > max.z)
+    {
+        glm::vec3 tmp = max;
+        max = min;
+        min = tmp;
+    }
 }
 
 
@@ -84,7 +128,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
             {
                 if(CollisionCheckBroad(own, objects[objectIds[i]]))
                 {
-                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrow(own, objects[objectIds[i]]);
+                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrow(own, objects[objectIds[i]], 0);
                     if(point.first)
                     {
                         glm::vec3 vel = velocity;

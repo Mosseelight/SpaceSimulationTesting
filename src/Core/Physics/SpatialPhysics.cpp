@@ -19,6 +19,7 @@ void RunSimulation(float deltaTime, Scene& scene, int runSim)
             scene.SpatialObjects[i].SO_mesh.position = scene.SpatialObjects[i].SO_rigidbody.position;
             scene.SpatialObjects[i].SO_mesh.rotation = scene.SpatialObjects[i].SO_rigidbody.rotation;
             scene.SpatialObjects[i].SO_rigidbody.boundbox.ConstructBoundingBox(scene.SpatialObjects[i].SO_mesh);
+            scene.SpatialObjects[i].SO_rigidbody.oriBoundBox.ConstructOriBoundingBox(scene.SpatialObjects[i].SO_mesh);
         }
         counter++;
 
