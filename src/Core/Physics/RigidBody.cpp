@@ -21,7 +21,7 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
     glm::vec3 maxtmp = glm::vec3(FLT_MIN);
     for (unsigned int i = 0; i < mesh.vertexes.size(); i++)
     {
-        glm::vec3 vertexPos = TransformVec4(glm::vec4(mesh.vertexes[i].position, 1.0f), mesh.modelMatrix);
+        glm::vec3 vertexPos = TransformVec4(glm::vec4(mesh.vertexes[i].position, 1.0f), mesh.rotMatrix);
 
         if (vertexPos.x < mintmp.x)
             mintmp.x = vertexPos.x;
@@ -38,8 +38,8 @@ void BoundingBox::ConstructBoundingBox(Mesh& mesh)
             maxtmp.z = vertexPos.z;
     }
     
-    min = mintmp;
-    max = maxtmp;
+    min = mintmp + mesh.position * mesh.scale;
+    max = maxtmp + mesh.position * mesh.scale;
 }
 
 void BoundingBox::ConstructOriBoundingBox(Mesh& mesh)
@@ -128,13 +128,14 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
             {
                 if(CollisionCheckBroad(own, objects[objectIds[i]]))
                 {
-                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrow(own, objects[objectIds[i]], 0);
+                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrowSat(own, objects[objectIds[i]]);
                     if(point.first)
                     {
                         glm::vec3 vel = velocity;
                         velocity = glm::vec3(0);
-                        glm::vec3 normal = -glm::normalize(point.second.point);
+                        glm::vec3 normal = -glm::normalize(point.second.normal);
                         position += normal * point.second.dist;
+                        std::cout << point.second.dist << std::endl;
                         float bounce = 0.3f;
                         float j = glm::dot(vel * -(1 + bounce), normal) / ((1 / mass) + (1 / objects[objectIds[i]].SO_rigidbody.mass));
                         ApplyImpulseForce(normal, j);

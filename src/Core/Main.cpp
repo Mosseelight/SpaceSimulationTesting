@@ -128,7 +128,7 @@ int main()
         {
             for (int j = 3; j < 15; j += 3)
             {
-                //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j,g), glm::vec3(0,0,0)));
+                mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j,g), glm::vec3(0,0,0)));
             }
         }
     }
