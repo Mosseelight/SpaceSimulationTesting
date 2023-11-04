@@ -12,6 +12,7 @@ void Texture::LoadTexture(std::string location)
     GLenum pixelSize;
     int bpp = 3;
     unsigned char pixels[64][64][3];
+    bool noImage = false;
     image = IMG_Load(location.c_str());
     if(image == nullptr)
     {
@@ -19,6 +20,7 @@ void Texture::LoadTexture(std::string location)
         image = SDL_CreateRGBSurface(0, 64, 64, 8, 0, 0, 0, 0);
         pixelSize = GL_RGB;
         textureFormat = GL_RGB;
+        noImage = true;
         for (unsigned int x = 0; x < 64; x++)
         {
             for (unsigned int y = 0; y < 64; y++)
@@ -64,7 +66,7 @@ void Texture::LoadTexture(std::string location)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
-    if(image == nullptr)
+    if(noImage)
         glTexImage2D(GL_TEXTURE_2D, 0, pixelSize, image->w, image->h, 0, textureFormat, GL_UNSIGNED_BYTE, pixels);
     else
         glTexImage2D(GL_TEXTURE_2D, 0, pixelSize, image->w, image->h, 0, textureFormat, GL_UNSIGNED_BYTE, image->pixels);
