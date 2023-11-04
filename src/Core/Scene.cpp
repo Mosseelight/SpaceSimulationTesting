@@ -109,7 +109,7 @@ void Scene::DrawSingle(Shader *shader, glm::mat4 view, glm::mat4 proj, glm::vec3
     for (unsigned int i = 0; i < SpatialObjects.size(); i++)
     {
         shader->setMat4("model", SpatialObjects[i].SO_mesh.modelMatrix);
-        shader->setVec3("color", glm::vec3(0.0f, 1.0f, 0.0f));
+        shader->setVec3("color", glm::vec3(1.0f, 1.0f, 1.0f));
         shader->setVec3("ViewPos", camPos);
         shader->setMat4("proj", proj);
         shader->setMat4("view", view);
