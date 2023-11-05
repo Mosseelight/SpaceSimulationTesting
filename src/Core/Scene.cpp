@@ -203,7 +203,7 @@ void Scene::SaveScene(std::string location, std::string name)
         WriteFile(location + name, "MR " + std::to_string(SpatialObjects[i].SO_mesh.rotation.x) + "/" + std::to_string(SpatialObjects[i].SO_mesh.rotation.y) + "/" + std::to_string(SpatialObjects[i].SO_mesh.rotation.z));
         WriteFile(location + name, "MS " + std::to_string(SpatialObjects[i].SO_mesh.scale));
         WriteFile(location + name, "TL " + SpatialObjects[i].SO_texture.textLocation);
-        WriteFile(location + name, "RS " + (int)SpatialObjects[i].SO_rigidbody.isStatic);
+        WriteFile(location + name, "RS " + std::to_string(SpatialObjects[i].SO_rigidbody.isStatic));
         WriteFile(location + name, "RM " + std::to_string(SpatialObjects[i].SO_rigidbody.mass));
         WriteFile(location + name, "RV " + std::to_string(SpatialObjects[i].SO_rigidbody.velocity.x) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.velocity.y) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.velocity.z));
         WriteFile(location + name, "RA " + std::to_string(SpatialObjects[i].SO_rigidbody.acceleration.x) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.acceleration.y) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.acceleration.z));
