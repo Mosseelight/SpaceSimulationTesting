@@ -94,6 +94,7 @@ RigidBody::RigidBody()
     rotVelocity = glm::vec3(0.0f);
     rotAcceleration = glm::vec3(0.0f);
     totalForce = glm::vec3(0.0f);
+    totalRotation = glm::vec3(0.0f);
     isStatic = false;
     gForce = 0;
 }

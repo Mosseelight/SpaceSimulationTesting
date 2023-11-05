@@ -1,0 +1,35 @@
+#Scene and Object Layout
+
+#S (Scene name)
+#SN (number of SpatialObjects)
+#SO (object number)
+#ML (Mesh location)
+#MP (Mesh position.x)/(mesh position.y)/(mesh position.z)
+#MR (Mesh rotation.x)/(mesh rotation.y)/(mesh rotation.z)
+#MS (mesh scale)
+#TL (Texture location)
+#RS (isStatic)
+#RM (Mass)
+#RV (Velocity.x)/(Velocity.y)/(Velocity.z)
+#RA (Acceleration.x)/(Acceleration.y)/(Acceleration.z)
+#RVR (RotVelocity.x)/(RotVelocity.y)/(RotVelocity.z)
+#RAR (RotAcceleration.x)/(RotAcceleration.y)/(RotAcceleration.z)
+#RF (TotalForce.x)/(TotalForce.y)/(TotalForce.z)
+#RFR (RotTotalForce.x)/(RotTotalForce.y)/(RotTotalForce.z)
+
+S main
+SN 1
+SO 0
+ML res/Models/Floor.obj
+MP 0.000000/-0.700000/0.000000
+MR 0.000000/0.000000/0.000000
+MS 1.000000
+TL 
+RS 1
+RM 1.000000
+RV 0.000000/0.000000/0.000000
+RA 0.000000/0.000000/0.000000
+RVR 0.000000/0.000000/0.000000
+RAR 0.000000/0.000000/0.000000
+RF 0.000000/0.000000/0.000000
+RFR 0.000000/0.000000/0.000000
