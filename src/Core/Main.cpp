@@ -156,7 +156,7 @@ int main()
         Render(window);
     }
 
-    //mainScene.SaveScene(sceneLoc, "main.scene");
+    mainScene.SaveScene(sceneLoc, "main.scene");
     
     texture.Delete();
     SDL_FreeSurface(windowIcon);

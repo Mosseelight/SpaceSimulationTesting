@@ -323,7 +323,6 @@ void LoadScene(std::string location, std::string name, Scene& scene)
             data >> y;
             data >> z;
             scene.SpatialObjects[id].SO_rigidbody.velocity = glm::vec3(x,y,z);
-            std::cout << line << std::endl;
         }
         if(line[0] == 'R' && line[1] == 'A' && line[2] != 'R')
         {
