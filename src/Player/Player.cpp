@@ -12,10 +12,12 @@ Player::~Player()
     DebugLog("Player got deleted");
 }  
 
-void Player::UpdatePlayer()
+void Player::UpdatePlayer(float delta)
 {
+    position += moveDir * speed * delta;
     camera.position = position;
     camera.rotation = rotation;
+    moveDir = glm::vec3(0);
 }
 
 glm::mat4 Player::GetRotMat()
@@ -27,9 +29,8 @@ glm::mat4 Player::GetRotMat()
     return mat;
 }
 
-void Player::Movement(int key, float delta)
+void Player::Movement(int key)
 {
-    glm::vec3 moveDir;
     glm::mat4 rotMat = GetRotMat();
     glm::vec3 up(0.0f,0.1f,0.0f);
     glm::vec3 down(0.0f,-0.1f,0.0f);
@@ -55,8 +56,6 @@ void Player::Movement(int key, float delta)
         break;
     }
     moveDir = glm::normalize(moveDir);
-    position += moveDir * speed * delta;
-    
 }
 
 void Player::MouseMovement(int x, int y, bool leftP, bool rightP)

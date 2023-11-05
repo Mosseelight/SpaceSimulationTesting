@@ -28,7 +28,10 @@ std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialOb
     }
 
     //get objects in chunk that is ahead of the current object
-    pos = getChunkpos(objects[objectID].SO_rigidbody.position + objects[objectID].SO_rigidbody.velocity * ChunkSize);
+    pos += glm::ceil(glm::normalize(objects[objectID].SO_rigidbody.velocity));
+    //object velocity points to same chunk so dont readd the objects
+    if(key == getKeyVal(getHashVal(pos)))
+        return objectsInSameChunk;
     key = getKeyVal(getHashVal(pos));
     startIndex = startLookup[key];
 

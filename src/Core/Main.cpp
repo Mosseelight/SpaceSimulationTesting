@@ -52,6 +52,7 @@ const std::string logLoc = "res/Logs/";
 const std::string sceneLoc = "res/Scenes/";
 
 void UpdateLogic(SDL_Window* window);
+void FixedUpdateLogic();
 void Render(SDL_Window* window);
 void ImguiMenu();
 void input();
@@ -116,7 +117,7 @@ int main()
         }
     }
 
-    //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(-5,5,0), glm::vec3(0,0,0)));
+    //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,5,0), glm::vec3(0,0,0)));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,3,0), glm::vec3(0), modelLoc + "Teapot.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0.5f,10,0), glm::vec3(0), modelLoc + "Teapot.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,25,0), glm::vec3(0), modelLoc + "Monkey.obj"));
@@ -126,7 +127,7 @@ int main()
     {
         for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
-            for (int j = 3; j < 15; j += 3)
+            for (int j = 3; j < 22; j += 3)
             {
                 mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j,g), glm::vec3(0,0,0)));
             }
@@ -139,7 +140,7 @@ int main()
         indCount += mainScene.SpatialObjects[i].SO_mesh.indices.size();
     }
 
-    player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 35), glm::vec3(-33,12,-20)));
+    player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 40), glm::vec3(-33,12,-20)));
     player->rotation.x = 300;
     player->rotation.y = 15;
     player->rotation.z = 0;
@@ -176,7 +177,7 @@ void UpdateLogic(SDL_Window* window)
     currentTime = GetTime();
     deltaTime = currentTime - lastTime;
     lastTime = currentTime;
-    drawCallAvg = DrawCallCount / (GetTime() / 1.0f / io->Framerate);
+    drawCallAvg = DrawCallCount / (GetTime() / 1.0f / deltaTime);
 
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
@@ -184,10 +185,34 @@ void UpdateLogic(SDL_Window* window)
         mainScene.SpatialObjects[i].SO_mesh.CreateRotationMat();
     }
 
-    RunSimulation(deltaTime, mainScene, runningSim);
+    static float totalTime;
+    int counter = 0;
+    totalTime += deltaTime;
+    while (totalTime >= PhysicsStep)
+    {
+        FixedUpdateLogic();
+        counter++;
 
-    player->UpdatePlayer();
+        if(deltaTime >= PhysicsStep)
+        {
+            if(counter == maxPhysicSteps)
+                break;
+            totalTime -= PhysicsStep;
+        }
+        else
+        {
+            totalTime = 0;
+            break;
+        }
+    }
+
     input();
+}
+
+void FixedUpdateLogic()
+{
+    RunSimulation(deltaTime, mainScene, runningSim);
+    player->UpdatePlayer(PhysicsStep);
 }
 
 void Render(SDL_Window* window)
@@ -258,22 +283,22 @@ void input()
                 DebugWindow = !DebugWindow;
                 break;
             case SDLK_w:
-                player->Movement(SDLK_w, deltaTime);
+                player->Movement(SDLK_w);
                 break;
             case SDLK_s:
-                player->Movement(SDLK_s, deltaTime);
+                player->Movement(SDLK_s);
                 break;
             case SDLK_a:
-                player->Movement(SDLK_a, deltaTime);
+                player->Movement(SDLK_a);
                 break;
             case SDLK_d:
-                player->Movement(SDLK_d, deltaTime);
+                player->Movement(SDLK_d);
                 break;
             case SDLK_SPACE:
-                player->Movement(SDLK_SPACE, deltaTime);
+                player->Movement(SDLK_SPACE);
                 break;
             case SDLK_LSHIFT:
-                player->Movement(SDLK_LSHIFT, deltaTime);
+                player->Movement(SDLK_LSHIFT);
                 break;
             case SDLK_t:
                 runningSim *= -1;
@@ -365,6 +390,7 @@ void ImguiMenu()
     }
 
     ImGui::Spacing();
+    ImGui::DragFloat("Physics Speed", &PhysicsSpeed, 0.01f, -10.0f, 10.0f);
     ImGui::DragFloat3("Player Position", glm::value_ptr(player->position), 1.0f, -50.0f, 50.0f);
     ImGui::DragFloat3("Player Rotation", glm::value_ptr(player->rotation), 1.0f, -360.0f, 360.0f);
     ImGui::SliderFloat("Cam Fov", &player->camera.fov, 179.9f, 0.01f);

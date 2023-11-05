@@ -124,23 +124,19 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     {
         if(own.SO_id != objects[objectIds[i]].SO_id)
         {
-            if(CollisionCheckBroader(own, objects[objectIds[i]]))
+            if(CollisionCheckBroad(own, objects[objectIds[i]]))
             {
-                if(CollisionCheckBroad(own, objects[objectIds[i]]))
+                std::pair<bool, CollisionPoint> point = CollisionCheckNarrowSat(own, objects[objectIds[i]]);
+                if(point.first)
                 {
-                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrowSat(own, objects[objectIds[i]]);
-                    if(point.first)
-                    {
-                        glm::vec3 vel = velocity;
-                        velocity = glm::vec3(0);
-                        glm::vec3 normal = -glm::normalize(point.second.normal);
-                        position += normal * point.second.dist;
-                        std::cout << point.second.dist << std::endl;
-                        float bounce = 0.3f;
-                        float j = glm::dot(vel * -(1 + bounce), normal) / ((1 / mass) + (1 / objects[objectIds[i]].SO_rigidbody.mass));
-                        ApplyImpulseForce(normal, j);
-                        break;
-                    }
+                    glm::vec3 vel = velocity;
+                    velocity = glm::vec3(0);
+                    glm::vec3 normal = -glm::normalize(point.second.normal);
+                    position += normal * point.second.dist;
+                    float bounce = 0.3f;
+                    float j = glm::dot(vel * -(1 + bounce), normal) / ((1 / mass) + (1 / objects[objectIds[i]].SO_rigidbody.mass));
+                    ApplyImpulseForce(normal, j);
+                    break;
                 }
             }
         }

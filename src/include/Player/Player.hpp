@@ -13,6 +13,7 @@ private:
     glm::mat4 GetRotMat();
     float speed;
 public:
+    glm::vec3 moveDir;
     glm::vec3 position;
     glm::vec3 rotation;
     Camera camera;
@@ -20,7 +21,7 @@ public:
 
     Player(float speed, Camera camera, glm::vec3 position);
     ~Player();
-    void UpdatePlayer();
-    void Movement(int key, float delta);
+    void UpdatePlayer(float delta);
+    void Movement(int key);
     void MouseMovement(int x, int y, bool leftP, bool rightP);
 };

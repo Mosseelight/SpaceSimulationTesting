@@ -10,16 +10,6 @@ bool CollisionCheckBroad(SpatialObject& own, SpatialObject& other)
     && boxOwn.min.z <= boxOther.max.z && boxOwn.max.z >= boxOther.min.z);
 }
 
-bool CollisionCheckBroader(SpatialObject& own, SpatialObject& other)
-{
-    float dist1 = glm::distance(own.SO_rigidbody.position, own.SO_rigidbody.boundbox.max);
-    float dist2 = glm::distance(other.SO_rigidbody.position, other.SO_rigidbody.boundbox.max);
-
-    if(dist1 + dist2 > glm::distance(own.SO_rigidbody.position, other.SO_rigidbody.position))
-        return true;
-    return false;
-}
-
 CollisionPoint::CollisionPoint()
 {
 
@@ -476,7 +466,7 @@ bool SameLine(glm::vec3 dir, glm::vec3 ao)
 //--------------------------------------------------------------
 //--------------------------------------------------------------
 
-float transformToAxis(SpatialObject& obj, glm::vec3 axis, glm::vec3 axisX, glm::vec3 axisY, glm::vec3 axisZ)
+float TransformToAxis(SpatialObject& obj, glm::vec3 axis, glm::vec3 axisX, glm::vec3 axisY, glm::vec3 axisZ)
 {
 	glm::vec3 half = (obj.SO_rigidbody.boundbox.max - obj.SO_rigidbody.position);
     return
@@ -485,12 +475,12 @@ float transformToAxis(SpatialObject& obj, glm::vec3 axis, glm::vec3 axisX, glm::
         half.z * fabs(glm::dot(axis, axisZ));
 }
 
-float penetrationOnAxis(SpatialObject& one, SpatialObject& two, glm::vec3 axis, glm::vec3 toCentre,
+float PenetrationOnAxis(SpatialObject& one, SpatialObject& two, glm::vec3 axis, glm::vec3 toCentre,
 	glm::vec3 b1AxisX, glm::vec3 b1AxisY, glm::vec3 b1AxisZ, glm::vec3 b2AxisX, glm::vec3 b2AxisY, glm::vec3 b2AxisZ)
 {
     // Project the half-size of one onto axis
-    float oneProject = transformToAxis(one, axis, b1AxisX, b1AxisY, b1AxisZ);
-    float twoProject = transformToAxis(two, axis, b2AxisX, b2AxisY, b2AxisZ);
+    float oneProject = TransformToAxis(one, axis, b1AxisX, b1AxisY, b1AxisZ);
+    float twoProject = TransformToAxis(two, axis, b2AxisX, b2AxisY, b2AxisZ);
 
     // Project this onto the axis
     float distance = fabs(glm::dot(toCentre, axis));
@@ -500,7 +490,7 @@ float penetrationOnAxis(SpatialObject& one, SpatialObject& two, glm::vec3 axis, 
     return oneProject + twoProject - distance;
 }
 
-bool pGetSeparatingPlane(glm::vec3 toCenter, glm::vec3 axis, SpatialObject& obj1, SpatialObject& obj2, glm::vec3 b1AxisX, glm::vec3 b1AxisY, glm::vec3 b1AxisZ,
+bool GetSeparatingPlane(glm::vec3 toCenter, glm::vec3 axis, SpatialObject& obj1, SpatialObject& obj2, glm::vec3 b1AxisX, glm::vec3 b1AxisY, glm::vec3 b1AxisZ,
 	glm::vec3 b2AxisX,glm::vec3 b2AxisY, glm::vec3 b2AxisZ, float& minPen, int& axisNum, int axisNumInt, glm::vec3& setMinPlane, int& smallestSingle) 
 {
 	//if true returned, we have no seperation
@@ -511,7 +501,7 @@ bool pGetSeparatingPlane(glm::vec3 toCenter, glm::vec3 axis, SpatialObject& obj1
 	//normalize the axis by dividing it by its lenth(or multiplying it by the inverse of its length)
 	axis *= (1.0f / sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z));
 
-	float penetration = penetrationOnAxis(obj1, obj2, axis, toCenter, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ);
+	float penetration = PenetrationOnAxis(obj1, obj2, axis, toCenter, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ);
 	
 	//if the penetration is less than 0, the objects are seperated
 	if (penetration < 0.0f)
@@ -593,21 +583,21 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 	glm::vec3 toCenter;
 	toCenter = obj1.SO_rigidbody.position - obj2.SO_rigidbody.position; //vector from centre 2 to centre 1
 	
-	if (!(pGetSeparatingPlane(toCenter, b1AxisX, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 0, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, b1AxisY, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 1, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, b1AxisZ, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 2, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, b2AxisX, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 3, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, b2AxisY, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 4, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, b2AxisZ, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 5, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, glm::cross(b1AxisX, b2AxisX), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 6, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, glm::cross(b1AxisX, b2AxisY), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 7, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, glm::cross(b1AxisX, b2AxisZ), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 8, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, glm::cross(b1AxisY, b2AxisX), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 9, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, glm::cross(b1AxisY, b2AxisY), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 10, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, glm::cross(b1AxisY, b2AxisZ), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 11, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, glm::cross(b1AxisZ, b2AxisX), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 12, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, glm::cross(b1AxisZ, b2AxisY), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 13, collisionNormal, smallestCaseSingleAxis) &&
-		pGetSeparatingPlane(toCenter, glm::cross(b1AxisZ, b2AxisZ), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 14, collisionNormal, smallestCaseSingleAxis))) 
+	if (!(GetSeparatingPlane(toCenter, b1AxisX, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 0, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, b1AxisY, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 1, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, b1AxisZ, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 2, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, b2AxisX, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 3, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, b2AxisY, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 4, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, b2AxisZ, obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 5, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, glm::cross(b1AxisX, b2AxisX), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 6, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, glm::cross(b1AxisX, b2AxisY), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 7, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, glm::cross(b1AxisX, b2AxisZ), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 8, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, glm::cross(b1AxisY, b2AxisX), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 9, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, glm::cross(b1AxisY, b2AxisY), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 10, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, glm::cross(b1AxisY, b2AxisZ), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 11, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, glm::cross(b1AxisZ, b2AxisX), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 12, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, glm::cross(b1AxisZ, b2AxisY), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 13, collisionNormal, smallestCaseSingleAxis) &&
+		GetSeparatingPlane(toCenter, glm::cross(b1AxisZ, b2AxisZ), obj1, obj2, b1AxisX, b1AxisY, b1AxisZ, b2AxisX, b2AxisY, b2AxisZ, penetration, smallestCase, 14, collisionNormal, smallestCaseSingleAxis))) 
 	{
 		//if this is true, there has been a seperating axis and the collision is false
 		return std::make_pair(false, CollisionPoint());
