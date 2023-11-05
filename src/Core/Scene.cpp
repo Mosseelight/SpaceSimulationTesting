@@ -140,6 +140,7 @@ void Scene::Clear()
 }
 
 /*Scene Save format
+
 S (Scene name)
 SN (number of SpatialObjects)
 SO (object number)
@@ -148,7 +149,14 @@ MP (Mesh position.x)/(mesh position.y)/(mesh position.z)
 MR (Mesh rotation.x)/(mesh rotation.y)/(mesh rotation.z)
 MS (mesh scale)
 TL (Texture location)
-RB (isStatic)
+RS (isStatic)
+RM (Mass)
+RV (Velocity.x)/(Velocity.y)/(Velocity.z)
+RA (Acceleration.x)/(Acceleration.y)/(Acceleration.z)
+RVR (RotVelocity.x)/(RotVelocity.y)/(RotVelocity.z)
+RAR (RotAcceleration.x)/(RotAcceleration.y)/(RotAcceleration.z)
+RF (TotalForce.x)/(TotalForce.y)/(TotalForce.z)
+RFR (RotTotalForce.x)/(RotTotalForce.y)/(RotTotalForce.z)
 
 */
 void Scene::SaveScene(std::string location, std::string name)
@@ -163,6 +171,27 @@ void Scene::SaveScene(std::string location, std::string name)
     }
     size_t endExt = name.find_last_of('.');
     std::string newName = name.substr(0, endExt);
+    std::string info =
+        "Scene and Object Layout\n"
+        "\n"
+        "S (Scene name)\n"
+        "SN (number of SpatialObjects)\n"
+        "SO (object number)\n"
+        "ML (Mesh location)\n"
+        "MP (Mesh position.x)/(mesh position.y)/(mesh position.z)\n"
+        "MR (Mesh rotation.x)/(mesh rotation.y)/(mesh rotation.z)\n"
+        "MS (mesh scale)\n"
+        "TL (Texture location)\n"
+        "RS (isStatic)\n"
+        "RM (Mass)\n"
+        "RV (Velocity.x)/(Velocity.y)/(Velocity.z)\n"
+        "RA (Acceleration.x)/(Acceleration.y)/(Acceleration.z)\n"
+        "RVR (RotVelocity.x)/(RotVelocity.y)/(RotVelocity.z)\n"
+        "RAR (RotAcceleration.x)/(RotAcceleration.y)/(RotAcceleration.z)\n"
+        "RF (TotalForce.x)/(TotalForce.y)/(TotalForce.z)\n"
+        "RFR (RotTotalForce.x)/(RotTotalForce.y)/(RotTotalForce.z)\n";
+
+    WriteFile(location + name, info);
     WriteFile(location + name, "S " + newName);
     WriteFile(location + name, "SN " + std::to_string(SpatialObjects.size()));
 
@@ -174,6 +203,14 @@ void Scene::SaveScene(std::string location, std::string name)
         WriteFile(location + name, "MR " + std::to_string(SpatialObjects[i].SO_mesh.rotation.x) + "/" + std::to_string(SpatialObjects[i].SO_mesh.rotation.y) + "/" + std::to_string(SpatialObjects[i].SO_mesh.rotation.z));
         WriteFile(location + name, "MS " + std::to_string(SpatialObjects[i].SO_mesh.scale));
         WriteFile(location + name, "TL " + SpatialObjects[i].SO_texture.textLocation);
+        WriteFile(location + name, "RS " + (int)SpatialObjects[i].SO_rigidbody.isStatic);
+        WriteFile(location + name, "RM " + std::to_string(SpatialObjects[i].SO_rigidbody.mass));
+        WriteFile(location + name, "RV " + std::to_string(SpatialObjects[i].SO_rigidbody.velocity.x) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.velocity.y) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.velocity.z));
+        WriteFile(location + name, "RA " + std::to_string(SpatialObjects[i].SO_rigidbody.acceleration.x) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.acceleration.y) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.acceleration.z));
+        WriteFile(location + name, "RVR " + std::to_string(SpatialObjects[i].SO_rigidbody.rotVelocity.x) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.rotVelocity.y) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.rotVelocity.z));
+        WriteFile(location + name, "RAR " + std::to_string(SpatialObjects[i].SO_rigidbody.rotAcceleration.x) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.rotAcceleration.y) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.rotAcceleration.z));
+        WriteFile(location + name, "RF " + std::to_string(SpatialObjects[i].SO_rigidbody.totalForce.x) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.totalForce.y) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.totalForce.z));
+        WriteFile(location + name, "RFR " + std::to_string(SpatialObjects[i].SO_rigidbody.totalRotation.x) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.totalRotation.y) + "/" + std::to_string(SpatialObjects[i].SO_rigidbody.totalRotation.z));
     }
     
 }

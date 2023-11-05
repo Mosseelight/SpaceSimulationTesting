@@ -16,7 +16,6 @@ Basic physics
     More rigidbody functions?
     Mesh updating in the gpu subBuffer()?
     
-
         
     raycasting
         from screen to world and world to screen
@@ -27,6 +26,8 @@ lights
 shader matrix issues
 __________________________
 console and logging system
+finish saving and loading scenes
+menu to load scenes
 
 ----MAYBE----
 fix smooth normal creater
