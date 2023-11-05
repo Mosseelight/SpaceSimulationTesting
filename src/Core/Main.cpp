@@ -33,7 +33,7 @@
 #define GetTime() SDL_GetTicks64() / 1000.0f
 
 bool DebugWindow = false;
-int runningSim = -1;
+int runningSim = 1;
 bool showWireFrame = false;
 float currentTime = 0.0f;
 float deltaTime = 0.0f;
@@ -128,9 +128,9 @@ int main()
     {
         for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
-            for (int j = 3; j < 17; j += 3)
+            for (int j = 0; j < 5; j++)
             {
-                mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j,g), glm::vec3(0,0,0)));
+                mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j * 3,g), glm::vec3(0,0,0)));
             }
         }
     }
