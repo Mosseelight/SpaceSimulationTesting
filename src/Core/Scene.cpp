@@ -172,24 +172,24 @@ void Scene::SaveScene(std::string location, std::string name)
     size_t endExt = name.find_last_of('.');
     std::string newName = name.substr(0, endExt);
     std::string info =
-        "Scene and Object Layout\n"
+        "#Scene and Object Layout\n"
         "\n"
-        "S (Scene name)\n"
-        "SN (number of SpatialObjects)\n"
-        "SO (object number)\n"
-        "ML (Mesh location)\n"
-        "MP (Mesh position.x)/(mesh position.y)/(mesh position.z)\n"
-        "MR (Mesh rotation.x)/(mesh rotation.y)/(mesh rotation.z)\n"
-        "MS (mesh scale)\n"
-        "TL (Texture location)\n"
-        "RS (isStatic)\n"
-        "RM (Mass)\n"
-        "RV (Velocity.x)/(Velocity.y)/(Velocity.z)\n"
-        "RA (Acceleration.x)/(Acceleration.y)/(Acceleration.z)\n"
-        "RVR (RotVelocity.x)/(RotVelocity.y)/(RotVelocity.z)\n"
-        "RAR (RotAcceleration.x)/(RotAcceleration.y)/(RotAcceleration.z)\n"
-        "RF (TotalForce.x)/(TotalForce.y)/(TotalForce.z)\n"
-        "RFR (RotTotalForce.x)/(RotTotalForce.y)/(RotTotalForce.z)\n";
+        "#S (Scene name)\n"
+        "#SN (number of SpatialObjects)\n"
+        "#SO (object number)\n"
+        "#ML (Mesh location)\n"
+        "#MP (Mesh position.x)/(mesh position.y)/(mesh position.z)\n"
+        "#MR (Mesh rotation.x)/(mesh rotation.y)/(mesh rotation.z)\n"
+        "#MS (mesh scale)\n"
+        "#TL (Texture location)\n"
+        "#RS (isStatic)\n"
+        "#RM (Mass)\n"
+        "#RV (Velocity.x)/(Velocity.y)/(Velocity.z)\n"
+        "#RA (Acceleration.x)/(Acceleration.y)/(Acceleration.z)\n"
+        "#RVR (RotVelocity.x)/(RotVelocity.y)/(RotVelocity.z)\n"
+        "#RAR (RotAcceleration.x)/(RotAcceleration.y)/(RotAcceleration.z)\n"
+        "#RF (TotalForce.x)/(TotalForce.y)/(TotalForce.z)\n"
+        "#RFR (RotTotalForce.x)/(RotTotalForce.y)/(RotTotalForce.z)\n";
 
     WriteFile(location + name, info);
     WriteFile(location + name, "S " + newName);
@@ -226,6 +226,7 @@ void LoadScene(std::string location, std::string name, Scene& scene)
     std::ifstream file(location + name);
     std::string line;
     unsigned int size = 0;
+    unsigned int id = 0;
     SpatialObject tempObject;
     
     while (std::getline(file, line))
@@ -290,7 +291,99 @@ void LoadScene(std::string location, std::string name, Scene& scene)
             line.erase(line.begin(), line.begin() + 2);
             line = stringRemove(line, " ", "");
             tempObject.SO_texture.textLocation = line;
+            id = scene.SpatialObjects.size();
             scene.AddSpatialObject(LoadModel(tempObject.SO_mesh.position, tempObject.SO_mesh.rotation, tempObject.SO_mesh.modelLocation));
+        }
+        if(line[0] == 'R' && line[1] == 'S')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            std::istringstream data(line);
+            unsigned int val;
+            data >> val;
+            scene.SpatialObjects[id].SO_rigidbody.isStatic = val;
+        }
+        if(line[0] == 'R' && line[1] == 'M')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            std::istringstream data(line);
+            float mass;
+            data >> mass;
+            scene.SpatialObjects[id].SO_rigidbody.mass = mass;
+        }
+        if(line[0] == 'R' && line[1] == 'V' && line[2] != 'R')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            line = stringRemove(line, "/", " ");
+            std::istringstream data(line);
+            float x, y, z;
+            data >> x;
+            data >> y;
+            data >> z;
+            scene.SpatialObjects[id].SO_rigidbody.velocity = glm::vec3(x,y,z);
+            std::cout << line << std::endl;
+        }
+        if(line[0] == 'R' && line[1] == 'A' && line[2] != 'R')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            line = stringRemove(line, "/", " ");
+            std::istringstream data(line);
+            float x, y, z;
+            data >> x;
+            data >> y;
+            data >> z;
+            scene.SpatialObjects[id].SO_rigidbody.acceleration = glm::vec3(x,y,z);
+        }
+        if(line[0] == 'R' && line[1] == 'V' && line[2] == 'R')
+        {
+            line.erase(line.begin(), line.begin() + 3);
+            line = stringRemove(line, " ", "");
+            line = stringRemove(line, "/", " ");
+            std::istringstream data(line);
+            float x, y, z;
+            data >> x;
+            data >> y;
+            data >> z;
+            scene.SpatialObjects[id].SO_rigidbody.rotVelocity = glm::vec3(x,y,z);
+        }
+        if(line[0] == 'R' && line[1] == 'A' && line[2] == 'R')
+        {
+            line.erase(line.begin(), line.begin() + 3);
+            line = stringRemove(line, " ", "");
+            line = stringRemove(line, "/", " ");
+            std::istringstream data(line);
+            float x, y, z;
+            data >> x;
+            data >> y;
+            data >> z;
+            scene.SpatialObjects[id].SO_rigidbody.rotAcceleration = glm::vec3(x,y,z);
+        }
+        if(line[0] == 'R' && line[1] == 'F' && line[2] != 'R')
+        {
+            line.erase(line.begin(), line.begin() + 2);
+            line = stringRemove(line, " ", "");
+            line = stringRemove(line, "/", " ");
+            std::istringstream data(line);
+            float x, y, z;
+            data >> x;
+            data >> y;
+            data >> z;
+            scene.SpatialObjects[id].SO_rigidbody.totalForce = glm::vec3(x,y,z);
+        }
+        if(line[0] == 'R' && line[1] == 'F' && line[2] == 'R')
+        {
+            line.erase(line.begin(), line.begin() + 3);
+            line = stringRemove(line, " ", "");
+            line = stringRemove(line, "/", " ");
+            std::istringstream data(line);
+            float x, y, z;
+            data >> x;
+            data >> y;
+            data >> z;
+            scene.SpatialObjects[id].SO_rigidbody.totalRotation = glm::vec3(x,y,z);
         }
     }
     

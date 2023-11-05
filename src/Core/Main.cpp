@@ -33,7 +33,7 @@
 #define GetTime() SDL_GetTicks64() / 1000.0f
 
 bool DebugWindow = false;
-int runningSim = 1;
+int runningSim = -1;
 bool showWireFrame = false;
 float currentTime = 0.0f;
 float deltaTime = 0.0f;
@@ -104,9 +104,10 @@ int main()
 
 
     //scene initilzation
+    LoadScene(sceneLoc, "main.scene", mainScene);
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
-    unsigned int count = 0;
+    /*unsigned int count = 0;
     for (int i = 0; i < 1; i++)
     {
         for (int g = 0; g < 1; g++)
@@ -129,10 +130,10 @@ int main()
         {
             for (int j = 3; j < 22; j += 3)
             {
-                mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j,g), glm::vec3(0,0,0)));
+                //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j,g), glm::vec3(0,0,0)));
             }
         }
-    }
+    }*/
 
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
@@ -155,7 +156,7 @@ int main()
         Render(window);
     }
 
-    mainScene.SaveScene(sceneLoc, "main.scene");
+    //mainScene.SaveScene(sceneLoc, "main.scene");
     
     texture.Delete();
     SDL_FreeSurface(windowIcon);
