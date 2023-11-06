@@ -9,6 +9,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+MakeFile
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -26,6 +27,7 @@ x86/
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
+.vscode/
 build/
 [Bb]in/
 [Oo]bj/
