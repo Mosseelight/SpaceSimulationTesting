@@ -223,6 +223,7 @@ void LoadScene(std::string location, std::string name, Scene& scene)
         return;
     }
     DebugLog("Loading scene " + name);
+    scene.Clear();
     std::ifstream file(location + name);
     std::string line;
     unsigned int size = 0;

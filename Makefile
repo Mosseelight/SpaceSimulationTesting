@@ -12,7 +12,7 @@ SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c' -or -name '*.s')
 # As an example, ./your_dir/hello.cpp turns into ./build/./your_dir/hello.cpp.o
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
-LIBS = -lSDL2 -lSDL2_image
+LIBS = -lSDL2 -lSDL2_image -lboost_system
 
 RES = $(SRC_DIRS)/res
 
@@ -27,7 +27,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # The -MMD and -MP flags together generate Makefiles for us!
 # These files will have .d instead of .o as the output.
-CPPFLAGS := $(INC_FLAGS) -MMD -MP -Wall -c -g -m64 -O3 -march=native
+CPPFLAGS := $(INC_FLAGS) -MMD -MP -Wall -c -g -m64 -O3 -march=native -std=c++17
 
 # The final build step.
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
