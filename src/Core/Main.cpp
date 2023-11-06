@@ -69,7 +69,13 @@ int main()
 {
     
     //Sdl creation
-    assert(!SDL_Init(SDL_INIT_VIDEO));
+    if(SDL_Init(SDL_INIT_VIDEO) == -1)
+    {
+        if(SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "SDL Error", "Could Not Init SDL Video", NULL) == -1)
+        {
+            assert(!SDL_Init(SDL_INIT_VIDEO));
+        }
+    }
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -78,7 +84,13 @@ int main()
     SDL_Window* window = SDL_CreateWindow("Spatial Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCRWIDTH, SCRHEIGHT, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(window);
     SDL_GL_SetSwapInterval(vsync);
-    assert(gladLoadGL());
+    if(!gladLoadGL())
+    {
+        if(SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "OpenGL Error", "Could Not Load OpenGL", NULL) == -1)
+        {
+            assert(gladLoadGL());
+        }
+    }
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_CULL_FACE);
@@ -118,7 +130,7 @@ int main()
         }
     }
 
-    //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,5,0), glm::vec3(0,0,0)));
+    mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,5,0), glm::vec3(0,0,0)));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,3,0), glm::vec3(0), modelLoc + "Teapot.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0.5f,10,0), glm::vec3(0), modelLoc + "Teapot.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,25,0), glm::vec3(0), modelLoc + "Monkey.obj"));
@@ -130,7 +142,7 @@ int main()
         {
             for (int j = 0; j < 5; j++)
             {
-                mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j * 3,g), glm::vec3(0,0,0)));
+                //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j * 3,g), glm::vec3(0,0,0)));
             }
         }
     }
