@@ -468,7 +468,7 @@ bool SameLine(glm::vec3 dir, glm::vec3 ao)
 
 float TransformToAxis(SpatialObject& obj, glm::vec3 axis, glm::vec3 axisX, glm::vec3 axisY, glm::vec3 axisZ)
 {
-	glm::vec3 half = (obj.SO_rigidbody.boundbox.max - obj.SO_rigidbody.position);
+	glm::vec3 half = (obj.SO_rigidbody.oriBoundBox.maxOri);
     return
         half.x * fabs(glm::dot(axis, axisX)) +
         half.y * fabs(glm::dot(axis, axisY)) +
@@ -530,16 +530,17 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 	int smallestCaseSingleAxis;
 	glm::vec3 collisionNormal;//the axis that seperates the 2 obbs, also the collision normal
 
-	glm::vec3 half1 = (obj1.SO_rigidbody.boundbox.max - obj1.SO_rigidbody.position);
-	glm::vec3 half2 = (obj2.SO_rigidbody.boundbox.max - obj2.SO_rigidbody.position);
+	glm::vec3 half1 = (obj1.SO_rigidbody.oriBoundBox.maxOri);
+	glm::vec3 half2 = (obj2.SO_rigidbody.oriBoundBox.maxOri);
 	
 	//create the orientation axis for the first box(idk why the order is switched up but it is, it is switched up in rendering the same way as well)
-	float cosA = cos(obj1.SO_rigidbody.rotation.y);//pitch
-	float cosB = cos(obj1.SO_rigidbody.rotation.x);//yaw
-	float cosC = cos(obj1.SO_rigidbody.rotation.z);//roll
-	float sinA = sin(obj1.SO_rigidbody.rotation.y);//pitch
-	float sinB = sin(obj1.SO_rigidbody.rotation.x);//yaw
-	float sinC = sin(obj1.SO_rigidbody.rotation.z);//roll
+	float deg2rad = M_PIf / 180.0f;
+	float cosA = cos(obj1.SO_rigidbody.rotation.x * deg2rad);//pitch
+	float cosB = cos(obj1.SO_rigidbody.rotation.y * deg2rad);//yaw
+	float cosC = cos(obj1.SO_rigidbody.rotation.z * deg2rad);//roll
+	float sinA = sin(obj1.SO_rigidbody.rotation.x * deg2rad);//pitch
+	float sinB = sin(obj1.SO_rigidbody.rotation.y * deg2rad);//yaw
+	float sinC = sin(obj1.SO_rigidbody.rotation.z * deg2rad);//roll
 	
 	glm::vec3 b1AxisX;
 	b1AxisX.x = cosB * cosC;
@@ -557,12 +558,12 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 	b1AxisZ.z = cosA * cosB;
 	
 	//create the orientation axis for the second box(idk why the order is switched up but it is, it is switched up in rendering the same way as well)
-	cosA = cos(obj2.SO_rigidbody.rotation.y);//pitch
-	cosB = cos(obj2.SO_rigidbody.rotation.x);//yaw
-	cosC = cos(obj2.SO_rigidbody.rotation.z);//roll
-	sinA = sin(obj2.SO_rigidbody.rotation.y);//pitch
-	sinB = sin(obj2.SO_rigidbody.rotation.x);//yaw
-	sinC = sin(obj2.SO_rigidbody.rotation.z);//roll
+	cosA = cos(obj2.SO_rigidbody.rotation.x * deg2rad);//pitch
+	cosB = cos(obj2.SO_rigidbody.rotation.y * deg2rad);//yaw
+	cosC = cos(obj2.SO_rigidbody.rotation.z * deg2rad);//roll
+	sinA = sin(obj2.SO_rigidbody.rotation.x * deg2rad);//pitch
+	sinB = sin(obj2.SO_rigidbody.rotation.y * deg2rad);//yaw
+	sinC = sin(obj2.SO_rigidbody.rotation.z * deg2rad);//roll
 		
 	glm::vec3 b2AxisX;
 	b2AxisX.x = cosB * cosC;
