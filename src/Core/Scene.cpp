@@ -172,6 +172,7 @@ void Scene::SaveScene(std::string location, std::string name)
     size_t endExt = name.find_last_of('.');
     std::string newName = name.substr(0, endExt);
     std::string info =
+        "#Scene File\n"
         "#Scene and Object Layout\n"
         "\n"
         "#S (Scene name)\n"
@@ -229,6 +230,15 @@ void LoadScene(std::string location, std::string name, Scene& scene)
     unsigned int size = 0;
     unsigned int id = 0;
     SpatialObject tempObject;
+
+    if(std::getline(file, line))
+    {
+        if(line != "#Scene File")
+        {
+            DebugLog("Uncorrect Scene Format Missing (#Scene File)");
+            return;
+        }
+    }
     
     while (std::getline(file, line))
     {

@@ -362,8 +362,7 @@ struct ScrollingBuffer {
 
 void ImguiMenu()
 {
-
-    static ScrollingBuffer frameTimes;
+    static ScrollingBuffer frameTimes(10000);
     static float HighestFT = 0.0f;
     if(deltaTime > HighestFT)
         HighestFT = deltaTime;
@@ -446,6 +445,23 @@ void ImguiMenu()
             }
             ImGui::TreePop();
         }
+        if(ImGui::TreeNode("Scenes"))
+        {
+            static std::vector<std::string> files = GetFiles(sceneLoc);
+            for (unsigned int i = 0; i < files.size(); i++)
+            {
+                if (ImGui::TreeNode((void*)(intptr_t)i, "Scene: %s", files[i].c_str()))
+                {
+                    ImGui::SameLine();
+                    if(ImGui::Button("Load"))
+                    {
+                        LoadScene(sceneLoc, files[i], mainScene);
+                    }
+                    ImGui::TreePop();
+                }
+            }
+            ImGui::TreePop();
+        }
 
         ImGui::End();
     }
@@ -456,7 +472,7 @@ void ImguiMenu()
         static glm::vec3 selposition;
         static glm::vec3 selrotation;
         static int IcoSphereSub = 0;
-        static char input[128] = "Mesh.obj";
+        static std::string input;
         ImGui::SetNextWindowSize(ImVec2(600,420), ImGuiCond_FirstUseEver);
         ImGui::Begin("Object Viewer");
 
@@ -477,16 +493,39 @@ void ImguiMenu()
         }
         ImGui::SameLine();
         ImGui::Text("%s", GetMeshTypeName(static_cast<MeshType>(counter)).c_str());
-        ImGui::InputFloat3("Object Position", glm::value_ptr(selposition));
-        ImGui::InputFloat3("Object Rotation", glm::value_ptr(selrotation));
         if(counter == MeshType::IcoSphereMesh)
             ImGui::SliderInt("IcoSphere Subdivison level", &IcoSphereSub, 0, 10);
         if(counter == MeshType::FileMesh)
         {
-            ImGui::Text("%s", modelLoc.c_str());
-            ImGui::SameLine();
-            ImGui::InputText("Mesh File Name", input, IM_ARRAYSIZE(input));
+            if(ImGui::TreeNode("Models"))
+            {
+                static std::vector<std::string> files = GetFiles(modelLoc);
+                for (unsigned int i = 0; i < files.size(); i++)
+                {
+                    if (i == 0)
+                        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+
+                    if (ImGui::TreeNode((void*)(intptr_t)i, "Model: %s", files[i].c_str()))
+                    {
+                        ImGui::SameLine();
+                        if(ImGui::Button("Set"))
+                        {
+                            input = files[i];
+                        }
+                        ImGui::TreePop();
+                    }
+                }
+                ImGui::TreePop();
+            }
         }
+        else
+        {
+            input = GetMeshTypeName(static_cast<MeshType>(counter));
+        }
+        ImGui::InputFloat3("Object Position", glm::value_ptr(selposition));
+        ImGui::InputFloat3("Object Rotation", glm::value_ptr(selrotation));
+
+        ImGui::Text("Current Model: %s", input.c_str());
 
         if(ImGui::Button("Add Object"))
         {
@@ -546,9 +585,9 @@ void ImguiMenu()
 
 void APIENTRY GLDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *msg, const void *data)
 {
-    char* _source;
-    char* _type;
-    char* _severity;
+    std::string _source;
+    std::string _type;
+    std::string _severity;
 
     switch (source) {
         case GL_DEBUG_SOURCE_API:
@@ -637,5 +676,5 @@ void APIENTRY GLDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLen
     }
 
     printf("%d: %s of %s severity, raised from %s: %s\n",
-            id, _type, _severity, _source, msg);
+            id, _type.c_str(), _severity.c_str(), _source.c_str(), msg);
 }

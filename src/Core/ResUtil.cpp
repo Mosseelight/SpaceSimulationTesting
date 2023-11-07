@@ -69,6 +69,8 @@ std::vector<std::string> GetFiles(std::string location)
     std::vector<std::string> files;
     for (const auto & entry : std::filesystem::directory_iterator(location))
         files.push_back(stringRemove(entry.path(), location, ""));
+
+    return files;
 }
 
 int parseLine(char* line){
