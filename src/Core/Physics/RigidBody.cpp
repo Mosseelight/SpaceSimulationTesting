@@ -136,7 +136,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
                         position += normal * point.second.dist;
                         float bounce = 0.6f;
                         float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass), normal);
-                        ApplyImpulseForce(velocity + normal * (j / mass), 1.0f);
+                        ApplyImpulseForceAtPos(velocity + normal * (j / mass), point.second.point, 1.0f);
                     }
                     else
                     {
@@ -144,8 +144,8 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
                         objects[objectIds[i]].SO_rigidbody.position += normal * point.second.dist * -0.5f;
                         float bounce = 0.3f;
                         float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass) + (1 / objects[objectIds[i]].SO_rigidbody.mass), normal);
-                        ApplyImpulseForce(velocity + normal * (j / mass), 1.0f);
-                        objects[objectIds[i]].SO_rigidbody.ApplyImpulseForce(objects[objectIds[i]].SO_rigidbody.velocity + -normal * (j / mass), 1.0f);
+                        ApplyImpulseForceAtPos(velocity + normal * (j / mass), point.second.point, 1.0f);
+                        objects[objectIds[i]].SO_rigidbody.ApplyImpulseForceAtPos(objects[objectIds[i]].SO_rigidbody.velocity + -normal * (j / mass), point.second.point, 1.0f);
                     }
                 }
             }
@@ -202,9 +202,9 @@ void RigidBody::ApplyRotationImpulseForce(glm::vec3 dir, float power)
 glm::vec3 RigidBody::GetLocalDir(glm::vec3 dir)
 {
     glm::mat4 rotMat = glm::mat4(1.0f);
-    rotMat = glm::rotate(rotMat, rotation.x * M_PIf/180.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-    rotMat = glm::rotate(rotMat, rotation.y * M_PIf/180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-    rotMat = glm::rotate(rotMat, rotation.z * M_PIf/180.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+    rotMat = glm::rotate(rotMat, rotation.x * 3.14159265358979323846f/180.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+    rotMat = glm::rotate(rotMat, rotation.y * 3.14159265358979323846f/180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    rotMat = glm::rotate(rotMat, rotation.z * 3.14159265358979323846f/180.0f, glm::vec3(0.0f, 0.0f, 1.0f));
     return rotMat * glm::vec4(dir, 1.0f);
 }
 

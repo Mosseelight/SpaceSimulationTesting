@@ -130,7 +130,7 @@ int main()
         }
     }
 
-    mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,5,0), glm::vec3(0,0,0)));
+    //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,5,0), glm::vec3(0,0,0)));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,3,0), glm::vec3(0), modelLoc + "Teapot.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0.5f,10,0), glm::vec3(0), modelLoc + "Teapot.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,25,0), glm::vec3(0), modelLoc + "Monkey.obj"));
@@ -140,9 +140,9 @@ int main()
     {
         for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
-            for (int j = 0; j < 5; j++)
+            for (int j = 0; j < 50; j++)
             {
-                //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j * 3,g), glm::vec3(0,0,0)));
+                mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j * 3,g), glm::vec3(0,0,0)));
             }
         }
     }

@@ -534,7 +534,7 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 	glm::vec3 half2 = (obj2.SO_rigidbody.oriBoundBox.maxOri);
 	
 	//create the orientation axis for the first box(idk why the order is switched up but it is, it is switched up in rendering the same way as well)
-	float deg2rad = M_PIf / 180.0f;
+	float deg2rad = 3.14159265358979323846f / 180.0f;
 	float cosA = cos(obj1.SO_rigidbody.rotation.x * deg2rad);//pitch
 	float cosB = cos(obj1.SO_rigidbody.rotation.y * deg2rad);//yaw
 	float cosC = cos(obj1.SO_rigidbody.rotation.z * deg2rad);//roll

@@ -15,9 +15,9 @@ Camera::Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 target, float f
 
 glm::vec3 Camera::GetCameraDir()
 {
-    target.x = -sinf(rotation.x*(M_PI/180)) * cosf((rotation.y)*(M_PI/180));
-    target.y = -sinf((rotation.y)*(M_PI/180));
-    target.z = cosf((rotation.x)*(M_PI/180)) * cosf((rotation.y)*(M_PI/180));
+    target.x = -sinf(rotation.x*(3.14159265358979323846f/180.0f)) * cosf((rotation.y)*(3.14159265358979323846f/180.0f));
+    target.y = -sinf((rotation.y)*(3.14159265358979323846f/180.0f));
+    target.z = cosf((rotation.x)*(3.14159265358979323846f/180.0f)) * cosf((rotation.y)*(3.14159265358979323846f/180.0f));
     return glm::normalize(target);
 }
 
