@@ -617,19 +617,19 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 				collisionNormal = -collisionNormal;
 			
 			//now find the vertex
-			glm::vec3 tempContactPoint = half2;
+			glm::vec3 tempContactPoint = half1;
 
-			if (glm::dot(b2AxisX, collisionNormal) < 0.0f) 
+			if (glm::dot(b1AxisX, collisionNormal) < 0.0f) 
 				tempContactPoint.x = -tempContactPoint.x;
-			if (glm::dot(b2AxisY, collisionNormal) < 0.0f) 
+			if (glm::dot(b1AxisY, collisionNormal) < 0.0f) 
 				tempContactPoint.y = -tempContactPoint.y;
-			if (glm::dot(b2AxisZ, collisionNormal) < 0.0f) 
+			if (glm::dot(b1AxisZ, collisionNormal) < 0.0f) 
 				tempContactPoint.z = -tempContactPoint.z;
 			
 			//transform this point to box 2's rotation
-			contactPoint.x = b2AxisX.x * tempContactPoint.x + b2AxisY.x * tempContactPoint.y + b2AxisZ.x * tempContactPoint.z + obj2.SO_rigidbody.position.x;
-			contactPoint.y = b2AxisX.y * tempContactPoint.x + b2AxisY.y * tempContactPoint.y + b2AxisZ.y * tempContactPoint.z + obj2.SO_rigidbody.position.y;
-			contactPoint.z = b2AxisX.z * tempContactPoint.x + b2AxisY.z * tempContactPoint.y + b2AxisZ.z * tempContactPoint.z + obj2.SO_rigidbody.position.z;
+			contactPoint.x = b1AxisX.x * tempContactPoint.x + b1AxisY.x * tempContactPoint.y + b1AxisZ.x * tempContactPoint.z + obj1.SO_rigidbody.position.x;
+			contactPoint.y = b1AxisX.y * tempContactPoint.x + b1AxisY.y * tempContactPoint.y + b1AxisZ.y * tempContactPoint.z + obj1.SO_rigidbody.position.y;
+			contactPoint.z = b1AxisX.z * tempContactPoint.x + b1AxisY.z * tempContactPoint.y + b1AxisZ.z * tempContactPoint.z + obj1.SO_rigidbody.position.z;
 			
 		} 
 		else if (smallestCase < 6) 
@@ -642,158 +642,18 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 				collisionNormal = -collisionNormal;
 			
 			//now find the vertex
-			glm::vec3 tempContactPoint = half1;
-			if (glm::dot(b1AxisX, collisionNormal) < 0.0f) 
+			glm::vec3 tempContactPoint = half2;
+			if (glm::dot(b2AxisX, collisionNormal) < 0.0f) 
 				tempContactPoint.x = -tempContactPoint.x;
-			if (glm::dot(b1AxisY, collisionNormal) < 0.0f) 
+			if (glm::dot(b2AxisY, collisionNormal) < 0.0f) 
 				tempContactPoint.y = -tempContactPoint.y;
-			if (glm::dot(b1AxisZ, collisionNormal) < 0.0f) 
+			if (glm::dot(b2AxisZ, collisionNormal) < 0.0f) 
 				tempContactPoint.z = -tempContactPoint.z;
 			
 			//transform this point to box 1's rotation
-			contactPoint.x = b1AxisX.x * tempContactPoint.x + b1AxisY.x * tempContactPoint.y + b1AxisZ.x * tempContactPoint.z + obj1.SO_rigidbody.position.x;
-			contactPoint.y = b1AxisX.y * tempContactPoint.x + b1AxisY.y * tempContactPoint.y + b1AxisZ.y * tempContactPoint.z + obj1.SO_rigidbody.position.y;
-			contactPoint.z = b1AxisX.z * tempContactPoint.x + b1AxisY.z * tempContactPoint.y + b1AxisZ.z * tempContactPoint.z + obj1.SO_rigidbody.position.z;
-			
-		} 
-		else 
-		{
-			//collision along one of the edge-edge axis
-			
-			//find out which axis is colliding
-			smallestCase -= 6;
-			int oneAxisIndex = smallestCase / 3;
-			int twoAxisIndex = smallestCase % 3;
-			glm::vec3 oneAxis;
-
-			if (oneAxisIndex == 0) 
-				oneAxis = b1AxisX;
-			else if (oneAxisIndex == 1) 
-				oneAxis = b1AxisY;
-			else 
-				oneAxis = b1AxisZ;
-
-			glm::vec3 twoAxis;
-
-			if (twoAxisIndex == 0) 
-				twoAxis = b2AxisX;
-			else if (twoAxisIndex == 1)
-				twoAxis = b2AxisY;
-			else
-				twoAxis = b2AxisZ;
-
-			glm::vec3 axis = glm::normalize(glm::cross(oneAxis, twoAxis));
-			
-			//the axis should point from box one to box 2
-			if (glm::dot(axis, toCenter) > 0.0f)
-				axis = -axis;
-			
-			//find out which edges to use
-			glm::vec3 ptOnOneEdge = half1;
-			glm::vec3 ptOnTwoEdge = half2;
-			
-			if (0 == oneAxisIndex)
-				ptOnOneEdge.x = 0.0f;
-			else if (glm::dot(b1AxisX, axis) > 0.0f) 
-				ptOnOneEdge.x = -ptOnOneEdge.x;
-
-			if (1 == oneAxisIndex)
-				ptOnOneEdge.y = 0.0f;
-			else if (glm::dot(b1AxisY, axis) > 0.0f) 
-				ptOnOneEdge.y = -ptOnOneEdge.y;
-
-			if (2 == oneAxisIndex)
-				ptOnOneEdge.z = 0.0f;
-			else if (glm::dot(b1AxisZ, axis) > 0.0f) 
-				ptOnOneEdge.z = -ptOnOneEdge.z;
-			
-			if (0 == twoAxisIndex)
-				ptOnTwoEdge.x = 0.0f;
-			else if (glm::dot(b2AxisX, axis) > 0.0f)
-				ptOnTwoEdge.x = -ptOnTwoEdge.x;
-			
-			if (1 == twoAxisIndex)
-				ptOnTwoEdge.y = 0.0f;
-			else if (glm::dot(b2AxisY, axis) > 0.0f)
-				ptOnTwoEdge.y = -ptOnTwoEdge.y;
-			
-			if (2 == twoAxisIndex)
-				ptOnTwoEdge.z = 0.0f;
-			else if (glm::dot(b2AxisZ, axis) > 0.0f)
-				ptOnTwoEdge.z = -ptOnTwoEdge.z;
-			
-			//scale them in reverse to fix some issues
-			//ptOnOneEdge = scaleVec3(ptOnOneEdge, -1.0f);
-			//ptOnTwoEdge = scaleVec3(ptOnTwoEdge, -1.0f);
-			
-			//move them into world coordinates(add the obb centre)
-			ptOnOneEdge += obj1.SO_rigidbody.position;
-			ptOnTwoEdge += obj2.SO_rigidbody.position;
-			
-			//if this is true and the contact point is outside the edge(edge-face contact), we use one's midpoint, otherwise two's
-			bool useOne = smallestCaseSingleAxis > 2;
-			
-			//find the final collision point
-			//create some variables
-			//these variables are from the cycloneEngine code, so I dont know exactly what they mean but they work
-			glm::vec3 toSt, cOne, cTwo;
-			float dpStaOne, dpStaTwo, dpOneTwo, smOne, smTwo, denom, mua, mub;
-			//set some of the variables
-			smOne = sqrt(oneAxis.x * oneAxis.x + oneAxis.y * oneAxis.y + oneAxis.z * oneAxis.z);
-			smTwo = sqrt(twoAxis.x * twoAxis.x + twoAxis.y * twoAxis.y + twoAxis.z * twoAxis.z);
-			dpOneTwo = glm::dot(twoAxis, oneAxis);
-			toSt = ptOnOneEdge - ptOnTwoEdge;
-			dpStaOne = glm::dot(oneAxis, toSt);
-			dpStaTwo = glm::dot(twoAxis, toSt);
-			denom = smOne * smTwo - dpOneTwo * dpOneTwo;
-			//now break off into different cases
-			if (fabs(denom) < 0.0001f) 
-			{
-				//zero denominator indicates parallel lines
-				if (useOne == true)
-					contactPoint = ptOnOneEdge;
-				else
-					contactPoint = ptOnTwoEdge;
-				
-			}
-			else 
-			{
-				
-				mua = (dpOneTwo * dpStaTwo - smTwo * dpStaOne) / denom;
-				mub = (smOne * dpStaTwo - dpOneTwo * dpStaOne) / denom;
-				
-				float oneSize;
-				if (oneAxisIndex == 0) 
-					oneSize = half1.x;
-				else if (oneAxisIndex == 1) 
-					oneSize = half1.y;
-				else 
-					oneSize = half1.z;
-
-				float twoSize;
-				if (twoAxisIndex == 0) 
-					twoSize = half2.x;
-				else if (twoAxisIndex == 1) 
-					twoSize = half2.y;
-				else 
-					twoSize = half2.z;
-				
-				if (mua > oneSize || mua < -oneSize || mub > twoSize || mub < -twoSize) {
-					if (useOne == true) 
-						contactPoint = ptOnOneEdge;
-					else 
-						contactPoint = ptOnTwoEdge;
-				} 
-				else 
-				{
-					cOne = (ptOnOneEdge + oneAxis) * mua;
-					cTwo = (ptOnTwoEdge + twoAxis) * mub;
-					
-					contactPoint = (cOne * 0.5f) + (cTwo * 0.5f);
-				}
-				
-			}
-			
+			contactPoint.x = b2AxisX.x * tempContactPoint.x + b2AxisY.x * tempContactPoint.y + b2AxisZ.x * tempContactPoint.z + obj2.SO_rigidbody.position.x;
+			contactPoint.y = b2AxisX.y * tempContactPoint.x + b2AxisY.y * tempContactPoint.y + b2AxisZ.y * tempContactPoint.z + obj2.SO_rigidbody.position.y;
+			contactPoint.z = b2AxisX.z * tempContactPoint.x + b2AxisY.z * tempContactPoint.y + b2AxisZ.z * tempContactPoint.z + obj2.SO_rigidbody.position.z;
 			
 		}
 		

@@ -127,6 +127,9 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
         {
             if(CollisionCheckBroad(own, objects[objectIds[i]]))
             {
+
+                //when collision
+
                 std::pair<bool, CollisionPoint> point = CollisionCheckNarrowSat(own, objects[objectIds[i]]);
                 if(point.first)
                 {
@@ -136,7 +139,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
                         position += normal * point.second.dist;
                         float bounce = 0.6f;
                         float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass), normal);
-                        ApplyImpulseForceAtPos(velocity + normal * (j / mass), point.second.point, 1.0f);
+                        ApplyImpulseForce(velocity + normal * (j / mass), 1.0f);
                     }
                     else
                     {
@@ -144,8 +147,8 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
                         objects[objectIds[i]].SO_rigidbody.position += normal * point.second.dist * -0.5f;
                         float bounce = 0.3f;
                         float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass) + (1 / objects[objectIds[i]].SO_rigidbody.mass), normal);
-                        ApplyImpulseForceAtPos(velocity + normal * (j / mass), point.second.point, 1.0f);
-                        objects[objectIds[i]].SO_rigidbody.ApplyImpulseForceAtPos(objects[objectIds[i]].SO_rigidbody.velocity + -normal * (j / mass), point.second.point, 1.0f);
+                        ApplyImpulseForce(velocity + normal * (j / mass), 1.0f);
+                        objects[objectIds[i]].SO_rigidbody.ApplyImpulseForce(objects[objectIds[i]].SO_rigidbody.velocity + -normal * (j / mass), 1.0f);
                     }
                 }
             }
@@ -205,7 +208,7 @@ glm::vec3 RigidBody::GetLocalDir(glm::vec3 dir)
     rotMat = glm::rotate(rotMat, rotation.x * 3.14159265358979323846f/180.0f, glm::vec3(1.0f, 0.0f, 0.0f));
     rotMat = glm::rotate(rotMat, rotation.y * 3.14159265358979323846f/180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     rotMat = glm::rotate(rotMat, rotation.z * 3.14159265358979323846f/180.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-    return rotMat * glm::vec4(dir, 1.0f);
+    return TransformVec4(glm::vec4(dir, 1.0f), rotMat);
 }
 
 void Solver(glm::vec3& out, glm::vec3 in, float step)
