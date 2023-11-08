@@ -34,7 +34,7 @@ void main()
     lightDot += vec3(1.0,1.0,1.0)*NdotL;
 
     float specCo = 0.0;
-    if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), nor))), 128.0); 
+    if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), nor))), 16.0); 
     specular += specCo;
 
     finalColor = (texelColor *((colorNew + vec4(specular, 1.0))*vec4(lightDot, 1.0)));

@@ -9,13 +9,14 @@ out vec3 pos;
 out vec2 uv;
 
 uniform mat4 model;
+uniform mat4 norModel;
 uniform mat4 view;
 uniform mat4 proj;
 
 void main()
 {
     pos = vec3(model * vec4(aPosition, 1.0));
-    normal = vec3(model * vec4(aNormal, 1.0));
+    normal = vec3(norModel * vec4(aNormal, 1.0));
     uv = aUv;
     gl_Position = proj * view * model * vec4(aPosition, 1.0);
 }
