@@ -66,7 +66,6 @@ void Mesh::Delete()
 
 void Mesh::BufferGens()
 {
-    BufferLock = true;
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
@@ -87,12 +86,10 @@ void Mesh::BufferGens()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 
     glBindVertexArray(0);
-    BufferLock = false;
 }
 
 void Mesh::ReGenBuffer()
 {
-    BufferLock = true;
     Delete();
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -114,17 +111,14 @@ void Mesh::ReGenBuffer()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 
     glBindVertexArray(0);
-    BufferLock = false;
 }
 
 void Mesh::DrawMesh()
 {
-    if(!BufferLock)
-    {
-        glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-        DrawCallCount++;
-    }
+
+    glBindVertexArray(vao);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    DrawCallCount++;
 }
 
 void Mesh::CreateModelMat()

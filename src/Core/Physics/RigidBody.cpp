@@ -127,9 +127,6 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
         {
             if(CollisionCheckBroad(own, objects[objectIds[i]]))
             {
-
-                //when collision
-
                 std::pair<bool, CollisionPoint> point = CollisionCheckNarrowSat(own, objects[objectIds[i]]);
                 if(point.first)
                 {

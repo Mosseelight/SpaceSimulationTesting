@@ -47,7 +47,6 @@ class Mesh
 private:
 
     unsigned int vao, vbo, ebo;
-    bool BufferLock = false;
 
 public:
 

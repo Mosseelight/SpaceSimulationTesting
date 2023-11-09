@@ -542,19 +542,19 @@ void ImguiMenu()
             {
             case CubeMesh:
                 selmesh = CreateCubeMesh(selposition, selrotation);
-                vertCount += selmesh.vertexes.size() * 3;
+                vertCount += selmesh.vertexes.size();
                 indCount += selmesh.indices.size();
                 mainScene.AddSpatialObject(selmesh);
                 break;
             case IcoSphereMesh:
                 selmesh = CreateSphereMesh(selposition, selrotation, IcoSphereSub);
-                vertCount += selmesh.vertexes.size() * 3;
+                vertCount += selmesh.vertexes.size();
                 indCount += selmesh.indices.size();
                 mainScene.AddSpatialObject(selmesh);
                 break;
             case TriangleMesh:
                 selmesh = Create2DTriangle(selposition, selrotation);
-                vertCount += selmesh.vertexes.size() * 3;
+                vertCount += selmesh.vertexes.size();
                 indCount += selmesh.indices.size();
                 mainScene.AddSpatialObject(selmesh);
                 break;
@@ -565,11 +565,10 @@ void ImguiMenu()
                 }
                 else
                 {
-                    selmesh = LoadModel(selposition, selrotation, modelLoc + input);
-                    vertCount += selmesh.vertexes.size() * 3;
-                    indCount += selmesh.indices.size();
                     unsigned int id = mainScene.SpatialObjects.size();
-                    mainScene.AddSpatialObject(selmesh);
+                    mainScene.AddSpatialObject(LoadModel(selposition, selrotation, modelLoc + input));
+                    vertCount += mainScene.SpatialObjects[id].SO_mesh.vertexes.size();
+                    indCount += mainScene.SpatialObjects[id].SO_mesh.indices.size();
                     mainScene.SpatialObjects[id].SO_rigidbody.velocity = selvelocity;
                     mainScene.SpatialObjects[id].SO_rigidbody.acceleration = selacceleration;
                     mainScene.SpatialObjects[id].SO_rigidbody.rotVelocity = selvelocityrot;
