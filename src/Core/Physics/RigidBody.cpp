@@ -86,7 +86,7 @@ void BoundingBox::ConstructOriBoundingBox(Mesh& mesh)
 
 RigidBody::RigidBody()
 {
-    mass = 1.0f;
+    mass = 1000.0f;
     position = glm::vec3(0.0f);
     velocity = glm::vec3(0.0f);
     acceleration = glm::vec3(0.0f);
@@ -120,7 +120,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
         once = false;
     }
     
-    ApplyForce(glm::vec3(0,-9.81,0));
+    ApplyForce(glm::vec3(0,-9.81,0) * mass);
     for (unsigned int i = 0; i < objectIds.size(); i++)
     {
         if(own.SO_id != objects[objectIds[i]].SO_id)

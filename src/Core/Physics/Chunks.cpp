@@ -52,6 +52,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
     static unsigned int objectCount = 0;
 
     //array space allocation to fit any new objects or objects that span multiple chunks
+    //have to span the max amount possible that it can which is highest 
     if(objectCount != objects.size())
     {
         spatialLookup.resize(objects.size());
@@ -65,14 +66,18 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
             if(glm::distance(objects[i].SO_rigidbody.boundbox.max, objects[i].SO_rigidbody.boundbox.min) / ChunkSize > 1)
             {
                 spanCount++;
-                glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
-                glm::vec3 max = objects[i].SO_rigidbody.boundbox.max;
-                
-                for (float x = min.x; x < max.x + 0.0001f; x += ChunkSize)
+                glm::vec3 min = objects[i].SO_rigidbody.oriBoundBox.minOri;
+                glm::vec3 max = objects[i].SO_rigidbody.oriBoundBox.maxOri;
+
+                //the maxiumum possible extents a object can have if it spans chunks so that if it is rotated quickly
+                //a seg fault does not occur
+                float maxL = fmaxf(max.x - min.x, fmaxf(max.y - min.y, max.z - min.z)) / ChunkSize;
+
+                for (unsigned int x = 0; x < maxL + 0.0001f; x++)
                 {
-                    for (float y = min.y; y < (max.y + 0.0001f); y += ChunkSize)
+                    for (unsigned int y = 0; y < maxL + 0.0001f; y++)
                     {
-                        for (float z = min.z; z < max.z + 0.0001f; z += ChunkSize)
+                        for (unsigned int z = 0; z < maxL + 0.0001f; z++)
                         {
                             spatialLookup.push_back(std::make_pair(0, 0));
                             startLookup.push_back(0);
@@ -101,6 +106,8 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
         {
             glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
             glm::vec3 max = objects[i].SO_rigidbody.boundbox.max;
+            DrawDebugCube(max, 0.4f, glm::vec3(255,0,0));
+            DrawDebugCube(min, 0.4f, glm::vec3(0,0,255));
             unsigned int count = 0;
 
             for (float x = min.x; x < max.x + 0.0001f; x += ChunkSize)
