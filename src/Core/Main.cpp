@@ -471,6 +471,10 @@ void ImguiMenu()
         static int counter;
         static glm::vec3 selposition;
         static glm::vec3 selrotation;
+        static glm::vec3 selvelocity;
+        static glm::vec3 selacceleration;
+        static glm::vec3 selvelocityrot;
+        static glm::vec3 selaccelerationrot;
         static int IcoSphereSub = 0;
         static std::string input;
         ImGui::SetNextWindowSize(ImVec2(600,420), ImGuiCond_FirstUseEver);
@@ -524,6 +528,10 @@ void ImguiMenu()
         }
         ImGui::InputFloat3("Object Position", glm::value_ptr(selposition));
         ImGui::InputFloat3("Object Rotation", glm::value_ptr(selrotation));
+        ImGui::InputFloat3("Object Velocity", glm::value_ptr(selvelocity));
+        ImGui::InputFloat3("Object Acceleration", glm::value_ptr(selacceleration));
+        ImGui::InputFloat3("Object Rotation Velocity", glm::value_ptr(selvelocityrot));
+        ImGui::InputFloat3("Object Rotation Acceleration", glm::value_ptr(selaccelerationrot));
 
         ImGui::Text("Current Model: %s", input.c_str());
 
@@ -560,7 +568,12 @@ void ImguiMenu()
                     selmesh = LoadModel(selposition, selrotation, modelLoc + input);
                     vertCount += selmesh.vertexes.size() * 3;
                     indCount += selmesh.indices.size();
+                    unsigned int id = mainScene.SpatialObjects.size();
                     mainScene.AddSpatialObject(selmesh);
+                    mainScene.SpatialObjects[id].SO_rigidbody.velocity = selvelocity;
+                    mainScene.SpatialObjects[id].SO_rigidbody.acceleration = selacceleration;
+                    mainScene.SpatialObjects[id].SO_rigidbody.rotVelocity = selvelocityrot;
+                    mainScene.SpatialObjects[id].SO_rigidbody.rotAcceleration = selaccelerationrot;
                 }
                 break;
             }
