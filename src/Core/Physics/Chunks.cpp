@@ -106,8 +106,6 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
         {
             glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
             glm::vec3 max = objects[i].SO_rigidbody.boundbox.max;
-            DrawDebugCube(max, 0.4f, glm::vec3(255,0,0));
-            DrawDebugCube(min, 0.4f, glm::vec3(0,0,255));
             unsigned int count = 0;
 
             for (float x = min.x; x < max.x + 0.0001f; x += ChunkSize)
