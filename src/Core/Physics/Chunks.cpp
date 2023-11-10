@@ -63,7 +63,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
         for (unsigned int i = 0; i < objects.size(); i++)
         {
             unsigned int offset = 0;
-            if(glm::distance(objects[i].SO_rigidbody.boundbox.max, objects[i].SO_rigidbody.boundbox.min) / ChunkSize > 1)
+            if(glm::distance(objects[i].SO_rigidbody.oriBoundBox.maxOri, objects[i].SO_rigidbody.oriBoundBox.minOri) / ChunkSize > 1)
             {
                 spanCount++;
                 glm::vec3 min = objects[i].SO_rigidbody.oriBoundBox.minOri;
@@ -73,18 +73,14 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                 //a seg fault does not occur
                 float maxL = fmaxf(max.x - min.x, fmaxf(max.y - min.y, max.z - min.z)) / ChunkSize;
 
-                for (unsigned int x = 0; x < maxL + 0.0001f; x++)
+                for (size_t i = 0; i < maxL * maxL * maxL; i++)
                 {
-                    for (unsigned int y = 0; y < maxL + 0.0001f; y++)
-                    {
-                        for (unsigned int z = 0; z < maxL + 0.0001f; z++)
-                        {
-                            spatialLookup.push_back(std::make_pair(0, 0));
-                            startLookup.push_back(0);
-                            offset++;
-                        }
-                    }
+                    spatialLookup.push_back(std::make_pair(0, 0));
+                    startLookup.push_back(0);
+                    offset++;
                 }
+                
+
                 chunkOffsets[i + 1] = offset * spanCount;
             }
             else
@@ -122,7 +118,6 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                     }
                 }
             }
-            
         }
     }
 

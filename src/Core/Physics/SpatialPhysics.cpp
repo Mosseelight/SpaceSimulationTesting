@@ -2,6 +2,25 @@
 
 void RunSimulation(float deltaTime, Scene& scene, int runSim)
 {
+
+    //Big World Inititive
+    /*
+        chunk sleeping
+
+        wake chunks
+            for every object that is awake, wake its chunk it is in and the one it will be in (using velocity)
+
+        sleeping chunks
+            for every object that is awake, check if it is sleeping (compaare position from last frame to current and get length, 
+            check for small value like 0.001f for small movements not visable)
+            if all objects in a chunk are sleeping then the chunk is sleeping
+        
+        updating chunks
+            if a object is sleeping dont update the chunk for it
+            (best way is to remove it from the for loop check, worse way is to early check if it is sleeping)
+
+    */
+
     static std::vector<unsigned int> ids;
     static ChunkManager cManager;
     cManager.UpdateChunks(scene.SpatialObjects);

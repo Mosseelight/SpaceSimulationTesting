@@ -142,7 +142,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
                     {
                         position += normal * point.second.dist * 0.5f;
                         objects[objectIds[i]].SO_rigidbody.position += normal * point.second.dist * -0.5f;
-                        float bounce = 0.3f;
+                        float bounce = 0.6f;
                         float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass) + (1 / objects[objectIds[i]].SO_rigidbody.mass), normal);
                         ApplyImpulseForce(velocity + normal * (j / mass), 1.0f);
                         objects[objectIds[i]].SO_rigidbody.ApplyImpulseForce(objects[objectIds[i]].SO_rigidbody.velocity + -normal * (j / mass), 1.0f);
