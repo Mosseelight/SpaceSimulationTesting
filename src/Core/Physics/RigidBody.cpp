@@ -96,6 +96,7 @@ RigidBody::RigidBody()
     totalForce = glm::vec3(0.0f);
     totalRotation = glm::vec3(0.0f);
     isStatic = false;
+    isAwake = true;
     gForce = 0;
 }
 
@@ -111,6 +112,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
         return;
     totalForce = glm::vec3(0);
     totalRotation = glm::vec3(0);
+    oldPos = position;
 
     //APPLY FORCE HERE
 
@@ -158,6 +160,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     Solver(rotVelocity, rotAcceleration * timeStep, 1.0f);
     Solver(rotation, rotVelocity * timeStep, 1.0f);
     Solver(position, velocity * timeStep, 1.0f);
+
 
     gForce = glm::length(acceleration) / 9.81f;
 }
@@ -218,6 +221,13 @@ void Solver(glm::vec3& out, glm::vec3 in, float step)
     out += (1.0f / 6.0f) * (temp1 + 2.0f * temp2 + 2.0f * temp3 + temp4);
 }
 
+void RigidBody::CheckSleep()
+{
+        if(glm::distance(position, oldPos) > 0.0f)
+            isAwake = true;
+        else
+            isAwake = false;
+}
 
 void RigidBody::CalculateCollisionShape(SpatialObject& object)
 {

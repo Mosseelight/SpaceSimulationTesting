@@ -6,8 +6,6 @@ Engine stuff for uses in other things
 ----NEED IN ORDER----
 Basic physics
 
-    fix spatial hashing issue of span objects when rotated quickly creating a seg fault
-
     More rigidbody functions?
     Mesh updating in the gpu subBuffer()?
     

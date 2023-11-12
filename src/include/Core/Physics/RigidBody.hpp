@@ -29,13 +29,14 @@ public:
 class RigidBody
 {
 private:
-    
+    glm::vec3 oldPos;
 public:
 
     BoundingBox boundbox;
     BoundingBox oriBoundBox;
     std::vector<Vertex> collisionShape;
     bool isStatic;
+    bool isAwake;
 
     float mass;
     glm::vec3 position;
@@ -65,4 +66,5 @@ public:
     glm::vec3 GetLocalDir(glm::vec3 dir);
 
     void CalculateCollisionShape(SpatialObject& object);
+    void CheckSleep();
 };

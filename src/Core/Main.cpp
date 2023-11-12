@@ -120,9 +120,9 @@ int main()
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
     unsigned int count = 0;
-    for (int i = -50; i < 50; i++)
+    for (int i = -10; i < 10; i++)
     {
-        for (int g = -50; g < 50; g++)
+        for (int g = -10; g < 10; g++)
         {
             mainScene.AddSpatialObject(LoadModel(glm::vec3(i * 100, -0.7f, g * 100), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
             mainScene.SpatialObjects[count].SO_rigidbody.isStatic = true;
@@ -130,7 +130,7 @@ int main()
         }
     }
 
-    //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(0,5,0), glm::vec3(0,0,0)));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,3,0), glm::vec3(0), modelLoc + "Teapot.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0.5f,10,0), glm::vec3(0), modelLoc + "Teapot.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,25,0), glm::vec3(0), modelLoc + "Monkey.obj"));

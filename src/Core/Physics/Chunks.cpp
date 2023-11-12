@@ -19,9 +19,9 @@ std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialOb
 
     for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
     {
-        unsigned int currentKey = spatialLookup[i].first;
-        if (currentKey == key && objects[spatialLookup[i].second].SO_id != objectID)
-            objectsInSameChunk.push_back(objects[spatialLookup[i].second].SO_id);
+        unsigned int currentKey = std::get<0>(spatialLookup[i]);
+        if (currentKey == key && objects[std::get<1>(spatialLookup[i])].SO_id != objectID)
+            objectsInSameChunk.push_back(objects[std::get<1>(spatialLookup[i])].SO_id);
             
         else
             break;
@@ -37,9 +37,9 @@ std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialOb
 
     for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
     {
-        unsigned int currentKey = spatialLookup[i].first;
-        if (currentKey == key && objects[spatialLookup[i].second].SO_id != objectID)
-            objectsInSameChunk.push_back(objects[spatialLookup[i].second].SO_id);
+        unsigned int currentKey = std::get<0>(spatialLookup[i]);
+        if (currentKey == key && objects[std::get<1>(spatialLookup[i])].SO_id != objectID)
+            objectsInSameChunk.push_back(objects[std::get<1>(spatialLookup[i])].SO_id);
         else
             break;
     }
@@ -75,7 +75,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
 
                 for (size_t i = 0; i < maxL * maxL * maxL; i++)
                 {
-                    spatialLookup.push_back(std::make_pair(0, 0));
+                    spatialLookup.push_back(std::make_tuple(0, 0, false));
                     startLookup.push_back(0);
                     offset++;
                 }
@@ -95,7 +95,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
         {
             glm::vec3 pos = getChunkpos(objects[i].SO_rigidbody.position);
             unsigned int key = getKeyVal(getHashVal(pos));
-            spatialLookup[i] = std::make_pair(key, i);
+            spatialLookup[i] = std::make_tuple(key, i, false);
             startLookup[i] = UINT32_MAX;
         }
         else
@@ -112,7 +112,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                     {
                         glm::vec3 pos = getChunkpos(glm::vec3(x,y,z));
                         unsigned int key = getKeyVal(getHashVal(pos));
-                        spatialLookup[objects.size() - 1 + count + chunkOffsets[i]] = std::make_pair(key, i);
+                        spatialLookup[objects.size() - 1 + count + chunkOffsets[i]] = std::make_tuple(key, i, objects[i].SO_rigidbody.isAwake);
                         startLookup[objects.size() - 1 + count + chunkOffsets[i]] = UINT32_MAX;
                         count++;
                     }
@@ -125,12 +125,12 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
 
     for (unsigned int i = 0; i < startLookup.size(); i++)
     {
-        unsigned int key = spatialLookup[i].first;
+        unsigned int key = std::get<0>(spatialLookup[i]);
         unsigned int keyPrev;
         if(i == 0)
             keyPrev = 0;
         else
-            keyPrev = spatialLookup[i - 1].first;
+            keyPrev = std::get<0>(spatialLookup[i - 1]);
         if(key != keyPrev)
             startLookup[key] = i;
     }

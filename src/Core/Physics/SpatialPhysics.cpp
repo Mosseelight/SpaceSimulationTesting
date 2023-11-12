@@ -19,6 +19,9 @@ void RunSimulation(float deltaTime, Scene& scene, int runSim)
             if a object is sleeping dont update the chunk for it
             (best way is to remove it from the for loop check, worse way is to early check if it is sleeping)
 
+        figure out a way to remove objects from updating if they are alseep
+        (pass in the ids of the awak objects with the scene objects to run the update chunk method with those?)
+
     */
 
     static std::vector<unsigned int> ids;

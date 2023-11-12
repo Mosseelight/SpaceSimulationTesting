@@ -4,11 +4,19 @@
 #include <vector>
 #include <algorithm>
 
+class Chunk
+{   
+public:
+    unsigned int key;
+    unsigned int id;
+    bool sleep;
+};
+
 class ChunkManager
 {
 public:
     float ChunkSize;
-    std::vector<std::pair<unsigned int, unsigned int>> spatialLookup;
+    std::vector<std::tuple<unsigned int, unsigned int, bool>> spatialLookup;
     std::vector<unsigned int> startLookup;
     std::vector<unsigned int> chunkOffsets;
 
