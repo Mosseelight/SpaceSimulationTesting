@@ -13,9 +13,7 @@ Basic physics
         from screen to world and world to screen
     
 __________________________
-Fix Shader not lighting objects under -1 y
 lights
-shader matrix issues
 __________________________
 console and logging system
 

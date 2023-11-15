@@ -30,6 +30,13 @@ class RigidBody
 {
 private:
     glm::vec3 oldPos;
+    
+    glm::vec3 forward;
+    glm::vec3 backward;
+    glm::vec3 right;
+    glm::vec3 left;
+    glm::vec3 up;
+    glm::vec3 down;
 public:
 
     BoundingBox boundbox;
@@ -60,6 +67,7 @@ public:
     void ApplyImpulseForce(glm::vec3 dir, float power);
     void ApplyImpulseForceAtPos(glm::vec3 dir, glm::vec3 pos, float power);
     void ApplyDragForce(float airDensity, float area);
+    void ApplyLiftForce(float airDesnity, float area);
 
     void ApplyRotationForce(glm::vec3 force);
     void ApplyRotationImpulseForce(glm::vec3 dir, float power);

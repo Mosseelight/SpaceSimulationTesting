@@ -86,7 +86,7 @@ void BoundingBox::ConstructOriBoundingBox(Mesh& mesh)
 
 RigidBody::RigidBody()
 {
-    mass = 1000.0f;
+    mass = 9100.0f;
     position = glm::vec3(0.0f);
     velocity = glm::vec3(0.0f);
     acceleration = glm::vec3(0.0f);
@@ -123,6 +123,8 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     }
     
     ApplyForce(glm::vec3(0,-9.81,0) * mass);
+    ApplyLiftForce(AirDensity, 28.0f);
+    ApplyDragForce(AirDensity, 28.0f);
     for (unsigned int i = 0; i < objectIds.size(); i++)
     {
         if(own.SO_id != objects[objectIds[i]].SO_id)
@@ -161,8 +163,16 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     Solver(rotation, rotVelocity * timeStep, 1.0f);
     Solver(position, velocity * timeStep, 1.0f);
 
+    //calculate local directions
+    forward = TransformVec4(glm::vec4(0,0,1,1), own.SO_mesh.rotMatrix);
+    right = TransformVec4(glm::vec4(01,0,0,1), own.SO_mesh.rotMatrix);
+    backward = -forward;
+    left = -right;
+    up = glm::cross(forward, right);
+    down = glm::cross(forward, left);
 
     gForce = glm::length(acceleration) / 9.81f;
+
 }
 
 void RigidBody::ApplyForce(glm::vec3 force)
@@ -189,7 +199,12 @@ void RigidBody::ApplyImpulseForceAtPos(glm::vec3 dir, glm::vec3 pos, float power
 
 void RigidBody::ApplyDragForce(float airDensity, float area)
 {
-    totalForce += 0.5f * airDensity * area * -velocity;
+    totalForce += 0.5f * airDensity * area * 0.0175f * -velocity;
+}
+
+void RigidBody::ApplyLiftForce(float airDensity, float area)
+{
+    totalForce += up * (0.5f * airDensity * glm::length(velocity) * glm::length(velocity) * area * 1.9f);
 }
 
 void RigidBody::ApplyRotationForce(glm::vec3 force)
@@ -202,6 +217,7 @@ void RigidBody::ApplyRotationImpulseForce(glm::vec3 dir, float power)
     rotVelocity = dir * power;
 }
 
+//dont use
 glm::vec3 RigidBody::GetLocalDir(glm::vec3 dir)
 {
     glm::mat4 rotMat = glm::mat4(1.0f);

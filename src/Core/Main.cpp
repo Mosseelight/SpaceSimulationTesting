@@ -376,6 +376,7 @@ void ImguiMenu()
 
     //needs to be io.framerate because the actal deltatime is polled too fast and the 
     //result is hard to read
+    ImGui::Text("Version %s", EngVer.c_str());
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1.0f / io->Framerate, io->Framerate);
     ImGui::Text("%u verts, %u indices (%u tris)", vertCount, indCount, indCount / 3);
     ImGui::Text("Amount of Spatials: (%zu)", mainScene.SpatialObjects.size());

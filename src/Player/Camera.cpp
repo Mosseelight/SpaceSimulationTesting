@@ -23,9 +23,7 @@ glm::vec3 Camera::GetCameraDir()
 
 glm::vec3 Camera::GetCameraUp()
 {
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 cameraRight = glm::normalize(glm::cross(up, GetCameraDir()));
-    return glm::cross(GetCameraDir(), cameraRight);
+    return glm::cross(GetCameraDir(), glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), GetCameraDir())));
 }
 
 glm::mat4 Camera::GetViewMat()
