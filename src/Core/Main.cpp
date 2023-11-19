@@ -139,7 +139,7 @@ int main()
 
     //scene initilzation
     //LoadScene(sceneLoc, "main.scene", mainScene);
-    texture.LoadTexture(imageLoc + "IconSpace.png");
+    texture.LoadTexture(imageLoc + "RedDebug.png");
 
     unsigned int count = 0;
     for (int i = 0; i < 1; i++)
@@ -269,25 +269,17 @@ void Render(SDL_Window* window)
 
     glClearColor(0.4f, 0.7f, 0.8f, 1.0f);
     
-    glm::vec3 lightPos = glm::vec3(-40.0f, 80.0f, -40.0f);
+    glm::vec3 lightPos = glm::vec3(sin(GetTime()) * 40, 80.0f, cos(GetTime()) * 40);
     float objectDists[mainScene.SpatialObjects.size()];
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
-        if(lightPos.x > mainScene.SpatialObjects[i].SO_rigidbody.boundbox.max.x &&
-            lightPos.y > mainScene.SpatialObjects[i].SO_rigidbody.boundbox.max.y && lightPos.z > mainScene.SpatialObjects[i].SO_rigidbody.boundbox.max.z)
-        {
-            objectDists[i] = glm::distance(lightPos, mainScene.SpatialObjects[i].SO_rigidbody.boundbox.max);
-        }
-        else
-        {
-            objectDists[i] = glm::distance(lightPos, mainScene.SpatialObjects[i].SO_rigidbody.boundbox.min);
-        }
+        objectDists[i] = glm::distance(lightPos, mainScene.SpatialObjects[i].SO_rigidbody.position);
     }
     std::sort(objectDists, objectDists + mainScene.SpatialObjects.size());
 
-    float near_plane = objectDists[0] * 0.5f, far_plane = objectDists[mainScene.SpatialObjects.size() - 1] * 2.0f;
-    float fov = glm::degrees(2.0f * atan(objectDists[mainScene.SpatialObjects.size() - 1] / 10.0f));
-    glm::mat4 lightProjection = glm::ortho(-60.0f, 60.0f, -60.0f, 60.0f, near_plane, far_plane);
+    float near_plane = objectDists[0] * 0.7f, far_plane = objectDists[mainScene.SpatialObjects.size() - 1] + 5.0f;
+    float fov = glm::degrees(2.0f * atan(objectDists[mainScene.SpatialObjects.size() - 1] / far_plane));
+    glm::mat4 lightProjection = glm::perspective(glm::radians(fov), (float)ShadowSize / (float)ShadowSize, near_plane, far_plane);
     glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
     glUseProgram(depthShader.shader);
@@ -313,7 +305,7 @@ void Render(SDL_Window* window)
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, depthMap);
     mainScene.DrawSingle(&shader, lightSpaceMatrix, player->camera.GetViewMat(), player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.1f, 100000.0f), player->position);
-    
+
     //debuging sets
     SetNeededDebug(player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.1f, 100000.0f), player->camera.GetViewMat(), shaderLoc);
     DrawDebugItems();
