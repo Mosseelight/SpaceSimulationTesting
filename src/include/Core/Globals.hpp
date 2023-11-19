@@ -3,7 +3,7 @@
 
 const int SCRWIDTH = 1920;
 const int SCRHEIGHT = 1080;
-const std::string EngVer = "0.6.2";
+const std::string EngVer = "0.6.3";
 const unsigned int ShadowSize = 4096;
 
 //Physics
