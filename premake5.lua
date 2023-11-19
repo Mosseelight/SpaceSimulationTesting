@@ -10,7 +10,7 @@ project "SpatialEngine"
     cppdialect "C++17"
     architecture "x86_64"
     targetdir "bin/%{cfg.buildcfg}"
-    buildoptions { "-MMD -MP -Wall -c -g -m64 -O3 -march=native" }
+    buildoptions { "-MMD -MP -Wall -c -g -m64 -march=native" }
 
     files { "src/**.hpp", "src/**.cpp", "src/**.h", "src/**.c" }
     includedirs { "src/include/**" }

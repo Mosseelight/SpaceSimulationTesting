@@ -39,7 +39,8 @@ public:
 
     void AddSpatialObject(Mesh mesh);
     void DrawFull(unsigned int stepSize); // Will Draw every object 
-    void DrawSingle(Shader *shader, glm::mat4 view, glm::mat4 proj, glm::vec3 camPos); 
+    void DrawSingle(Shader *shader, glm::mat4 lightMat, glm::mat4 view, glm::mat4 proj, glm::vec3 camPos);
+    void DrawSingleNoAssign(Shader *shader);
     void DeleteObjects();
     void Clear();
 

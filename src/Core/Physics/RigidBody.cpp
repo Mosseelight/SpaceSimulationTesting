@@ -169,7 +169,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     backward = -forward;
     left = -right;
     up = glm::cross(forward, right);
-    down = glm::cross(forward, left);
+    down = -up;
 
     gForce = glm::length(acceleration) / 9.81f;
 

@@ -12,6 +12,7 @@
 #include <memory>
 #include <random>
 #include <assert.h>
+#include <algorithm>
 
 //core
 #include "../include/Core/Globals.hpp"
@@ -38,6 +39,8 @@ bool showWireFrame = false;
 float currentTime = 0.0f;
 float deltaTime = 0.0f;
 float lastTime = 0.0f;
+double updateTime = 0.0;
+double updateFixedTime = 0.0;
 int currentSCRWIDTH = 0;
 int currentSCRHEIGHT = 0;
 bool vsync = true;
@@ -59,10 +62,13 @@ void input();
 void APIENTRY GLDebugMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *msg, const void *data);
 
 Shader shader;
+Shader depthShader;
 Texture texture;
 std::unique_ptr<Player> player;
 Scene mainScene;
 unsigned int vertCount, indCount;
+unsigned int depthMap;
+unsigned int depthMapFBO;
 
 int run = 1;
 int main()
@@ -115,14 +121,30 @@ int main()
     ImGui::SetNextWindowSize(ImVec2(450,420), ImGuiCond_FirstUseEver);
 
 
+    glGenFramebuffers(1, &depthMapFBO);
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, ShadowSize, ShadowSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+
     //scene initilzation
     //LoadScene(sceneLoc, "main.scene", mainScene);
     texture.LoadTexture(imageLoc + "IconSpace.png");
 
     unsigned int count = 0;
-    for (int i = -10; i < 10; i++)
+    for (int i = 0; i < 1; i++)
     {
-        for (int g = -10; g < 10; g++)
+        for (int g = 0; g < 1; g++)
         {
             mainScene.AddSpatialObject(LoadModel(glm::vec3(i * 100, -0.7f, g * 100), glm::vec3(0,0,0), modelLoc + "Floor.obj"));
             mainScene.SpatialObjects[count].SO_rigidbody.isStatic = true;
@@ -130,19 +152,19 @@ int main()
         }
     }
 
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,3,0), glm::vec3(0), modelLoc + "Teapot.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0.5f,10,0), glm::vec3(0), modelLoc + "Teapot.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,25,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,-4), glm::vec3(0), modelLoc + "Teapot.obj"));
     
-    for (int i = -48 ; i < 48 + (100 * 9); i += 3)
+    for (int i = -48 ; i < 48 + (100 * 0); i += 3)
     {
-        for (int g = -48; g < 48 + (100 * 9); g += 3)
+        for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
             for (int j = 0; j < 1; j++)
             {
-                //mainScene.AddSpatialObject(CreateCubeMesh(glm::vec3(i,j * 3,g), glm::vec3(0,0,0)));
+                mainScene.AddSpatialObject(LoadModel(glm::vec3(i,5,g), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
             }
         }
     }
@@ -160,7 +182,9 @@ int main()
 
     shader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Default.vert"), ReadFile(shaderLoc + "Default.frag")));
     glUseProgram(shader.shader);
-    shader.setInt("tex", 0);
+    shader.setInt("diffuseTexture", 0);
+    shader.setInt("shadowMap", 1);
+    depthShader.CompileShader(ShaderLoc(ReadFile(shaderLoc + "Depth.vert"), ReadFile(shaderLoc + "Depth.frag")));
 
     while(run)
     {
@@ -185,6 +209,7 @@ int main()
 
 void UpdateLogic(SDL_Window* window)
 {
+    updateTime = SDL_GetTicks64();
     SDL_GetWindowSize(window, &currentSCRWIDTH, &currentSCRHEIGHT);
 
     currentTime = GetTime();
@@ -198,6 +223,9 @@ void UpdateLogic(SDL_Window* window)
         mainScene.SpatialObjects[i].SO_mesh.CreateRotationMat();
     }
 
+    updateTime -= SDL_GetTicks64();
+
+    updateFixedTime = SDL_GetTicks64();
     static float totalTime;
     int counter = 0;
     totalTime += deltaTime;
@@ -218,6 +246,7 @@ void UpdateLogic(SDL_Window* window)
             break;
         }
     }
+    updateFixedTime -= SDL_GetTicks64();
 
     input();
 }
@@ -238,7 +267,38 @@ void Render(SDL_Window* window)
         ImguiMenu();
     }
 
-    glClearColor(0.0f, 0.54f, 0.54f, 1.0f);
+    glClearColor(0.4f, 0.7f, 0.8f, 1.0f);
+    
+    glm::vec3 lightPos = glm::vec3(-40.0f, 80.0f, -40.0f);
+    float objectDists[mainScene.SpatialObjects.size()];
+    for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
+    {
+        if(lightPos.x > mainScene.SpatialObjects[i].SO_rigidbody.boundbox.max.x &&
+            lightPos.y > mainScene.SpatialObjects[i].SO_rigidbody.boundbox.max.y && lightPos.z > mainScene.SpatialObjects[i].SO_rigidbody.boundbox.max.z)
+        {
+            objectDists[i] = glm::distance(lightPos, mainScene.SpatialObjects[i].SO_rigidbody.boundbox.max);
+        }
+        else
+        {
+            objectDists[i] = glm::distance(lightPos, mainScene.SpatialObjects[i].SO_rigidbody.boundbox.min);
+        }
+    }
+    std::sort(objectDists, objectDists + mainScene.SpatialObjects.size());
+
+    float near_plane = objectDists[0] * 0.5f, far_plane = objectDists[mainScene.SpatialObjects.size() - 1] * 2.0f;
+    float fov = glm::degrees(2.0f * atan(objectDists[mainScene.SpatialObjects.size() - 1] / 10.0f));
+    glm::mat4 lightProjection = glm::ortho(-60.0f, 60.0f, -60.0f, 60.0f, near_plane, far_plane);
+    glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+    glUseProgram(depthShader.shader);
+    depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+    glViewport(0, 0, ShadowSize, ShadowSize);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    mainScene.DrawSingleNoAssign(&depthShader);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glViewport(0, 0, SCRWIDTH, SCRHEIGHT);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDepthFunc(GL_LESS);
     //glCullFace(GL_FRONT);
@@ -247,9 +307,13 @@ void Render(SDL_Window* window)
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     glUseProgram(shader.shader);
+    shader.setVec3("lightPos", lightPos);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture.id);
-    mainScene.DrawSingle(&shader, player->camera.GetViewMat(), player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.1f, 100000.0f), player->position);
-
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    mainScene.DrawSingle(&shader, lightSpaceMatrix, player->camera.GetViewMat(), player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.1f, 100000.0f), player->position);
+    
     //debuging sets
     SetNeededDebug(player->camera.GetProjMat(currentSCRWIDTH, currentSCRHEIGHT, 0.1f, 100000.0f), player->camera.GetViewMat(), shaderLoc);
     DrawDebugItems();
@@ -335,16 +399,19 @@ bool ShowSceneViewerMenu = false;
 bool ShowObjectViewerMenu = false;
 bool ShowConsoleViewerMenu = false;
 
-struct ScrollingBuffer {
+struct ScrollingBuffer 
+{
     int MaxSize;
     int Offset;
     ImVector<ImVec2> Data;
-    ScrollingBuffer(int max_size = 2000) {
+    ScrollingBuffer(int max_size = 2000) 
+    {
         MaxSize = max_size;
         Offset  = 0;
         Data.reserve(MaxSize);
     }
-    void AddPoint(float x, float y) {
+    void AddPoint(float x, float y) 
+    {
         if (Data.size() < MaxSize)
             Data.push_back(ImVec2(x,y));
         else {
@@ -352,7 +419,8 @@ struct ScrollingBuffer {
             Offset =  (Offset + 1) % MaxSize;
         }
     }
-    void Erase() {
+    void Erase() 
+    {
         if (Data.size() > 0) {
             Data.shrink(0);
             Offset  = 0;
@@ -362,6 +430,7 @@ struct ScrollingBuffer {
 
 void ImguiMenu()
 {
+
     static ScrollingBuffer frameTimes(10000);
     static float HighestFT = 0.0f;
     if(deltaTime > HighestFT)
@@ -377,13 +446,15 @@ void ImguiMenu()
     //needs to be io.framerate because the actal deltatime is polled too fast and the 
     //result is hard to read
     ImGui::Text("Version %s", EngVer.c_str());
-    ImGui::Text("%.3f ms/frame (%.1f FPS)", 1.0f / io->Framerate, io->Framerate);
+    ImGui::Text("%.3f ms/frame (%.1f FPS)", (1.0f / io->Framerate) * 1000.0f, io->Framerate);
     ImGui::Text("%u verts, %u indices (%u tris)", vertCount, indCount, indCount / 3);
     ImGui::Text("Amount of Spatials: (%zu)", mainScene.SpatialObjects.size());
     ImGui::Text("DrawCall Avg: (%.1f) DC/frame, DrawCall Total (%d)", drawCallAvg, DrawCallCount);
     if(platform == "Linux")
         ImGui::Text("Ram Usage: %.2fmb", GetRamUsage() / 1024);
     ImGui::Text("Time Open %.1f minutes", (GetTime() / 60.0f));
+    ImGui::Text("Time taken for Update run %.2fms ", fabs(updateTime));
+    ImGui::Text("Time taken for Fixed Update run %.2fms ", fabs(updateFixedTime));
 
     static float frameTimeHistory = 2.75f;
     ImGui::SliderFloat("FrameTimeHistory", &frameTimeHistory, 0.1f, 10.0f);

@@ -104,19 +104,26 @@ void Scene::AddSpatialObject(Mesh mesh)
 
 }*/
 
-void Scene::DrawSingle(Shader *shader, glm::mat4 view, glm::mat4 proj, glm::vec3 camPos)
+void Scene::DrawSingle(Shader *shader, glm::mat4 lightMat, glm::mat4 view, glm::mat4 proj, glm::vec3 camPos)
 {
     for (unsigned int i = 0; i < SpatialObjects.size(); i++)
     {
         shader->setMat4("model", SpatialObjects[i].SO_mesh.modelMatrix);
-        shader->setMat4("norModel", glm::transpose(glm::inverse(SpatialObjects[i].SO_mesh.modelMatrix)));
-        shader->setVec3("color", glm::vec3(1.0f, 1.0f, 1.0f));
-        shader->setVec3("ViewPos", camPos);
-        shader->setMat4("proj", proj);
+        shader->setMat4("lightSpaceMatrix", lightMat);
+        shader->setVec3("viewPos", camPos);
+        shader->setMat4("projection", proj);
         shader->setMat4("view", view);
         SpatialObjects[i].SO_mesh.DrawMesh();
     }
-    
+}
+
+void Scene::DrawSingleNoAssign(Shader *shader)
+{
+    for (unsigned int i = 0; i < SpatialObjects.size(); i++)
+    {
+        shader->setMat4("model", SpatialObjects[i].SO_mesh.modelMatrix);
+        SpatialObjects[i].SO_mesh.DrawMesh();
+    }
 }
 
 void Scene::DeleteObjects()
