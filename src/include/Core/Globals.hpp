@@ -3,8 +3,8 @@
 
 const int SCRWIDTH = 1920;
 const int SCRHEIGHT = 1080;
-const std::string EngVer = "0.6.3";
-const unsigned int ShadowSize = 4096;
+const std::string EngVer = "0.6.4";
+const unsigned int ShadowSize = 16384;
 
 //Physics
 const int maxPhysicSteps = 3; // if fps is lower than 20 then the simulation will start skipping calculations for the missed time
