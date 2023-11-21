@@ -62,6 +62,10 @@ void Player::MouseMovement(int x, int y, bool leftP, bool rightP)
 {
     rotation.x += x * sensitivity;
     rotation.y += y * sensitivity;
+    if(rotation.y > 89.0f)
+        rotation.y =  89.0f;
+    if(rotation.y < -89.0f)
+        rotation.y = -89.0f;
 }
 
 void Player::LaunchObject(Scene& scene, std::string modelLoc)
