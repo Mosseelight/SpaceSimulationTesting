@@ -160,15 +160,12 @@ int main()
     {
         for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
-            for (int j = 0; j < 5; j++)
+            for (int j = 0; j < 6; j++)
             {
                 mainScene.AddSpatialObject(LoadModel(glm::vec3(i,5 * j,g), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
             }
         }
     }
-
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(80,40,80), glm::vec3(0), modelLoc + "Monkey.obj"));
-    mainScene.SpatialObjects[mainScene.SpatialObjects.size() - 1].SO_rigidbody.isStatic = true;
 
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
@@ -176,7 +173,7 @@ int main()
         indCount += mainScene.SpatialObjects[i].SO_mesh.indices.size();
     }
 
-    player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 40), glm::vec3(-33,12,-20)));
+    player.reset(new Player(30.0f, Camera(glm::vec3(0,0,0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0,0,-1), 60), glm::vec3(-33,12,-20)));
     player->rotation.x = 300;
     player->rotation.y = 15;
     player->rotation.z = 0;
@@ -223,7 +220,6 @@ void UpdateLogic(SDL_Window* window)
         mainScene.SpatialObjects[i].SO_mesh.CreateModelMat();
         mainScene.SpatialObjects[i].SO_mesh.CreateRotationMat();
     }
-    mainScene.SpatialObjects[mainScene.SpatialObjects.size() - 1].SO_rigidbody.position = glm::vec3(sin(GetTime() / 10.0f) * 70, 80.0f, cos(GetTime()  / 10.0f) * 70);
 
     updateTime -= SDL_GetTicks64();
 
@@ -376,6 +372,9 @@ void input()
                 break;
             case SDLK_y:
                 RunSimulation(deltaTime, mainScene, 1);
+                break;
+            case SDLK_v:
+                player->LaunchObject(mainScene, modelLoc + "Cube.obj");
                 break;
             }
             break;

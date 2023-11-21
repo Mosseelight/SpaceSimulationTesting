@@ -63,3 +63,10 @@ void Player::MouseMovement(int x, int y, bool leftP, bool rightP)
     rotation.x += x * sensitivity;
     rotation.y += y * sensitivity;
 }
+
+void Player::LaunchObject(Scene& scene, std::string modelLoc)
+{
+    unsigned int id = scene.SpatialObjects.size();
+    scene.AddSpatialObject(LoadModel(camera.position, glm::vec3(0), modelLoc));
+    scene.SpatialObjects[id].SO_rigidbody.ApplyImpulseForce(glm::normalize(camera.GetCameraDir()), 350.0f);
+}

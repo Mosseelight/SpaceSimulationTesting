@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Camera.hpp"
+#include "../Core/Scene.hpp"
 #include "../Core/Debug.hpp"
 #include <iostream>
 
@@ -24,4 +25,5 @@ public:
     void UpdatePlayer(float delta);
     void Movement(int key);
     void MouseMovement(int x, int y, bool leftP, bool rightP);
+    void LaunchObject(Scene& scene, std::string modelLoc);
 };

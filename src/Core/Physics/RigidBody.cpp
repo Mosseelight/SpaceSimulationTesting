@@ -123,8 +123,8 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     }
     
     ApplyForce(glm::vec3(0,-9.81,0) * mass);
-    ApplyLiftForce(AirDensity, 28.0f);
-    ApplyDragForce(AirDensity, 28.0f);
+    //ApplyLiftForce(AirDensity, 28.0f);
+    ApplyDragForce(AirDensity, 1.0f);
     for (unsigned int i = 0; i < objectIds.size(); i++)
     {
         if(own.SO_id != objects[objectIds[i]].SO_id)
@@ -147,7 +147,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
                         position += normal * point.second.dist * 0.5f;
                         objects[objectIds[i]].SO_rigidbody.position += normal * point.second.dist * -0.5f;
                         float bounce = 0.6f;
-                        float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass) + (1 / objects[objectIds[i]].SO_rigidbody.mass), normal);
+                        float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass + 1 / objects[objectIds[i]].SO_rigidbody.mass), normal);
                         ApplyImpulseForce(velocity + normal * (j / mass), 1.0f);
                         objects[objectIds[i]].SO_rigidbody.ApplyImpulseForce(objects[objectIds[i]].SO_rigidbody.velocity + -normal * (j / mass), 1.0f);
                     }
