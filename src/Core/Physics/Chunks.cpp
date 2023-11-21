@@ -14,12 +14,12 @@ std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialOb
 {
     std::vector<unsigned int> objectsInSameChunk;
     glm::vec3 pos = getChunkpos(objects[objectID].SO_rigidbody.position);
-    unsigned int key = getKeyVal(getHashVal(pos));
+    int key = getKeyVal(getHashVal(pos));
     unsigned int startIndex = startLookup[key];
 
     for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
     {
-        unsigned int currentKey = std::get<0>(spatialLookup[i]);
+        int currentKey = std::get<0>(spatialLookup[i]);
         if (currentKey == key && objects[std::get<1>(spatialLookup[i])].SO_id != objectID)
             objectsInSameChunk.push_back(objects[std::get<1>(spatialLookup[i])].SO_id);
             
@@ -37,7 +37,7 @@ std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialOb
 
     for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
     {
-        unsigned int currentKey = std::get<0>(spatialLookup[i]);
+        int currentKey = std::get<0>(spatialLookup[i]);
         if (currentKey == key && objects[std::get<1>(spatialLookup[i])].SO_id != objectID)
             objectsInSameChunk.push_back(objects[std::get<1>(spatialLookup[i])].SO_id);
         else
@@ -91,10 +91,73 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
     //add the keys to the array with the corresponding id 
     for (unsigned int i = 0; i < objects.size(); i++)
     {
+        //static std::pair<int, unsigned int> keyBefore = std::make_pair(0, 0);
+        //unsigned int index = 0;
         if(glm::distance(objects[i].SO_rigidbody.boundbox.max, objects[i].SO_rigidbody.boundbox.min) / ChunkSize < 1)
         {
             glm::vec3 pos = getChunkpos(objects[i].SO_rigidbody.position);
-            unsigned int key = getKeyVal(getHashVal(pos));
+            int key = getKeyVal(getHashVal(pos));
+            /*for (unsigned int g = 0; g < spatialLookup.size(); g++)
+            {
+                if(i == 0)
+                {
+                    spatialLookup.insert(spatialLookup.begin(), std::make_tuple(key, i, objects[i].SO_rigidbody.isAwake));
+                    spatialLookup.erase(spatialLookup.end());
+                    index = 0;
+                    break;
+                }
+                if(key == keyBefore.first)
+                {
+                    spatialLookup.insert(spatialLookup.begin() + keyBefore.second + 1, std::make_tuple(key, i, objects[i].SO_rigidbody.isAwake));
+                    spatialLookup.erase(spatialLookup.end());
+                    index = keyBefore.second + 1;
+                    break;
+                }
+                if(key > keyBefore.first)
+                {
+                    if(keyBefore.second + 1 == spatialLookup.size())
+                    {
+                        spatialLookup.insert(spatialLookup.begin() + keyBefore.second, std::make_tuple(key, i, objects[i].SO_rigidbody.isAwake));
+                        spatialLookup.erase(spatialLookup.end());
+                        index = keyBefore.second;
+                        break;
+                    }
+                    if(std::get<0>(spatialLookup[keyBefore.second + 1]) < key)
+                    {
+                        keyBefore.first = std::get<0>(spatialLookup[keyBefore.second + 1]);
+                        keyBefore.second = keyBefore.second + 1;
+                    }
+                    else
+                    {
+                        spatialLookup.insert(spatialLookup.begin() + keyBefore.second + 1, std::make_tuple(key, i, objects[i].SO_rigidbody.isAwake));
+                        spatialLookup.erase(spatialLookup.end());
+                        index = keyBefore.second + 1;
+                        break;
+                    }
+                }
+                else
+                {
+                    if(keyBefore.second - 1 == -1)
+                    {
+                        spatialLookup.insert(spatialLookup.begin(), std::make_tuple(key, i, objects[i].SO_rigidbody.isAwake));
+                        spatialLookup.erase(spatialLookup.end());
+                        index = 0;
+                        break;
+                    }
+                    if(std::get<0>(spatialLookup[keyBefore.second - 1]) > key)
+                    {
+                        keyBefore.first = std::get<0>(spatialLookup[keyBefore.second - 1]);
+                        keyBefore.second = keyBefore.second - 1;
+                    }
+                    else
+                    {
+                        spatialLookup.insert(spatialLookup.begin() + keyBefore.second - 1, std::make_tuple(key, i, objects[i].SO_rigidbody.isAwake));
+                        spatialLookup.erase(spatialLookup.end());
+                        index = keyBefore.second - 1;
+                        break;
+                    }
+                }
+            }*/
             spatialLookup[i] = std::make_tuple(key, i, false);
             startLookup[i] = UINT32_MAX;
         }
@@ -111,7 +174,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                     for (float z = min.z; z < max.z + 0.0001f; z += ChunkSize)
                     {
                         glm::vec3 pos = getChunkpos(glm::vec3(x,y,z));
-                        unsigned int key = getKeyVal(getHashVal(pos));
+                        int key = getKeyVal(getHashVal(pos));
                         spatialLookup[objects.size() - 1 + count + chunkOffsets[i]] = std::make_tuple(key, i, objects[i].SO_rigidbody.isAwake);
                         startLookup[objects.size() - 1 + count + chunkOffsets[i]] = UINT32_MAX;
                         count++;
@@ -119,14 +182,25 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                 }
             }
         }
+        //keyBefore.first = std::get<0>(spatialLookup[index]);
+        //keyBefore.second = index;
     }
 
     std::sort(spatialLookup.begin(), spatialLookup.end());
 
+    /*for (unsigned int i = 0; i < spatialLookup.size(); i++)
+    {
+        std::cout << std::get<0>(spatialLookup[i]) << " " << std::get<1>(spatialLookup[i]) << std::endl;
+        if(i == spatialLookup.size() - 1)
+        {
+            std::cout << "end" << std::endl;
+        }
+    }*/
+
     for (unsigned int i = 0; i < startLookup.size(); i++)
     {
-        unsigned int key = std::get<0>(spatialLookup[i]);
-        unsigned int keyPrev;
+        int key = std::get<0>(spatialLookup[i]);
+        int keyPrev;
         if(i == 0)
             keyPrev = 0;
         else
@@ -143,15 +217,15 @@ glm::vec3 ChunkManager::getChunkpos(glm::vec3 pos)
     return glm::vec3((int)(pos.x / ChunkSize), (int)(pos.y / ChunkSize), (int)(pos.z / ChunkSize));
 }
 
-unsigned int ChunkManager::getHashVal(glm::vec3 pos)
+int ChunkManager::getHashVal(glm::vec3 pos)
 {
-    unsigned int a = pos.x * 12289;
-    unsigned int b = pos.y * 786433;
-    unsigned int c = pos.z * 50331652;
+    int a = pos.x * 12289;
+    int b = pos.y * 786433;
+    int c = pos.z * 50331652;
     return a + b + c;
 }
 
-unsigned int ChunkManager::getKeyVal(unsigned int hash)
+int ChunkManager::getKeyVal(int hash)
 {
     return hash % spatialLookup.size();
 }

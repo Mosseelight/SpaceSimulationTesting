@@ -160,12 +160,15 @@ int main()
     {
         for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
-            for (int j = 0; j < 1; j++)
+            for (int j = 0; j < 5; j++)
             {
-                mainScene.AddSpatialObject(LoadModel(glm::vec3(i,5,g), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
+                mainScene.AddSpatialObject(LoadModel(glm::vec3(i,5 * j,g), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
             }
         }
     }
+
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(80,40,80), glm::vec3(0), modelLoc + "Monkey.obj"));
+    mainScene.SpatialObjects[mainScene.SpatialObjects.size() - 1].SO_rigidbody.isStatic = true;
 
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
@@ -220,6 +223,7 @@ void UpdateLogic(SDL_Window* window)
         mainScene.SpatialObjects[i].SO_mesh.CreateModelMat();
         mainScene.SpatialObjects[i].SO_mesh.CreateRotationMat();
     }
+    mainScene.SpatialObjects[mainScene.SpatialObjects.size() - 1].SO_rigidbody.position = glm::vec3(sin(GetTime() / 10.0f) * 70, 80.0f, cos(GetTime()  / 10.0f) * 70);
 
     updateTime -= SDL_GetTicks64();
 
@@ -267,7 +271,7 @@ void Render(SDL_Window* window)
 
     glClearColor(0.4f, 0.7f, 0.8f, 1.0f);
     
-    glm::vec3 lightPos = glm::vec3(sin(GetTime()) * 40, 80.0f, cos(GetTime()) * 40);
+    glm::vec3 lightPos = glm::vec3(sin(GetTime()  / 10.0f) * 70, 80.0f, cos(GetTime()  / 10.0f) * 70);
     float objectDists[mainScene.SpatialObjects.size()];
     for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
     {
