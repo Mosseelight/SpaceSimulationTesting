@@ -152,7 +152,7 @@ int main()
         }
     }
 
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(5,5,0), glm::vec3(0), modelLoc + "Teapot.obj"));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(5,5,0), glm::vec3(0), modelLoc + "Cube.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(-5,5,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
     
@@ -160,9 +160,9 @@ int main()
     {
         for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
-            for (int j = 0; j < 6; j++)
+            for (int j = 0; j < 2; j++)
             {
-                mainScene.AddSpatialObject(LoadModel(glm::vec3(i,5 * j,g), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
+                //mainScene.AddSpatialObject(LoadModel(glm::vec3(i,3 + 5 * j,g), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
             }
         }
     }
@@ -375,6 +375,12 @@ void input()
                 break;
             case SDLK_v:
                 player->LaunchObject(mainScene, modelLoc + "Cube.obj");
+                break;
+            case SDLK_b:
+                player->LaunchObject(mainScene, modelLoc + "Floor.obj");
+                break;
+            case SDLK_c:
+                player->LaunchObject(mainScene, modelLoc + "Monkey.obj");
                 break;
             }
             break;

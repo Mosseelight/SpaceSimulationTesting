@@ -53,7 +53,6 @@ struct Simplex
 };
 
 glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir);
-glm::vec3 GetSupportPointNonTrans(SpatialObject& object, glm::vec3 dir);
 bool NextSimplex(Simplex& simplex, glm::vec3& direction);
 bool SameLine(glm::vec3 dir, glm::vec3 ao);
 bool Simplex2(Simplex& simplex, glm::vec3& direction);
@@ -85,7 +84,7 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowGjk(SpatialObject& own, Spat
         simplex.a = support;
         if(NextSimplex(simplex, direction))
         {
-            return std::make_pair(true, GetCollisionPoint(simplex, own, other));
+            return std::make_pair(true, CollisionPoint());
         }
     }
     return std::make_pair(false, CollisionPoint());
@@ -265,7 +264,7 @@ bool Simplex3(Simplex& simplex, glm::vec3& direction)
 {
     glm::vec3 ab = simplex.b - simplex.a;
 	glm::vec3 ac = simplex.c - simplex.a;
-	glm::vec3 ao =   - simplex.a;
+	glm::vec3 ao = -simplex.a;
  
 	glm::vec3 abc = cross(ab, ac);
  
@@ -320,7 +319,7 @@ bool Simplex4(Simplex& simplex, glm::vec3& direction)
 	glm::vec3 ab = simplex.b - simplex.a;
 	glm::vec3 ac = simplex.c - simplex.a;
 	glm::vec3 ad = simplex.d - simplex.a;
-	glm::vec3 ao =   - simplex.a;
+	glm::vec3 ao = -simplex.a;
  
 	glm::vec3 abc = cross(ab, ac);
 	glm::vec3 acd = cross(ac, ad);
@@ -361,23 +360,6 @@ glm::vec3 GetSupportPoint(SpatialObject& object, glm::vec3 dir)
 
     return TransformVec4(glm::vec4(maxP, 1.0f), object.SO_mesh.modelMatrix);
 }
-
-glm::vec3 GetSupportPointNonTrans(SpatialObject& object, glm::vec3 dir)
-{
-    glm::vec3 maxP;
-	float maxDist = FLT_MIN;
-    for (unsigned int i = 0; i < object.SO_mesh.vertexes.size(); i++)
-    {
-        float distance = dot(object.SO_mesh.vertexes[i].position, dir);
-        if(distance > maxDist)
-        {
-            maxDist = distance;
-            maxP = object.SO_mesh.vertexes[i].position;
-        }
-    }
-    return maxP;
-}
-
 
 bool SameLine(glm::vec3 dir, glm::vec3 ao)
 {
@@ -464,8 +446,7 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 	int smallestCaseSingleAxis;
 	glm::vec3 collisionNormal;//the axis that seperates the 2 obbs, also the collision normal
 
-	glm::vec3 half1 = (obj1.SO_rigidbody.oriBoundBox.maxOri);
-	glm::vec3 half2 = (obj2.SO_rigidbody.oriBoundBox.maxOri);
+	glm::vec3 half1 = (obj1.SO_rigidbody.oriBoundBox.maxOri) * 0.5f;
 	
 	//create the orientation axis for the first box(idk why the order is switched up but it is, it is switched up in rendering the same way as well)
 	float deg2rad = 3.14159265358979323846f / 180.0f;
@@ -576,7 +557,7 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 				collisionNormal = -collisionNormal;
 			
 			//now find the vertex
-			glm::vec3 tempContactPoint = half2;
+			glm::vec3 tempContactPoint = half1;
 			if (glm::dot(b2AxisX, collisionNormal) < 0.0f) 
 				tempContactPoint.x = -tempContactPoint.x;
 			if (glm::dot(b2AxisY, collisionNormal) < 0.0f) 

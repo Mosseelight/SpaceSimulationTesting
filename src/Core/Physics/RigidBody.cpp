@@ -2,6 +2,8 @@
 #include "../../include/Core/Physics/Collision.hpp"
 #include "../../include/Core/Scene.hpp"
 #include "../../include/Core/Math.hpp"
+#include <list>
+#include <array>
 
 void Solver(glm::vec3& out, glm::vec3 in, float step);
 
@@ -86,7 +88,8 @@ void BoundingBox::ConstructOriBoundingBox(Mesh& mesh)
 
 RigidBody::RigidBody()
 {
-    mass = 9100.0f;
+    mass = 1000.0f;
+    density = 1.0f;
     position = glm::vec3(0.0f);
     velocity = glm::vec3(0.0f);
     acceleration = glm::vec3(0.0f);
@@ -155,6 +158,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
             }
         }
     }
+    
 
     acceleration = totalForce / mass;
     rotAcceleration = totalRotation / mass;
@@ -170,6 +174,13 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     left = -right;
     up = glm::cross(forward, right);
     down = -up;
+
+    CalculateInertiaTensor(own);
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        std::cout << inertiaT[i][0] << " " << inertiaT[i][1] << " " << inertiaT[i][2] << std::endl;
+    }
+    
 
     gForce = glm::length(acceleration) / 9.81f;
 
@@ -248,4 +259,98 @@ void RigidBody::CheckSleep()
 void RigidBody::CalculateCollisionShape(SpatialObject& object)
 {
 
+}
+
+
+// Source: https://github.com/blackedout01/simkn/blob/main/simkn.h
+
+float ITScalarTripleProduct(glm::vec3 A, glm::vec3 B, glm::vec3 C) {
+    glm::vec3 tmp;
+    tmp = glm::cross(B, C);
+    float Result = glm::dot(A, tmp);
+    return Result;
+}
+
+float ITTet3InertiaMoment(glm::mat3& P, unsigned int I) 
+{
+    float Result = (P[0][I] * P[0][I]) + P[1][I] * P[2][I]
+               + (P[1][I] * P[1][I]) + P[0][I] * P[2][I]
+               + (P[2][I] * P[2][I]) + P[0][I] * P[1][I];
+    return Result;
+}
+
+
+float ITTet3IntertiaProduct(glm::mat3& P, unsigned int I, unsigned int J) 
+{
+    float Result = 2.0 * P[0][I] * P[0][J] + P[1][I] * P[2][J] + P[2][I] * P[1][J]
+               + 2.0 * P[1][I] * P[1][J] + P[0][I] * P[2][J] + P[2][I] * P[0][J]
+               + 2.0 * P[2][I] * P[2][J] + P[0][I] * P[1][J] + P[1][I] * P[0][J];
+    return Result;
+}
+
+void ITCuboidInertia3(float density, glm::vec3& size, glm::vec3& I) 
+{
+    float XX = glm::pow(size.x, 2);
+    float YY = glm::pow(size.y, 2);
+    float ZZ = glm::pow(size.z, 2);
+    float Mass = density * size.x * size.y * size.z;
+    I.x = Mass * (YY + ZZ) / 12.0;
+    I.y = Mass * (XX + ZZ) / 12.0;
+    I.z = Mass * (XX + YY) / 12.0;
+}
+
+void RigidBody::CalculateInertiaTensor(SpatialObject& object)
+{
+    float Mass = 0.0f;
+    glm::vec3 MassCenter = glm::vec3(0.0f);
+    float Ia = 0.0f, Ib = 0.0f, Ic = 0.0f, Iap = 0.0f, Ibp = 0.0f, Icp = 0.0f;
+    glm::mat3 P;
+    for(unsigned int I = 0; I < object.SO_mesh.vertexes.size(); I += 3) {
+        P[0] = object.SO_mesh.vertexes[I].position;
+        P[1] = object.SO_mesh.vertexes[I].position;
+        P[2] = object.SO_mesh.vertexes[I].position;
+        
+        float DetJ = ITScalarTripleProduct(P[0], P[1], P[2]);
+        float TetVolume = DetJ / 6.0f;
+        float TetMass = density * TetVolume;
+        
+        glm::vec3 TetMassCenter = glm::vec3(0.0f);
+        TetMassCenter += P[0];
+        TetMassCenter += P[1];
+        TetMassCenter += P[2];
+        TetMassCenter /= 4.0f;
+        
+        float V100 = ITTet3InertiaMoment(P, 0);
+        float V010 = ITTet3InertiaMoment(P, 1);
+        float V001 = ITTet3InertiaMoment(P, 2);
+        
+        Ia += DetJ * (V010 + V001);
+        Ib += DetJ * (V100 + V001);
+        Ic += DetJ * (V100 + V010);
+        Iap += DetJ * ITTet3IntertiaProduct(P, 1, 2);
+        Ibp += DetJ * ITTet3IntertiaProduct(P, 0, 1);
+        Icp += DetJ * ITTet3IntertiaProduct(P, 0, 2);
+        
+        TetMassCenter *= TetMass;
+        MassCenter += TetMassCenter;
+        Mass += TetMass;
+    }
+    
+    MassCenter /= Mass;
+    Ia = density * Ia / 60.0f - Mass*((MassCenter[1] * MassCenter[1]) + (MassCenter[2] * MassCenter[2]));
+    Ib = density * Ib / 60.0f - Mass*((MassCenter[0] * MassCenter[0]) + (MassCenter[2] * MassCenter[2]));
+    Ic = density * Ic / 60.0f - Mass*((MassCenter[0] * MassCenter[0]) + (MassCenter[1] * MassCenter[1]));
+    Iap = density * Iap / 120.0f - Mass*(MassCenter[1] * MassCenter[2]);
+    Ibp = density * Ibp / 120.0f - Mass*(MassCenter[0] * MassCenter[1]);
+    Icp = density * Icp / 120.0f - Mass*(MassCenter[0] * MassCenter[2]);
+    
+    inertiaT[0][0] = Ia;
+    inertiaT[1][0] = Ib;
+    inertiaT[2][0] = Ic;
+    inertiaT[0][1] = inertiaT[0][2] = -Ibp;
+    inertiaT[0][2] = inertiaT[1][2] = -Icp;
+    inertiaT[1][1] = inertiaT[2][2] = -Iap;
+    
+    massCenter = MassCenter; 
+    mass = Mass;
 }

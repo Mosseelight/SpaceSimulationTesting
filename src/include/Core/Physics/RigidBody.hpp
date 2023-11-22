@@ -37,6 +37,9 @@ private:
     glm::vec3 left;
     glm::vec3 up;
     glm::vec3 down;
+
+    glm::mat3 inertiaT;
+
 public:
 
     BoundingBox boundbox;
@@ -46,6 +49,8 @@ public:
     bool isAwake;
 
     float mass;
+    float density;
+    glm::vec3 massCenter;
     glm::vec3 position;
     glm::vec3 velocity;
     glm::vec3 acceleration;
@@ -74,5 +79,6 @@ public:
     glm::vec3 GetLocalDir(glm::vec3 dir);
 
     void CalculateCollisionShape(SpatialObject& object);
+    void CalculateInertiaTensor(SpatialObject& object);
     void CheckSleep();
 };

@@ -163,8 +163,8 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
         }
         else
         {
-            glm::vec3 min = objects[i].SO_rigidbody.boundbox.min;
-            glm::vec3 max = objects[i].SO_rigidbody.boundbox.max;
+            glm::vec3 min = objects[i].SO_rigidbody.oriBoundBox.min;
+            glm::vec3 max = objects[i].SO_rigidbody.oriBoundBox.max;
             unsigned int count = 0;
 
             for (float x = min.x; x < max.x + 0.0001f; x += ChunkSize)
@@ -187,15 +187,6 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
     }
 
     std::sort(spatialLookup.begin(), spatialLookup.end());
-
-    /*for (unsigned int i = 0; i < spatialLookup.size(); i++)
-    {
-        std::cout << std::get<0>(spatialLookup[i]) << " " << std::get<1>(spatialLookup[i]) << std::endl;
-        if(i == spatialLookup.size() - 1)
-        {
-            std::cout << "end" << std::endl;
-        }
-    }*/
 
     for (unsigned int i = 0; i < startLookup.size(); i++)
     {
