@@ -80,5 +80,6 @@ public:
 
     void CalculateCollisionShape(SpatialObject& object);
     void CalculateInertiaTensor(SpatialObject& object);
+    void CalculateInertiaTensorCube(SpatialObject& object);
     void CheckSleep();
 };

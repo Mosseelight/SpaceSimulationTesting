@@ -89,7 +89,7 @@ void BoundingBox::ConstructOriBoundingBox(Mesh& mesh)
 RigidBody::RigidBody()
 {
     mass = 1000.0f;
-    density = 1.0f;
+    density = 10.0f;
     position = glm::vec3(0.0f);
     velocity = glm::vec3(0.0f);
     acceleration = glm::vec3(0.0f);
@@ -175,12 +175,16 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     up = glm::cross(forward, right);
     down = -up;
 
+    //CalculateInertiaTensorCube(own);
+    //for (unsigned int i = 0; i < 3; i++)
+    //{
+    //    std::cout << inertiaT[i][0] << " " << inertiaT[i][1] << " " << inertiaT[i][2] << std::endl;
+    //}
     CalculateInertiaTensor(own);
-    for (unsigned int i = 0; i < 3; i++)
-    {
-        std::cout << inertiaT[i][0] << " " << inertiaT[i][1] << " " << inertiaT[i][2] << std::endl;
-    }
-    
+    //for (unsigned int i = 0; i < 3; i++)
+    //{
+    //    std::cout << inertiaT[i][0] << " " << inertiaT[i][1] << " " << inertiaT[i][2] << std::endl;
+    //}
 
     gForce = glm::length(acceleration) / 9.81f;
 
@@ -261,7 +265,6 @@ void RigidBody::CalculateCollisionShape(SpatialObject& object)
 
 }
 
-
 // Source: https://github.com/blackedout01/simkn/blob/main/simkn.h
 
 float ITScalarTripleProduct(glm::vec3 A, glm::vec3 B, glm::vec3 C) {
@@ -271,32 +274,35 @@ float ITScalarTripleProduct(glm::vec3 A, glm::vec3 B, glm::vec3 C) {
     return Result;
 }
 
-float ITTet3InertiaMoment(glm::mat3& P, unsigned int I) 
+float ITTet3InertiaMoment(glm::mat3 P, unsigned int I) 
 {
-    float Result = (P[0][I] * P[0][I]) + P[1][I] * P[2][I]
-               + (P[1][I] * P[1][I]) + P[0][I] * P[2][I]
-               + (P[2][I] * P[2][I]) + P[0][I] * P[1][I];
-    return Result;
+    float a = P[0][I];
+    float b = P[1][I];
+    float c = P[2][I];
+    return (a * a) + b * c + (b * b) + a * c + (c * c) + a * b;
 }
 
 
-float ITTet3IntertiaProduct(glm::mat3& P, unsigned int I, unsigned int J) 
+float ITTet3IntertiaProduct(glm::mat3 P, unsigned int I, unsigned int J) 
 {
-    float Result = 2.0 * P[0][I] * P[0][J] + P[1][I] * P[2][J] + P[2][I] * P[1][J]
-               + 2.0 * P[1][I] * P[1][J] + P[0][I] * P[2][J] + P[2][I] * P[0][J]
-               + 2.0 * P[2][I] * P[2][J] + P[0][I] * P[1][J] + P[1][I] * P[0][J];
-    return Result;
+    float a = P[0][I];
+    float b = P[0][J];
+    float c = P[1][I];
+    float d = P[1][J];
+    float e = P[2][I];
+    float f = P[2][J];
+    return 2.0f * a * b + c * f + e * d + 2.0f * c * d + a * f + e * b + 2.0f * e * f + a * d + c * b;
 }
 
-void ITCuboidInertia3(float density, glm::vec3& size, glm::vec3& I) 
+void RigidBody::CalculateInertiaTensorCube(SpatialObject& object) 
 {
-    float XX = glm::pow(size.x, 2);
-    float YY = glm::pow(size.y, 2);
-    float ZZ = glm::pow(size.z, 2);
-    float Mass = density * size.x * size.y * size.z;
-    I.x = Mass * (YY + ZZ) / 12.0;
-    I.y = Mass * (XX + ZZ) / 12.0;
-    I.z = Mass * (XX + YY) / 12.0;
+    float XX = boundbox.max.x * boundbox.max.x;
+    float YY = boundbox.max.y * boundbox.max.y;
+    float ZZ = boundbox.max.z * boundbox.max.z;
+    float Mass = density * boundbox.max.x * boundbox.max.y * boundbox.max.z;
+    inertiaT[0][0] = Mass * (YY + ZZ) / 12.0f;
+    inertiaT[0][1] = Mass * (XX + ZZ) / 12.0f;
+    inertiaT[0][2] = Mass * (XX + YY) / 12.0f;
 }
 
 void RigidBody::CalculateInertiaTensor(SpatialObject& object)
@@ -305,11 +311,12 @@ void RigidBody::CalculateInertiaTensor(SpatialObject& object)
     glm::vec3 MassCenter = glm::vec3(0.0f);
     float Ia = 0.0f, Ib = 0.0f, Ic = 0.0f, Iap = 0.0f, Ibp = 0.0f, Icp = 0.0f;
     glm::mat3 P;
-    for(unsigned int I = 0; I < object.SO_mesh.vertexes.size(); I += 3) {
-        P[0] = object.SO_mesh.vertexes[I].position;
-        P[1] = object.SO_mesh.vertexes[I].position;
-        P[2] = object.SO_mesh.vertexes[I].position;
-        
+    for(unsigned int I = 0; I < object.SO_mesh.vertexes.size(); I += 3) 
+    {
+        P[0] = TransformVec4(glm::vec4(object.SO_mesh.vertexes[I].position, 1.0f), object.SO_mesh.modelMatrix);
+        P[1] = TransformVec4(glm::vec4(object.SO_mesh.vertexes[I + 1].position, 1.0f), object.SO_mesh.modelMatrix);
+        P[2] = TransformVec4(glm::vec4(object.SO_mesh.vertexes[I + 2].position, 1.0f), object.SO_mesh.modelMatrix);
+
         float DetJ = ITScalarTripleProduct(P[0], P[1], P[2]);
         float TetVolume = DetJ / 6.0f;
         float TetMass = density * TetVolume;

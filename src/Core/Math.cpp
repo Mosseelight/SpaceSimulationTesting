@@ -2,10 +2,9 @@
 
 // matrix math in coloum major for faster speeds
 
-static float array[4] __attribute__ ((aligned(16)));
-
 float* ConvertVec4(glm::vec4 vec)
 {
+    float array[4] __attribute__ ((aligned(16)));
     array[0] = vec.x;
     array[1] = vec.y;
     array[2] = vec.z;
@@ -15,11 +14,19 @@ float* ConvertVec4(glm::vec4 vec)
 
 glm::vec4 TransformVec4(glm::vec4 vec, glm::mat4& mat)
 {
-    __m128 x = _mm_load_ps(ConvertVec4(vec));
+    /*__m128 x = _mm_load_ps(glm::value_ptr(vec));
     __m128 a = _mm_load_ps(ConvertVec4(mat[0]));
     __m128 b = _mm_load_ps(ConvertVec4(mat[1]));
     __m128 c = _mm_load_ps(ConvertVec4(mat[2]));
-    __m128 d = _mm_load_ps(ConvertVec4(mat[3]));
+    __m128 d = _mm_load_ps(ConvertVec4(mat[3]));*/
+
+    // this solution seems better for performance right now because ConvertVec4 is slow but I dont know how it compares to
+    // loadu and load if its not aligned
+    __m128 x = _mm_load_ps(glm::value_ptr(vec));
+    __m128 a = _mm_loadu_ps(glm::value_ptr(mat[0]));
+    __m128 b = _mm_loadu_ps(glm::value_ptr(mat[1]));
+    __m128 c = _mm_loadu_ps(glm::value_ptr(mat[2]));
+    __m128 d = _mm_loadu_ps(glm::value_ptr(mat[3]));
 
     _MM_TRANSPOSE4_PS(a,b,c,d);
 
