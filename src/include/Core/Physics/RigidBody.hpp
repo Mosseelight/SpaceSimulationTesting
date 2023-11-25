@@ -81,5 +81,6 @@ public:
     void CalculateCollisionShape(SpatialObject& object);
     void CalculateInertiaTensor(SpatialObject& object);
     void CalculateInertiaTensorCube(SpatialObject& object);
+    void ApplyImpulseForceAtPos2(glm::vec3 dir, glm::vec3 pos, float power);
     void CheckSleep();
 };

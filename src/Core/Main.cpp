@@ -152,7 +152,7 @@ int main()
         }
     }
 
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(5,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
+    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
     //mainScene.AddSpatialObject(LoadModel(glm::vec3(-5,5,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
     
@@ -160,7 +160,7 @@ int main()
     {
         for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
-            for (int j = 0; j < 2; j++)
+            for (int j = 0; j < 1; j++)
             {
                 //mainScene.AddSpatialObject(LoadModel(glm::vec3(i,3 + 5 * j,g), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
             }

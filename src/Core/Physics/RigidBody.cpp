@@ -89,7 +89,7 @@ void BoundingBox::ConstructOriBoundingBox(Mesh& mesh)
 RigidBody::RigidBody()
 {
     mass = 1000.0f;
-    density = 10.0f;
+    density = 1000.0f;
     position = glm::vec3(0.0f);
     velocity = glm::vec3(0.0f);
     acceleration = glm::vec3(0.0f);
@@ -127,23 +127,26 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     
     ApplyForce(glm::vec3(0,-9.81,0) * mass);
     //ApplyLiftForce(AirDensity, 28.0f);
-    ApplyDragForce(AirDensity, 1.0f);
+    //ApplyDragForce(AirDensity, 1.0f);
+    //ApplyImpulseForceAtPos2(glm::vec3(0,0,1), glm::vec3(0,10,0), 100.0f);
     for (unsigned int i = 0; i < objectIds.size(); i++)
     {
         if(own.SO_id != objects[objectIds[i]].SO_id)
         {
             if(CollisionCheckBroad(own, objects[objectIds[i]]))
             {
-                std::pair<bool, CollisionPoint> point = CollisionCheckNarrowSat(own, objects[objectIds[i]]);
+                std::pair<bool, CollisionPoint> point = CollisionCheckNarrowGjk(own, objects[objectIds[i]]);
                 if(point.first)
                 {
                     glm::vec3 normal = -glm::normalize(point.second.normal);
+                    DrawDebugCube(point.second.point, 0.1f, glm::vec3(0,0,255));
                     if(objects[objectIds[i]].SO_rigidbody.isStatic)
                     {
                         position += normal * point.second.dist;
                         float bounce = 0.6f;
                         float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass), normal);
                         ApplyImpulseForce(velocity + normal * (j / mass), 1.0f);
+                        //ApplyRotationImpulseForce(rotVelocity + j * glm::cross(point.second.point, normal), 1.0f);
                     }
                     else
                     {
@@ -152,7 +155,10 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
                         float bounce = 0.6f;
                         float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass + 1 / objects[objectIds[i]].SO_rigidbody.mass), normal);
                         ApplyImpulseForce(velocity + normal * (j / mass), 1.0f);
+                        //ApplyRotationImpulseForce(rotVelocity + j * glm::inverse(inertiaT) * glm::cross(normal, normal), 1.0f);
                         objects[objectIds[i]].SO_rigidbody.ApplyImpulseForce(objects[objectIds[i]].SO_rigidbody.velocity + -normal * (j / mass), 1.0f);
+                        //objects[objectIds[i]].SO_rigidbody.ApplyRotationImpulseForce(objects[objectIds[i]].SO_rigidbody.rotVelocity
+                        // + j * glm::inverse(objects[objectIds[i]].SO_rigidbody.inertiaT) * glm::cross(-normal, -normal), 1.0f);
                     }
                 }
             }
@@ -208,8 +214,15 @@ void RigidBody::ApplyImpulseForce(glm::vec3 dir, float power)
 
 void RigidBody::ApplyImpulseForceAtPos(glm::vec3 dir, glm::vec3 pos, float power)
 {
-    velocity = dir * power;
+    //velocity = dir * power;
     ApplyRotationImpulseForce(glm::cross(pos, dir), power);
+}
+
+void RigidBody::ApplyImpulseForceAtPos2(glm::vec3 dir, glm::vec3 pos, float power)
+{
+    //velocity = dir * power;
+    glm::vec3 rot = glm::cross(pos, dir) * inertiaT;
+    ApplyRotationImpulseForce(rot, power);
 }
 
 void RigidBody::ApplyDragForce(float airDensity, float area)
@@ -267,13 +280,6 @@ void RigidBody::CalculateCollisionShape(SpatialObject& object)
 
 // Source: https://github.com/blackedout01/simkn/blob/main/simkn.h
 
-float ITScalarTripleProduct(glm::vec3 A, glm::vec3 B, glm::vec3 C) {
-    glm::vec3 tmp;
-    tmp = glm::cross(B, C);
-    float Result = glm::dot(A, tmp);
-    return Result;
-}
-
 float ITTet3InertiaMoment(glm::mat3 P, unsigned int I) 
 {
     float a = P[0][I];
@@ -317,7 +323,7 @@ void RigidBody::CalculateInertiaTensor(SpatialObject& object)
         P[1] = TransformVec4(glm::vec4(object.SO_mesh.vertexes[I + 1].position, 1.0f), object.SO_mesh.modelMatrix);
         P[2] = TransformVec4(glm::vec4(object.SO_mesh.vertexes[I + 2].position, 1.0f), object.SO_mesh.modelMatrix);
 
-        float DetJ = ITScalarTripleProduct(P[0], P[1], P[2]);
+        float DetJ = glm::dot(P[0], glm::cross(P[1], P[2]));
         float TetVolume = DetJ / 6.0f;
         float TetMass = density * TetVolume;
         

@@ -3,6 +3,7 @@
 #include "../Scene.hpp"
 #include "../Debug.hpp"
 #include "../Math.hpp"
+#include "libccd/ccd/ccd.h"
 
 class CollisionPoint
 {
