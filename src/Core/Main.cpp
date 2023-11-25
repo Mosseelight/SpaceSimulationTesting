@@ -152,17 +152,28 @@ int main()
         }
     }
 
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Bunny.obj"));
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0), modelLoc + "Monkey.obj"));
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(-5,5,0), glm::vec3(0), modelLoc + "Bunnysmooth.obj"));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,5,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,10,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,15,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,20,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,25,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,30,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,35,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,40,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,45,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,50,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,55,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,60,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,65,0), glm::vec3(0,0,0), 2));
+    mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,70,0), glm::vec3(0,0,0), 2));
     
     for (int i = -48 ; i < 48 + (100 * 0); i += 3)
     {
         for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
-            for (int j = 0; j < 1; j++)
+            for (int j = 0; j < 3; j++)
             {
-                //mainScene.AddSpatialObject(LoadModel(glm::vec3(i,3 + 5 * j,g), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
+                //mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(i,3 + 5 * j,g), glm::vec3(0,0,0), 1));
             }
         }
     }

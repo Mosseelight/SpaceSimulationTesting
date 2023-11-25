@@ -70,9 +70,9 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowGjk(SpatialObject& own, Spat
 void center(const void *obj, ccd_vec3_t *center)
 {
     SpatialObject *_obj = (SpatialObject *)obj;
-	center->v[0] = _obj->SO_rigidbody.position.x;
-	center->v[1] = _obj->SO_rigidbody.position.y;
-	center->v[2] = _obj->SO_rigidbody.position.z;
+	center->v[0] = _obj->SO_mesh.position.x;
+	center->v[1] = _obj->SO_mesh.position.y;
+	center->v[2] = _obj->SO_mesh.position.z;
 }
 
 void support(const void *obj, const ccd_vec3_t *dir, ccd_vec3_t *vec)
@@ -98,6 +98,7 @@ void support(const void *obj, const ccd_vec3_t *dir, ccd_vec3_t *vec)
 	vec->v[1] = maxP.y;
 	vec->v[2] = maxP.z;
 }
+
 
 //--------------------------------------------------------------
 //--------------------------------------------------------------

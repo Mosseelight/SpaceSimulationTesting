@@ -4,6 +4,7 @@
 #include "../Debug.hpp"
 #include "../Math.hpp"
 #include "libccd/ccd/ccd.h"
+#include "libccd/ccd/quat.h"
 
 class CollisionPoint
 {

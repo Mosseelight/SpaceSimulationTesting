@@ -139,7 +139,6 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
                 if(point.first)
                 {
                     glm::vec3 normal = -glm::normalize(point.second.normal);
-                    DrawDebugCube(point.second.point, 0.1f, glm::vec3(0,0,255));
                     if(objects[objectIds[i]].SO_rigidbody.isStatic)
                     {
                         position += normal * point.second.dist;
@@ -164,7 +163,6 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
             }
         }
     }
-    
 
     acceleration = totalForce / mass;
     rotAcceleration = totalRotation / mass;
