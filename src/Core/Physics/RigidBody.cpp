@@ -2,8 +2,6 @@
 #include "../../include/Core/Physics/Collision.hpp"
 #include "../../include/Core/Scene.hpp"
 #include "../../include/Core/Math.hpp"
-#include <list>
-#include <array>
 
 void Solver(glm::vec3& out, glm::vec3 in, float step);
 
@@ -139,6 +137,12 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
                 if(point.first)
                 {
                     glm::vec3 normal = -glm::normalize(point.second.normal);
+                    if(normal.x - roundf(normal.x) < 0.001)
+                        normal.x = roundf(normal.x);
+                    if(normal.y - roundf(normal.y) < 0.001)
+                        normal.y = roundf(normal.y);
+                    if(normal.z - roundf(normal.z) < 0.001)
+                        normal.z = roundf(normal.z);
                     if(objects[objectIds[i]].SO_rigidbody.isStatic)
                     {
                         position += normal * point.second.dist;

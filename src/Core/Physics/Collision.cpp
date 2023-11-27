@@ -54,17 +54,17 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowGjk(SpatialObject& own, Spat
     ccd.support2 = support;
 	ccd.center1 = center;
     ccd.center2 = center;
-    ccd.max_iterations = 100;
-    ccd.epa_tolerance  = 0.0001;
+    ccd.max_iterations = 500;
+    ccd.epa_tolerance  = 0.00001;
 
-    ccd_real_t depth = 0.0f;
+    ccd_real_t depth;
     ccd_vec3_t dir, pos;
     int intersect = ccdMPRPenetration(&own, &other, &ccd, &depth, &dir, &pos);
 	if(intersect == -1)
 	{
 		return std::make_pair(false, CollisionPoint());
 	}
-	return std::make_pair(true, CollisionPoint(glm::vec3(pos.v[0], pos.v[1], pos.v[2]), glm::vec3(dir.v[0], dir.v[1], dir.v[2]), static_cast<float>(depth)));
+	return std::make_pair(true, CollisionPoint(glm::vec3(pos.v[0], pos.v[1], pos.v[2]), glm::vec3(dir.v[0], dir.v[1], dir.v[2]), static_cast<double>(depth)));
 }
 
 void center(const void *obj, ccd_vec3_t *center)
@@ -79,13 +79,13 @@ void support(const void *obj, const ccd_vec3_t *dir, ccd_vec3_t *vec)
 {
 	SpatialObject *_obj = (SpatialObject *)obj;
     glm::vec3 maxP;
-	float maxDist = FLT_MIN;
+	double maxDist = DBL_MIN;
 	glm::vec3 dirGlm(dir->v[0], dir->v[1], dir->v[2]);
 	glm::mat4 mat = glm::inverse(_obj->SO_mesh.rotMatrix);
 	dirGlm = TransformVec4(glm::vec4(dirGlm, 1.0f), mat);
     for (unsigned int i = 0; i < _obj->SO_mesh.vertexes.size(); i++)
 	{
-		float distance = glm::dot(_obj->SO_mesh.vertexes[i].position, dirGlm);
+		double distance = glm::dot(_obj->SO_mesh.vertexes[i].position, dirGlm);
 		if(distance > maxDist)
 		{
 			maxDist = distance;
