@@ -87,7 +87,7 @@ void BoundingBox::ConstructOriBoundingBox(Mesh& mesh)
 RigidBody::RigidBody()
 {
     mass = 1000.0f;
-    density = 1000.0f;
+    density = 50.0f;
     position = glm::vec3(0.0f);
     velocity = glm::vec3(0.0f);
     acceleration = glm::vec3(0.0f);
@@ -126,7 +126,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     ApplyForce(glm::vec3(0,-9.81,0) * mass);
     //ApplyLiftForce(AirDensity, 28.0f);
     //ApplyDragForce(AirDensity, 1.0f);
-    //ApplyImpulseForceAtPos2(glm::vec3(0,0,1), glm::vec3(0,10,0), 100.0f);
+    //pplyImpulseForceAtPos2(glm::vec3(0,0,1), glm::vec3(0,10,0), 1.0f);
     for (unsigned int i = 0; i < objectIds.size(); i++)
     {
         if(own.SO_id != objects[objectIds[i]].SO_id)
@@ -150,6 +150,7 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
                         float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass), normal);
                         ApplyImpulseForce(velocity + normal * (j / mass), 1.0f);
                         //ApplyRotationImpulseForce(rotVelocity + j * glm::cross(point.second.point, normal), 1.0f);
+
                     }
                     else
                     {
@@ -216,15 +217,15 @@ void RigidBody::ApplyImpulseForce(glm::vec3 dir, float power)
 
 void RigidBody::ApplyImpulseForceAtPos(glm::vec3 dir, glm::vec3 pos, float power)
 {
-    //velocity = dir * power;
+    velocity = dir * power;
     ApplyRotationImpulseForce(glm::cross(pos, dir), power);
 }
 
 void RigidBody::ApplyImpulseForceAtPos2(glm::vec3 dir, glm::vec3 pos, float power)
 {
     //velocity = dir * power;
-    glm::vec3 rot = glm::cross(pos, dir) * inertiaT;
-    ApplyRotationImpulseForce(rot, power);
+    glm::vec3 rot = inertiaT * dir;
+    ApplyRotationImpulseForce(rot / 10.0f, power);
 }
 
 void RigidBody::ApplyDragForce(float airDensity, float area)
@@ -316,17 +317,20 @@ void RigidBody::CalculateInertiaTensorCube(SpatialObject& object)
 void RigidBody::CalculateInertiaTensor(SpatialObject& object)
 {
     float Mass = 0.0f;
+    float Volume = 0.0f;
     glm::vec3 MassCenter = glm::vec3(0.0f);
     float Ia = 0.0f, Ib = 0.0f, Ic = 0.0f, Iap = 0.0f, Ibp = 0.0f, Icp = 0.0f;
-    glm::mat3 P;
+    glm::mat3 P = glm::mat3(0.0f);
     for(unsigned int I = 0; I < object.SO_mesh.vertexes.size(); I += 3) 
     {
         P[0] = TransformVec4(glm::vec4(object.SO_mesh.vertexes[I].position, 1.0f), object.SO_mesh.modelMatrix);
         P[1] = TransformVec4(glm::vec4(object.SO_mesh.vertexes[I + 1].position, 1.0f), object.SO_mesh.modelMatrix);
         P[2] = TransformVec4(glm::vec4(object.SO_mesh.vertexes[I + 2].position, 1.0f), object.SO_mesh.modelMatrix);
+        P = glm::transpose(P);
 
         float DetJ = glm::dot(P[0], glm::cross(P[1], P[2]));
-        float TetVolume = DetJ / 6.0f;
+        //divided by 8 seems to fix a problem where the mass is 8 times what it should be
+        float TetVolume = (DetJ / 6.0f) / 8.0f;
         float TetMass = density * TetVolume;
         
         glm::vec3 TetMassCenter = glm::vec3(0.0f);
@@ -345,10 +349,11 @@ void RigidBody::CalculateInertiaTensor(SpatialObject& object)
         Iap += DetJ * ITTet3IntertiaProduct(P, 1, 2);
         Ibp += DetJ * ITTet3IntertiaProduct(P, 0, 1);
         Icp += DetJ * ITTet3IntertiaProduct(P, 0, 2);
-        
+
         TetMassCenter *= TetMass;
         MassCenter += TetMassCenter;
         Mass += TetMass;
+        Volume += TetVolume;
     }
     
     MassCenter /= Mass;
@@ -368,4 +373,5 @@ void RigidBody::CalculateInertiaTensor(SpatialObject& object)
     
     massCenter = MassCenter; 
     mass = Mass;
+    volume = Volume;
 }

@@ -49,6 +49,7 @@ public:
     bool isAwake;
 
     float mass;
+    float volume;
     float density;
     glm::vec3 massCenter;
     glm::vec3 position;
