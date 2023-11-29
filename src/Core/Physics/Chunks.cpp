@@ -13,21 +13,9 @@ ChunkManager::~ChunkManager()
 std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialObject>& objects, unsigned int objectID)
 {
     std::vector<unsigned int> objectsInSameChunk;
-    glm::vec3 pos = getChunkpos(objects[objectID].SO_rigidbody.position);
+    glm::vec3 pos = getChunkpos(objects[objectID].SO_rigidbody.boundbox.max);
     int key = getKeyVal(getHashVal(pos));
     unsigned int startIndex = startLookup[key];
-
-    for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
-    {
-        int currentKey = std::get<0>(spatialLookup[i]);
-        if (currentKey == key && std::get<1>(spatialLookup[i]) != objectID)
-        {
-            objectsInSameChunk.push_back(std::get<1>(spatialLookup[i]));
-        }
-            
-        else
-            break;
-    }
 
     // for any objects that span multiple chunks we need to add to the list of their keys plus also any objects
     // that border chunks
@@ -39,10 +27,11 @@ std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialOb
         {
             for (float z = min.z; z < max.z + 0.0001f; z += ChunkSize)
             {
+                pos = getChunkpos(glm::vec3(x,y,z));
+                key = getKeyVal(getHashVal(pos));
+                startIndex = startLookup[key];
                 for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
                 {
-                    pos = getChunkpos(glm::vec3(x,y,z));
-                    key = getKeyVal(getHashVal(pos));
                     int currentKey = std::get<0>(spatialLookup[i]);
                     if (currentKey == key && std::get<1>(spatialLookup[i]) != objectID)
                     {
@@ -55,22 +44,27 @@ std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialOb
             }
         }
     }
+
     // do the max position as it is not accounted in the for loop
-    pos = getChunkpos(max);
-    key = getKeyVal(getHashVal(pos));
-    for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
+    if(key != getKeyVal(getHashVal(max)))
     {
-        int currentKey = std::get<0>(spatialLookup[i]);
-        if (currentKey == key && std::get<1>(spatialLookup[i]) != objectID)
+        pos = getChunkpos(max);
+        key = getKeyVal(getHashVal(pos));
+        startIndex = startLookup[key];
+        for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
         {
-            objectsInSameChunk.push_back(std::get<1>(spatialLookup[i]));
+            int currentKey = std::get<0>(spatialLookup[i]);
+            if (currentKey == key && std::get<1>(spatialLookup[i]) != objectID)
+            {
+                objectsInSameChunk.push_back(std::get<1>(spatialLookup[i]));
+            }
+                
+            else
+                break;
         }
-            
-        else
-            break;
     }
 
-    pos += glm::ceil(glm::normalize(objects[objectID].SO_rigidbody.velocity)) * ChunkSize;
+    pos += objects[objectID].SO_rigidbody.velocity;
     //object velocity points to same chunk so dont readd the objects
     if(key == getKeyVal(getHashVal(pos)))
         return objectsInSameChunk;

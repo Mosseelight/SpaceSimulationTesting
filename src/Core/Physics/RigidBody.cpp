@@ -127,22 +127,20 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     
     ApplyForce(glm::vec3(0,-9.81,0) * mass);
     //ApplyLiftForce(AirDensity, 28.0f);
-    //ApplyDragForce(AirDensity, 1.0f);```
+    //ApplyDragForce(AirDensity, 1.0f);
     //pplyImpulseForceAtPos2(glm::vec3(0,0,1), glm::vec3(0,10,0), 1.0f);
-    for (unsigned int i = 0; i < objects.size(); i++)
+    for (unsigned int i = 0; i < objectIds.size(); i++)
     {
-        if(own.SO_id != objects[i].SO_id)
+        if(own.SO_id != objects[objectIds[i]].SO_id)
         {
-            if(CollisionCheckBroad(own, objects[i]))
+            if(CollisionCheckBroad(own, objects[objectIds[i]]))
             {
-                float id = own.SO_id;
-                //std::cout << id << " " << objectIds[i] << " " << i << " " << objectIds.size() << std::endl;
-                if(own.SO_id != objects[i].SO_id)
+                if(own.SO_id != objects[objectIds[i]].SO_id)
                 {
-                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrowSat(own, objects[i]);
+                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrowSat(own, objects[objectIds[i]]);
                     if(point.first)
                     {
-                        CollisionSolve(own, objects[i], point.second);
+                        CollisionSolve(own, objects[objectIds[i]], point.second);
                     }
                 }
             }
