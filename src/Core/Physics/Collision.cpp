@@ -268,17 +268,17 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 			//now find the vertex
 			glm::vec3 tempContactPoint = half1;
 
-			if (glm::dot(b1AxisX, collisionNormal) < 0.0f) 
+			if (glm::dot(b2AxisX, collisionNormal) < 0.0f) 
 				tempContactPoint.x = -tempContactPoint.x;
-			if (glm::dot(b1AxisY, collisionNormal) < 0.0f) 
+			if (glm::dot(b2AxisY, collisionNormal) < 0.0f) 
 				tempContactPoint.y = -tempContactPoint.y;
-			if (glm::dot(b1AxisZ, collisionNormal) < 0.0f) 
+			if (glm::dot(b2AxisZ, collisionNormal) < 0.0f) 
 				tempContactPoint.z = -tempContactPoint.z;
 			
 			//transform this point to box 2's rotation
-			contactPoint.x = b1AxisX.x * tempContactPoint.x + b1AxisY.x * tempContactPoint.y + b1AxisZ.x * tempContactPoint.z + obj1.SO_rigidbody.position.x;
-			contactPoint.y = b1AxisX.y * tempContactPoint.x + b1AxisY.y * tempContactPoint.y + b1AxisZ.y * tempContactPoint.z + obj1.SO_rigidbody.position.y;
-			contactPoint.z = b1AxisX.z * tempContactPoint.x + b1AxisY.z * tempContactPoint.y + b1AxisZ.z * tempContactPoint.z + obj1.SO_rigidbody.position.z;
+			contactPoint.x = b2AxisX.x * tempContactPoint.x + b2AxisY.x * tempContactPoint.y + b2AxisZ.x * tempContactPoint.z + obj2.SO_rigidbody.position.x;
+			contactPoint.y = b2AxisX.y * tempContactPoint.x + b2AxisY.y * tempContactPoint.y + b2AxisZ.y * tempContactPoint.z + obj2.SO_rigidbody.position.y;
+			contactPoint.z = b2AxisX.z * tempContactPoint.x + b2AxisY.z * tempContactPoint.y + b2AxisZ.z * tempContactPoint.z + obj2.SO_rigidbody.position.z;
 			
 		} 
 		else if (smallestCase < 6) 
@@ -292,17 +292,17 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 			
 			//now find the vertex
 			glm::vec3 tempContactPoint = half1;
-			if (glm::dot(b2AxisX, collisionNormal) < 0.0f) 
+			if (glm::dot(b1AxisX, collisionNormal) < 0.0f) 
 				tempContactPoint.x = -tempContactPoint.x;
-			if (glm::dot(b2AxisY, collisionNormal) < 0.0f) 
+			if (glm::dot(b1AxisY, collisionNormal) < 0.0f) 
 				tempContactPoint.y = -tempContactPoint.y;
-			if (glm::dot(b2AxisZ, collisionNormal) < 0.0f) 
+			if (glm::dot(b1AxisZ, collisionNormal) < 0.0f) 
 				tempContactPoint.z = -tempContactPoint.z;
 			
 			//transform this point to box 1's rotation
-			contactPoint.x = b2AxisX.x * tempContactPoint.x + b2AxisY.x * tempContactPoint.y + b2AxisZ.x * tempContactPoint.z + obj2.SO_rigidbody.position.x;
-			contactPoint.y = b2AxisX.y * tempContactPoint.x + b2AxisY.y * tempContactPoint.y + b2AxisZ.y * tempContactPoint.z + obj2.SO_rigidbody.position.y;
-			contactPoint.z = b2AxisX.z * tempContactPoint.x + b2AxisY.z * tempContactPoint.y + b2AxisZ.z * tempContactPoint.z + obj2.SO_rigidbody.position.z;
+			contactPoint.x = b1AxisX.x * tempContactPoint.x + b1AxisY.x * tempContactPoint.y + b1AxisZ.x * tempContactPoint.z + obj1.SO_rigidbody.position.x;
+			contactPoint.y = b1AxisX.y * tempContactPoint.x + b1AxisY.y * tempContactPoint.y + b1AxisZ.y * tempContactPoint.z + obj1.SO_rigidbody.position.y;
+			contactPoint.z = b1AxisX.z * tempContactPoint.x + b1AxisY.z * tempContactPoint.y + b1AxisZ.z * tempContactPoint.z + obj1.SO_rigidbody.position.z;
 			
 		}
 		

@@ -51,6 +51,7 @@ public:
     float mass;
     float volume;
     float density;
+    float friction;
     glm::vec3 massCenter;
     glm::vec3 position;
     glm::vec3 velocity;

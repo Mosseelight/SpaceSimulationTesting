@@ -152,7 +152,7 @@ int main()
         }
     }
 
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
     /*mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,5,0), glm::vec3(0,0,0), 2));
     mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,10,0), glm::vec3(0,0,0), 2));
     mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,15,0), glm::vec3(0,0,0), 2));
@@ -172,9 +172,9 @@ int main()
     {
         for (int g = -48; g < 48 + (100 * 0); g += 3)
         {
-            for (int j = 0; j < 1; j++)
+            for (int j = 0; j < 3; j++)
             {
-                //mainScene.AddSpatialObject(LoadModel(glm::vec3(i,3 + 5 * j,g), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
+                mainScene.AddSpatialObject(LoadModel(glm::vec3(i,3 + 5 * j,g), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
             }
         }
     }
@@ -513,7 +513,7 @@ void ImguiMenu()
         {
             for (unsigned int i = 0; i < mainScene.SpatialObjects.size(); i++)
             {
-                if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", i))
+                if (ImGui::TreeNode((void*)(intptr_t)i, "Object %d", mainScene.SpatialObjects[i].SO_id))
                 {
                     ImGui::DragFloat3("Object Position", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.position), 0.05f, -100000.0f, 100000.0f);
                     ImGui::DragFloat3("Object Rotation", glm::value_ptr(mainScene.SpatialObjects[i].SO_rigidbody.rotation), 0.1f, -360.0f, 360.0f);

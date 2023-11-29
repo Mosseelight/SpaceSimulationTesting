@@ -5,6 +5,7 @@
 #include "Shader.hpp"
 #include "Texture.hpp"
 #include "Physics/RigidBody.hpp"
+#include "Physics/SpatialPhysics.hpp"
 #include <vector>
 #include <glm/glm.hpp>
 
@@ -16,9 +17,18 @@ public:
     RigidBody SO_rigidbody;
     unsigned int SO_id;
 
-    SpatialObject() {}
-    SpatialObject(Mesh mesh, unsigned int id)
-        : SO_mesh(mesh), SO_id(id) {}
+    SpatialObject() 
+    {
+        SO_mesh = Mesh();
+        SO_rigidbody = RigidBody();
+        SO_texture = Texture();
+        SO_id = -1;
+    }
+    SpatialObject(Mesh mesh, unsigned int id) : SO_mesh(mesh), SO_id(id) 
+    {
+        SO_rigidbody = RigidBody();
+        SO_texture = Texture();
+    }
     ~SpatialObject() {}
 
     unsigned int GetSizeUsage();

@@ -20,15 +20,57 @@ std::vector<unsigned int> ChunkManager::FindObjectsInChunk(std::vector<SpatialOb
     for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
     {
         int currentKey = std::get<0>(spatialLookup[i]);
-        if (currentKey == key && objects[std::get<1>(spatialLookup[i])].SO_id != objectID)
-            objectsInSameChunk.push_back(objects[std::get<1>(spatialLookup[i])].SO_id);
+        if (currentKey == key && std::get<1>(spatialLookup[i]) != objectID)
+        {
+            objectsInSameChunk.push_back(std::get<1>(spatialLookup[i]));
+        }
             
         else
             break;
     }
 
-    //get objects in chunk that is ahead of the current object
-    pos += glm::ceil(glm::normalize(objects[objectID].SO_rigidbody.velocity));
+    // for any objects that span multiple chunks we need to add to the list of their keys plus also any objects
+    // that border chunks
+    glm::vec3 min = objects[objectID].SO_rigidbody.boundbox.min;
+    glm::vec3 max = objects[objectID].SO_rigidbody.boundbox.max;
+    for (float x = min.x; x < max.x + 0.0001f; x += ChunkSize)
+    {
+        for (float y = min.y; y < max.y + 0.0001f; y += ChunkSize)
+        {
+            for (float z = min.z; z < max.z + 0.0001f; z += ChunkSize)
+            {
+                for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
+                {
+                    pos = getChunkpos(glm::vec3(x,y,z));
+                    key = getKeyVal(getHashVal(pos));
+                    int currentKey = std::get<0>(spatialLookup[i]);
+                    if (currentKey == key && std::get<1>(spatialLookup[i]) != objectID)
+                    {
+                        objectsInSameChunk.push_back(std::get<1>(spatialLookup[i]));
+                    }
+                        
+                    else
+                        break;
+                }
+            }
+        }
+    }
+    // do the max position as it is not accounted in the for loop
+    pos = getChunkpos(max);
+    key = getKeyVal(getHashVal(pos));
+    for (unsigned int i = startIndex; i < spatialLookup.size(); i++)
+    {
+        int currentKey = std::get<0>(spatialLookup[i]);
+        if (currentKey == key && std::get<1>(spatialLookup[i]) != objectID)
+        {
+            objectsInSameChunk.push_back(std::get<1>(spatialLookup[i]));
+        }
+            
+        else
+            break;
+    }
+
+    pos += glm::ceil(glm::normalize(objects[objectID].SO_rigidbody.velocity)) * ChunkSize;
     //object velocity points to same chunk so dont readd the objects
     if(key == getKeyVal(getHashVal(pos)))
         return objectsInSameChunk;
@@ -58,7 +100,7 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
         spatialLookup.resize(objects.size());
         startLookup.clear();
         startLookup.resize(objects.size());
-        chunkOffsets.resize(objects.size() + 1);
+        chunkOffsets.resize(objects.size() + 2);
         unsigned int spanCount = 0;
         for (unsigned int i = 0; i < objects.size(); i++)
         {
@@ -72,11 +114,11 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
                 //the maxiumum possible extents a object can have if it spans chunks so that if it is rotated quickly
                 //a seg fault does not occur
                 float maxL = fmaxf(max.x - min.x, fmaxf(max.y - min.y, max.z - min.z)) / ChunkSize;
-
+                
                 for (size_t i = 0; i < maxL * maxL * maxL; i++)
                 {
-                    spatialLookup.push_back(std::make_tuple(0, 0, false));
-                    startLookup.push_back(0);
+                    spatialLookup.push_back(std::make_tuple(INT_MAX, INT_MAX, false));
+                    startLookup.push_back(UINT_MAX);
                     offset++;
                 }
                 
@@ -196,6 +238,8 @@ void ChunkManager::UpdateChunks(std::vector<SpatialObject>& objects)
             keyPrev = 0;
         else
             keyPrev = std::get<0>(spatialLookup[i - 1]);
+        if(key == INT_MAX)
+            key = keyPrev;
         if(key != keyPrev)
             startLookup[key] = i;
     }
@@ -213,7 +257,7 @@ int ChunkManager::getHashVal(glm::vec3 pos)
     int a = pos.x * 12289;
     int b = pos.y * 786433;
     int c = pos.z * 50331652;
-    return a + b + c;
+    return a ^ b ^ c;
 }
 
 int ChunkManager::getKeyVal(int hash)

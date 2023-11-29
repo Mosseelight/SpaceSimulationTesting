@@ -4,6 +4,7 @@
 #include "../../include/Core/Math.hpp"
 
 void Solver(glm::vec3& out, glm::vec3 in, float step);
+void CollisionSolve(SpatialObject& own, SpatialObject& other, CollisionPoint point);
 
 BoundingBox::BoundingBox()
 {
@@ -88,6 +89,7 @@ RigidBody::RigidBody()
 {
     mass = 1000.0f;
     density = 50.0f;
+    friction = 0.99f;
     position = glm::vec3(0.0f);
     velocity = glm::vec3(0.0f);
     acceleration = glm::vec3(0.0f);
@@ -125,44 +127,22 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
     
     ApplyForce(glm::vec3(0,-9.81,0) * mass);
     //ApplyLiftForce(AirDensity, 28.0f);
-    //ApplyDragForce(AirDensity, 1.0f);
+    //ApplyDragForce(AirDensity, 1.0f);```
     //pplyImpulseForceAtPos2(glm::vec3(0,0,1), glm::vec3(0,10,0), 1.0f);
-    for (unsigned int i = 0; i < objectIds.size(); i++)
+    for (unsigned int i = 0; i < objects.size(); i++)
     {
-        if(own.SO_id != objects[objectIds[i]].SO_id)
+        if(own.SO_id != objects[i].SO_id)
         {
-            if(CollisionCheckBroad(own, objects[objectIds[i]]))
+            if(CollisionCheckBroad(own, objects[i]))
             {
-                std::pair<bool, CollisionPoint> point = CollisionCheckNarrowGjk(own, objects[objectIds[i]]);
-                if(point.first)
+                float id = own.SO_id;
+                //std::cout << id << " " << objectIds[i] << " " << i << " " << objectIds.size() << std::endl;
+                if(own.SO_id != objects[i].SO_id)
                 {
-                    glm::vec3 normal = -glm::normalize(point.second.normal);
-                    if(normal.x - roundf(normal.x) < 0.001)
-                        normal.x = roundf(normal.x);
-                    if(normal.y - roundf(normal.y) < 0.001)
-                        normal.y = roundf(normal.y);
-                    if(normal.z - roundf(normal.z) < 0.001)
-                        normal.z = roundf(normal.z);
-                    if(objects[objectIds[i]].SO_rigidbody.isStatic)
+                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrowSat(own, objects[i]);
+                    if(point.first)
                     {
-                        position += normal * point.second.dist;
-                        float bounce = 0.6f;
-                        float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass), normal);
-                        ApplyImpulseForce(velocity + normal * (j / mass), 1.0f);
-                        //ApplyRotationImpulseForce(rotVelocity + j * glm::cross(point.second.point, normal), 1.0f);
-
-                    }
-                    else
-                    {
-                        position += normal * point.second.dist * 0.5f;
-                        objects[objectIds[i]].SO_rigidbody.position += normal * point.second.dist * -0.5f;
-                        float bounce = 0.6f;
-                        float j = glm::dot(velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / mass + 1 / objects[objectIds[i]].SO_rigidbody.mass), normal);
-                        ApplyImpulseForce(velocity + normal * (j / mass), 1.0f);
-                        //ApplyRotationImpulseForce(rotVelocity + j * glm::inverse(inertiaT) * glm::cross(normal, normal), 1.0f);
-                        objects[objectIds[i]].SO_rigidbody.ApplyImpulseForce(objects[objectIds[i]].SO_rigidbody.velocity + -normal * (j / mass), 1.0f);
-                        //objects[objectIds[i]].SO_rigidbody.ApplyRotationImpulseForce(objects[objectIds[i]].SO_rigidbody.rotVelocity
-                        // + j * glm::inverse(objects[objectIds[i]].SO_rigidbody.inertiaT) * glm::cross(-normal, -normal), 1.0f);
+                        CollisionSolve(own, objects[i], point.second);
                     }
                 }
             }
@@ -374,4 +354,55 @@ void RigidBody::CalculateInertiaTensor(SpatialObject& object)
     massCenter = MassCenter; 
     mass = Mass;
     volume = Volume;
+}
+
+void CollisionSolve(SpatialObject& own, SpatialObject& other, CollisionPoint point)
+{
+    glm::vec3 normal = -glm::normalize(point.normal);
+    if(normal.x - roundf(normal.x) < 0.001)
+        normal.x = roundf(normal.x);
+    if(normal.y - roundf(normal.y) < 0.001)
+        normal.y = roundf(normal.y);
+    if(normal.z - roundf(normal.z) < 0.001)
+        normal.z = roundf(normal.z);
+    if(other.SO_rigidbody.isStatic)
+    {
+        own.SO_rigidbody.position += normal * point.dist;
+        float bounce = 0.6f;
+        float j = glm::dot(own.SO_rigidbody.velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / own.SO_rigidbody.mass), normal);
+        own.SO_rigidbody.ApplyImpulseForce(own.SO_rigidbody.velocity + normal * (j / own.SO_rigidbody.mass), 1.0f);
+        //own.SO_rigidbody.velocity += own.SO_rigidbody.velocity * -own.SO_rigidbody.friction;
+        //ApplyRotationImpulseForce(rotVelocity + j * glm::cross(point.second.point, normal), 1.0f);
+        return;
+    }
+    else
+    {
+        glm::vec3 sizeOther = other.SO_rigidbody.oriBoundBox.max * 0.5f;
+        glm::vec3 size = own.SO_rigidbody.oriBoundBox.max * 0.5f;
+        if (own.SO_rigidbody.position.y > other.SO_rigidbody.position.y + std::min(sizeOther.x, std::min(sizeOther.y, sizeOther.z))) 
+        {
+        	own.SO_rigidbody.position += normal * point.dist * 0.8f;
+            other.SO_rigidbody.position += normal * point.dist * -0.2f;
+        } 
+        else if (other.SO_rigidbody.position.y > own.SO_rigidbody.position.y + std::min(size.x, std::min(size.y, size.z))) 
+        {
+        	own.SO_rigidbody.position += normal * point.dist * 0.2f;
+            other.SO_rigidbody.position += normal * point.dist * -0.8f;
+        } 
+        else 
+        {
+            own.SO_rigidbody.position += normal * point.dist * 0.5f;
+            other.SO_rigidbody.position += normal * point.dist * -0.5f;
+        }
+        float bounce = 0.6f;
+        float j = glm::dot(own.SO_rigidbody.velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / own.SO_rigidbody.mass + 1 / other.SO_rigidbody.mass), normal);
+        own.SO_rigidbody.ApplyImpulseForce(own.SO_rigidbody.velocity + normal * (j / own.SO_rigidbody.mass), 1.0f);
+        //ApplyRotationImpulseForce(rotVelocity + j * glm::inverse(inertiaT) * glm::cross(normal, normal), 1.0f);
+        other.SO_rigidbody.ApplyImpulseForce(other.SO_rigidbody.velocity + -normal * (j / other.SO_rigidbody.mass), 1.0f);
+        //objects[i].SO_rigidbody.ApplyRotationImpulseForce(objects[i].SO_rigidbody.rotVelocity
+        // + j * glm::inverse(objects[i].SO_rigidbody.inertiaT) * glm::cross(-normal, -normal), 1.0f);
+        //own.SO_rigidbody.velocity += own.SO_rigidbody.velocity * -own.SO_rigidbody.friction;
+        //other.SO_rigidbody.velocity += other.SO_rigidbody.velocity * -other.SO_rigidbody.friction;
+        return;
+    }
 }

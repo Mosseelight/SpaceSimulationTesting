@@ -1,5 +1,7 @@
 #include "../../include/Core/Physics/SpatialPhysics.hpp"
 
+static ChunkManager cManager;
+
 void RunSimulation(float deltaTime, Scene& scene, int runSim)
 {
 
@@ -25,7 +27,6 @@ void RunSimulation(float deltaTime, Scene& scene, int runSim)
     */
 
     static std::vector<unsigned int> ids;
-    static ChunkManager cManager;
     cManager.UpdateChunks(scene.SpatialObjects);
     for (unsigned int i = 0; i < scene.SpatialObjects.size(); i++)
     {
@@ -37,4 +38,9 @@ void RunSimulation(float deltaTime, Scene& scene, int runSim)
         scene.SpatialObjects[i].SO_rigidbody.boundbox.ConstructBoundingBox(scene.SpatialObjects[i].SO_mesh);
         scene.SpatialObjects[i].SO_rigidbody.oriBoundBox.ConstructOriBoundingBox(scene.SpatialObjects[i].SO_mesh);
     }
+}
+
+void UpdateChunks(std::vector<SpatialObject>& SpatialObjects)
+{
+    cManager.UpdateChunks(SpatialObjects);
 }
