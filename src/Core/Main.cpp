@@ -99,7 +99,7 @@ int main()
     }
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(GLDebugMessageCallback, NULL);
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
@@ -152,8 +152,8 @@ int main()
         }
     }
 
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(9.9f,5,0), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
-    mainScene.AddSpatialObject(LoadModel(glm::vec3(10.5f,5,0), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
+    mainScene.AddSpatialObject(CreateSpikerMesh(glm::vec3(0,5,0), glm::vec3(0,0,0), 0.3f, 2));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(10.5f,5,0), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
     /*mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,5,0), glm::vec3(0,0,0), 2));
     mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,10,0), glm::vec3(0,0,0), 2));
     mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,15,0), glm::vec3(0,0,0), 2));
