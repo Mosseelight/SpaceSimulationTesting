@@ -14,6 +14,7 @@ enum MeshType
 {
     CubeMesh,
     IcoSphereMesh,
+    SpikerMesh,
     TriangleMesh,
     FileMesh,
     First = CubeMesh,
@@ -79,5 +80,6 @@ Mesh LoadModel(glm::vec3 position, glm::vec3 rotation, std::string location);
 Mesh Create2DTriangle(glm::vec3 position, glm::vec3 rotation);
 Mesh CreateCubeMesh(glm::vec3 position, glm::vec3 rotation);
 Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdivideNum);
+Mesh CreateSpikerMesh(glm::vec3 position, glm::vec3 rotation, float size, unsigned int subdivideNum);
 
 

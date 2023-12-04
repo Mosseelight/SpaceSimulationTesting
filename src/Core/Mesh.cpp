@@ -10,6 +10,9 @@ std::string GetMeshTypeName(MeshType type)
     case IcoSphereMesh:
         return "IcoSphereMesh";
         break;
+    case SpikerMesh:
+        return "SpikerMesh";
+        break;
     case TriangleMesh:
         return "TriangleMesh";
         break;
@@ -279,7 +282,10 @@ Mesh LoadModel(glm::vec3 position, glm::vec3 rotation, std::string location)
             return CreateCubeMesh(position, rotation);
             break;
         case IcoSphereMesh:
-            return CreateSphereMesh(position, rotation, 4);
+            return CreateSphereMesh(position, rotation, 3);
+            break;
+        case SpikerMesh:
+            return CreateSpikerMesh(position, rotation, 0.3f, 2);
             break;
         case TriangleMesh:
             return Create2DTriangle(position, rotation);
@@ -542,12 +548,106 @@ Mesh CreateSphereMesh(glm::vec3 position, glm::vec3 rotation, unsigned int subdi
             newIndices.push_back(ic); newIndices.push_back(ica); newIndices.push_back(ibc);
             newIndices.push_back(iab); newIndices.push_back(ibc); newIndices.push_back(ica);
         }
-        indices.clear();
         indices = newIndices;
-        vertexes.clear();
         vertexes = newVerts;
     }
     Mesh mesh = Mesh(std::to_string(IcoSphereMesh), vertexes, indices, position, rotation, 1.0f);
+    return mesh;
+}
+
+Mesh CreateSpikerMesh(glm::vec3 position, glm::vec3 rotation, float size, unsigned int subdivideNum)
+{
+
+    std::vector<Vertex> vertexes = {
+        Vertex(glm::vec3(-1.0f,  1.0f,  0),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(1.0f,  1.0f,  0),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(-1.0f, -1.0f,  0),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(1.0f, -1.0f,  0),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(0, -1.0f,  1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(0,  1.0f,  1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(0, -1.0f, -1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(0,  1.0f, -1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(1.0f,  0, -1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(1.0f,  0,  1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(-1.0f,  0, -1.0f),glm::vec3(0), glm::vec2(0)),
+        Vertex(glm::vec3(-1.0f,  0,  1.0f),glm::vec3(0), glm::vec2(0))
+    };
+
+    std::vector<unsigned int> indices = {
+        0, 11, 5, 
+        0, 5, 1,
+        0, 1, 7,
+        0, 7, 10,
+        0, 10, 11,
+        
+        1, 5, 9,
+        5, 11, 4,
+        11, 10, 2,
+        10, 7, 6,
+        7, 1, 8,
+        
+        3, 9, 4,
+        3, 4, 2,
+        3, 2, 6,
+        3, 6, 8,
+        3, 8, 9,
+        
+        4, 9, 5,
+        2, 4, 11,
+        6, 2, 10,
+        8, 6, 7,
+        9, 8, 1
+    };
+
+    std::vector<float> normals;
+    std::vector<float> uv;
+
+    for (unsigned int i = 0; i < subdivideNum; i++)
+    {
+        std::vector<unsigned int> newIndices;
+        std::vector<Vertex> newVerts;
+        for (unsigned int i = 0; i < indices.size(); i += 3)
+        {
+            //Get the required vertexes
+            unsigned int ia = indices[i]; 
+            unsigned int ib = indices[i + 1];
+            unsigned int ic = indices[i + 2]; 
+            Vertex a = vertexes[ia];
+            Vertex b = vertexes[ib];
+            Vertex c = vertexes[ic];
+
+            //Create New Points
+            glm::vec3 ab = glm::normalize((a.position + b.position) * 0.5f) * size;
+            glm::vec3 bc = glm::normalize((b.position + c.position) * 0.5f) * size;
+            glm::vec3 ca = glm::normalize((c.position + a.position) * 0.5f) * size;
+
+            //Create Normals
+            glm::vec3 u = bc - ab;
+            glm::vec3 v = ca - ab;
+            glm::vec3 normal = glm::normalize(glm::cross(u,v));
+
+            //Add the new vertexes
+            ia = newVerts.size();
+            newVerts.push_back(a);
+            ib = newVerts.size();
+            newVerts.push_back(b);
+            ic = newVerts.size();
+            newVerts.push_back(c);
+            unsigned int iab = newVerts.size();
+            newVerts.push_back(Vertex(ab, normal, glm::vec2(0)));
+            unsigned int ibc = newVerts.size(); 
+            newVerts.push_back(Vertex(bc, normal, glm::vec2(0)));
+            unsigned int ica = newVerts.size(); 
+            newVerts.push_back(Vertex(ca, normal, glm::vec2(0)));
+            newIndices.push_back(ia); newIndices.push_back(iab); newIndices.push_back(ica);
+            newIndices.push_back(ib); newIndices.push_back(ibc); newIndices.push_back(iab);
+            newIndices.push_back(ic); newIndices.push_back(ica); newIndices.push_back(ibc);
+            newIndices.push_back(iab); newIndices.push_back(ibc); newIndices.push_back(ica);
+        }
+        indices = newIndices;
+        vertexes = newVerts;
+    }
+    Mesh mesh = Mesh(std::to_string(SpikerMesh), vertexes, indices, position, rotation, 1.0f);
     return mesh;
 }
 
