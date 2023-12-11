@@ -137,9 +137,10 @@ void RigidBody::Step(float timeStep, float deltaTime, std::vector<unsigned int>&
             {
                 if(own.SO_id != objects[objectIds[i]].SO_id)
                 {
-                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrowSat(own, objects[objectIds[i]]);
+                    std::pair<bool, CollisionPoint> point = CollisionCheckNarrowGjk(own, objects[objectIds[i]]);
                     if(point.first)
                     {
+                        DrawDebugCube(point.second.point, 0.1f, glm::vec3(0,0,255));
                         CollisionSolve(own, objects[objectIds[i]], point.second);
                     }
                 }
@@ -365,7 +366,7 @@ void CollisionSolve(SpatialObject& own, SpatialObject& other, CollisionPoint poi
         normal.z = roundf(normal.z);
     if(other.SO_rigidbody.isStatic)
     {
-        own.SO_rigidbody.position += normal * point.dist;
+        own.SO_rigidbody.position += normal * point.dist * 0.5f;
         float bounce = 0.6f;
         float j = glm::dot(own.SO_rigidbody.velocity * -(1 + bounce), normal) / glm::dot(normal * (1 / own.SO_rigidbody.mass), normal);
         own.SO_rigidbody.ApplyImpulseForce(own.SO_rigidbody.velocity + normal * (j / own.SO_rigidbody.mass), 1.0f);

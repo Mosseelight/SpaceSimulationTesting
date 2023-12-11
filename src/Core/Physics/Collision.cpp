@@ -171,7 +171,7 @@ bool GetSeparatingPlane(glm::vec3 toCenter, glm::vec3 axis, SpatialObject& obj1,
 
 //the function to detect collisions
 //collision point may not be correct and collision normal may also need to be reversed(*-1.0f)
-std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, SpatialObject& obj2)
+std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj2, SpatialObject& obj1)
 {
 	
 	glm::vec3 contactPoint;
@@ -180,7 +180,8 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 	int smallestCaseSingleAxis;
 	glm::vec3 collisionNormal;//the axis that seperates the 2 obbs, also the collision normal
 
-	glm::vec3 half1 = (obj1.SO_rigidbody.oriBoundBox.maxOri) * 0.5f;
+	glm::vec3 half1 = (obj1.SO_rigidbody.position - obj1.SO_rigidbody.boundbox.max);
+	glm::vec3 half2 = (obj2.SO_rigidbody.position - obj2.SO_rigidbody.boundbox.max);
 	
 	//create the orientation axis for the first box(idk why the order is switched up but it is, it is switched up in rendering the same way as well)
 	float deg2rad = 3.14159265358979323846f / 180.0f;
@@ -266,7 +267,7 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 				collisionNormal = -collisionNormal;
 			
 			//now find the vertex
-			glm::vec3 tempContactPoint = half1;
+			glm::vec3 tempContactPoint = half2;
 
 			if (glm::dot(b2AxisX, collisionNormal) < 0.0f) 
 				tempContactPoint.x = -tempContactPoint.x;
@@ -303,10 +304,169 @@ std::pair<bool, CollisionPoint> CollisionCheckNarrowSat(SpatialObject& obj1, Spa
 			contactPoint.x = b1AxisX.x * tempContactPoint.x + b1AxisY.x * tempContactPoint.y + b1AxisZ.x * tempContactPoint.z + obj1.SO_rigidbody.position.x;
 			contactPoint.y = b1AxisX.y * tempContactPoint.x + b1AxisY.y * tempContactPoint.y + b1AxisZ.y * tempContactPoint.z + obj1.SO_rigidbody.position.y;
 			contactPoint.z = b1AxisX.z * tempContactPoint.x + b1AxisY.z * tempContactPoint.y + b1AxisZ.z * tempContactPoint.z + obj1.SO_rigidbody.position.z;
+		}
+		else
+		{
+			smallestCase -= 6;
+			int oneAxisIndex = smallestCase / 3;
+			int twoAxisIndex = smallestCase % 3;
+			glm::vec3 oneAxis;
+			if (oneAxisIndex == 0) 
+			{
+				oneAxis = b1AxisX;
+			} 
+			else if (oneAxisIndex == 1) 
+			{
+				oneAxis = b1AxisY;
+			} 
+			else 
+			{
+				oneAxis = b1AxisZ;
+			}
+			glm::vec3 twoAxis;
+			if (twoAxisIndex == 0) 
+			{
+				twoAxis = b2AxisX;
+			} 
+			else if (twoAxisIndex == 1) 
+			{
+				twoAxis = b2AxisY;
+			} 
+			else 
+			{
+				twoAxis = b2AxisZ;
+			}
+			glm::vec3 axis = glm::cross(oneAxis, twoAxis);
+			axis *= sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);//normalize the axis
 			
+			//the axis should point from box one to box 2
+			if (glm::dot(axis, toCenter) > 0) 
+				axis *= -1;
+			
+			//find out which edges to use
+			glm::vec3 ptOnOneEdge = half1;
+			glm::vec3 ptOnTwoEdge = half2;
+			
+			if (0 == oneAxisIndex) 
+				ptOnOneEdge.x = 0;
+			else if (glm::dot(b1AxisX, axis) > 0) 
+				ptOnOneEdge.x = -ptOnOneEdge.x;
+			if (1 == oneAxisIndex) 
+				ptOnOneEdge.y = 0;
+			else if (glm::dot(b1AxisY, axis) > 0) 
+				ptOnOneEdge.y = -ptOnOneEdge.y;
+			if (2 == oneAxisIndex) 
+				ptOnOneEdge.z = 0;
+			else if (glm::dot(b1AxisZ, axis) > 0) 
+				ptOnOneEdge.z = -ptOnOneEdge.z;
+			
+			if (0 == twoAxisIndex) 
+				ptOnTwoEdge.x = 0;
+			else if (glm::dot(b2AxisX, axis) > 0) 
+				ptOnTwoEdge.x = -ptOnTwoEdge.x;
+			if (1 == twoAxisIndex) { ptOnTwoEdge.y = 0; }
+			else if (glm::dot(b2AxisY, axis) > 0) 
+				ptOnTwoEdge.y = -ptOnTwoEdge.y;	
+			if (2 == twoAxisIndex) 
+				ptOnTwoEdge.z = 0;
+			else if (glm::dot(b2AxisZ, axis) > 0) 
+				ptOnTwoEdge.z = -ptOnTwoEdge.z;
+			
+			//scale them in reverse to fix some issues
+			//ptOnOneEdge = scaleVec3(ptOnOneEdge, -1.0);
+			//ptOnTwoEdge = scaleVec3(ptOnTwoEdge, -1.0);
+			
+			//move them into world coordinates(add the obb centre)
+			ptOnOneEdge += obj1.SO_mesh.position;
+			ptOnTwoEdge += obj2.SO_mesh.position;
+			
+			//if this is true and the contact point is outside the edge(edge-face contact), we use one's midpoint, otherwise two's
+			bool useOne = smallestCaseSingleAxis > 2;
+			
+			//find the final collision point
+			//create some variables
+			//these variables are from the cycloneEngine code, so I dont know exactly what they mean but they work
+			glm::vec3 toSt, cOne, cTwo;
+			float dpStaOne, dpStaTwo, dpOneTwo, smOne, smTwo, denom, mua, mub;
+			//set some of the variables
+			smOne = sqrt(oneAxis.x * oneAxis.x + oneAxis.y * oneAxis.y + oneAxis.z * oneAxis.z);
+			smTwo = sqrt(twoAxis.x * twoAxis.x + twoAxis.y * twoAxis.y + twoAxis.z * twoAxis.z);
+			dpOneTwo = glm::dot(twoAxis, oneAxis);
+			toSt = ptOnOneEdge -ptOnTwoEdge;
+			dpStaOne = glm::dot(oneAxis, toSt);
+			dpStaTwo = glm::dot(twoAxis, toSt);
+			denom = smOne * smTwo - dpOneTwo * dpOneTwo;
+			//now break off into different cases
+			if (fabs(denom) < 0.0001) 
+			{
+				//zero denominator indicates parallel lines
+				if (useOne == true) 
+				{
+					contactPoint = ptOnOneEdge;
+				} 
+				else 
+				{
+					contactPoint = ptOnTwoEdge;
+				}
+				
+			} 
+			else 
+			{
+				
+				mua = (dpOneTwo * dpStaTwo - smTwo * dpStaOne) / denom;
+				mub = (smOne * dpStaTwo - dpOneTwo * dpStaOne) / denom;
+				
+				float oneSize;
+				if (oneAxisIndex == 0) 
+				{
+					oneSize = half1.x;
+				} 
+				else if (oneAxisIndex == 1) 
+				{
+					oneSize = half1.y;
+				} 
+				else 
+				{
+					oneSize = half1.z;
+				}
+				float twoSize;
+				if (twoAxisIndex == 0) 
+				{
+
+					twoSize = half2.x;
+				} 
+				else if (twoAxisIndex == 1) 
+				{
+					twoSize = half2.y;
+				} 
+				else 
+				{
+					twoSize = half2.z;
+				}
+				
+				if (mua > oneSize || mua < -oneSize || mub > twoSize || mub < -twoSize) 
+				{
+					if (useOne == true) 
+					{
+						contactPoint = ptOnOneEdge;
+					} 
+					else 
+					{
+						contactPoint = ptOnTwoEdge;
+					}
+				} 
+				else 
+				{
+					cOne = (ptOnOneEdge + oneAxis) * mua;
+					cTwo = (ptOnTwoEdge + twoAxis) * mub;
+					
+					contactPoint = (cOne * 0.5f) + (cTwo * 0.5f);
+				}
+				
+			}
 		}
 		
-		return std::make_pair(true, CollisionPoint(contactPoint, collisionNormal, penetration + 0.0001f));
+		return std::make_pair(true, CollisionPoint(contactPoint, -collisionNormal, penetration + 0.0001f));
 	}
 	
 	//should never reach this point

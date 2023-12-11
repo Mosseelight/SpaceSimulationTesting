@@ -153,7 +153,7 @@ int main()
     }
 
     mainScene.AddSpatialObject(CreateSpikerMesh(glm::vec3(0,5,0), glm::vec3(0,0,0), 0.3f, 2));
-    //mainScene.AddSpatialObject(LoadModel(glm::vec3(10.5f,5,0), glm::vec3(0,0,0), modelLoc + "Cube.obj"));
+    //mainScene.AddSpatialObject(LoadModel(glm::vec3(0,5,0), glm::vec3(0,0,0), modelLoc + "Bunny.obj"));
     /*mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,5,0), glm::vec3(0,0,0), 2));
     mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,10,0), glm::vec3(0,0,0), 2));
     mainScene.AddSpatialObject(CreateSphereMesh(glm::vec3(0,15,0), glm::vec3(0,0,0), 2));
